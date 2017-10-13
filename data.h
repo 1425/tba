@@ -1,0 +1,1087 @@
+#ifndef TBA_DATA_H
+#define TBA_DATA_H
+
+#include<vector>
+#include<optional>
+#include<map>
+#include<variant>
+#include "rapidjson/document.h"
+
+#define TBA_SINGLE_ARG(A,B) A,B
+
+namespace tba{
+
+using JSON=rapidjson::GenericValue<rapidjson::UTF8<>>;
+using URL=std::string;
+
+#define TBA_INST(A,B) A B;
+
+#define TBA_MAKE_INST(NAME,ITEMS)\
+	struct NAME{ ITEMS(TBA_INST) };\
+	std::ostream& operator<<(std::ostream&,NAME const&);\
+	NAME decode(JSON const& in,const NAME*);\
+
+using Page=unsigned;
+
+class Year{
+	//An integer that is between 1992 and 2092.
+	int i;
+
+	bool valid()const;
+
+	public:
+	explicit Year(int);
+	int get()const;
+
+	friend Year& operator++(Year&);
+};
+
+std::ostream& operator<<(std::ostream& o,Year);
+bool operator<(Year,Year);
+Year& operator++(Year&);
+Year decode(JSON const&,const Year*);
+
+#define TBA_API_STATUS_APP_VERSION(X)\
+	X(int,min_app_version)\
+	X(int,latest_app_version)
+
+TBA_MAKE_INST(API_Status_App_Version,TBA_API_STATUS_APP_VERSION)
+
+#define TBA_API_STATUS(X) \
+	X(int,current_season)\
+	X(int,max_season)\
+	X(bool,is_datafeed_down)\
+	X(std::vector<std::string>,down_events)\
+	X(API_Status_App_Version,ios)\
+	X(API_Status_App_Version,android)
+
+TBA_MAKE_INST(API_Status,TBA_API_STATUS)
+
+class Team_key{
+	std::string s;
+
+	public:
+	explicit Team_key(std::string);
+	std::string str()const;
+};
+
+bool operator<(Team_key const&,Team_key const&);
+std::ostream& operator<<(std::ostream&,Team_key const&);
+Team_key decode(JSON const& in,const Team_key*);
+
+#define TBA_TEAM(X)\
+	X(Team_key,key)\
+	X(int,team_number)\
+	X(std::optional<std::string>,nickname)\
+	X(std::optional<std::string>,name)\
+	X(std::optional<std::string>,city)\
+	X(std::optional<std::string>,state_prov)\
+	X(std::optional<std::string>,country)\
+	X(std::optional<std::string>,address)\
+	X(std::optional<std::string>,postal_code)\
+	X(std::optional<std::string>,gmaps_place_id)\
+	X(std::optional<URL>,gmaps_url)\
+	X(std::optional<double>,lat)\
+	X(std::optional<double>,lng)\
+	X(std::optional<std::string>,location_name)\
+	X(std::optional<URL>,website)\
+	X(std::optional<Year>,rookie_year)\
+	X(std::optional<std::string>,motto)\
+	X(std::optional<TBA_SINGLE_ARG(std::map<std::string,std::string>)>,home_championship)
+
+TBA_MAKE_INST(Team,TBA_TEAM)
+
+#define TBA_TEAM_ROBOT(X)\
+	X(Year,year)\
+	X(std::string,robot_name)\
+	X(std::string,key)\
+	X(Team_key,team_key)
+
+TBA_MAKE_INST(Team_Robot,TBA_TEAM_ROBOT)
+
+using Team_number=int;
+
+#define TBA_TEAM_SIMPLE(X)\
+	X(Team_key,key)\
+	X(Team_number,team_number)\
+	X(std::optional<std::string>,nickname)\
+	X(std::optional<std::string>,name)\
+	X(std::optional<std::string>,city)\
+	X(std::optional<std::string>,state_prov)\
+	X(std::optional<std::string>,country)
+
+TBA_MAKE_INST(Team_Simple,TBA_TEAM_SIMPLE)
+
+class District_key{
+	std::string s;
+
+	public:
+	explicit District_key(std::string);
+	std::string const& get()const;
+};
+
+std::ostream& operator<<(std::ostream&,District_key const&);
+District_key decode(JSON const&,const District_key*);
+
+#define TBA_DISTRICT_LIST(X)\
+	X(std::string,abbreviation)\
+	X(std::string,display_name)\
+	X(District_key,key)\
+	X(Year,year)
+
+TBA_MAKE_INST(District_List,TBA_DISTRICT_LIST)
+
+class Event_key{
+	std::string s;
+
+	public:
+	explicit Event_key(std::string);
+	std::string const& get()const;
+};
+
+std::ostream& operator<<(std::ostream&,Event_key const&);
+Event_key decode(JSON const& in,const Event_key*);
+
+#define TBA_EVENT_POINTS(X)\
+	X(Event_key,event_key)\
+	X(bool,district_cmp)\
+	X(int,alliance_points)\
+	X(int,award_points)\
+	X(int,qual_points)\
+	X(double,elim_points)\
+	X(double,total)
+
+TBA_MAKE_INST(Event_points,TBA_EVENT_POINTS)
+
+#define TBA_DISTRICT_RANKING(X)\
+	X(Team_key,team_key)\
+	X(int,rank)\
+	X(int,rookie_bonus)\
+	X(double,point_total)\
+	X(std::vector<Event_points>,event_points)
+
+TBA_MAKE_INST(District_Ranking,TBA_DISTRICT_RANKING)
+
+#define TBA_WEBCAST_TYPES(X)\
+	X(youtube)\
+	X(twitch)\
+	X(ustream)\
+	X(ifream)\
+	X(html5)\
+	X(rtmp)\
+	X(livestream)
+
+enum class Webcast_type{
+	#define X(A) A,
+	TBA_WEBCAST_TYPES(X)
+	#undef X
+};
+
+std::ostream& operator<<(std::ostream&,Webcast_type);
+Webcast_type decode(JSON const& in,const Webcast_type*);
+
+#define TBA_WEBCAST(X)\
+	X(Webcast_type,type)\
+	X(std::string,channel)\
+	X(std::string,file)
+//supposedly, file may be null; it never seems to be though.
+
+TBA_MAKE_INST(Webcast,TBA_WEBCAST)
+
+#define TBA_EVENT_TYPES(X)\
+	X(REGIONAL,0)\
+	X(DISTRICT,1)\
+	X(DISTRICT_CMP,2)\
+	X(CMP_DIVISION,3)\
+	X(CMP_FINALS,4)\
+	X(DISTRICT_CMP_DIVISION,5)\
+	X(FOC,6)\
+	X(OFFSEASON,99)\
+	X(PRESEASON,100)\
+	X(UNLABLED,-1)
+
+enum class Event_type{
+	#define X(A,B) A,
+	TBA_EVENT_TYPES(X)
+	#undef X
+};
+
+std::ostream& operator<<(std::ostream&,Event_type);
+Event_type decode(JSON const& in,const Event_type *);
+
+#define TBA_PLAYOFF_TYPES(X)\
+	X(0,BRACKET_8_TEAM,"Elimination Bracket (8 Alliances)")\
+	X(1,BRACKET_16_TEAM,"Elimination Bracket (16 Alliances)")\
+	X(2,BRACKET_4_TEAM,"Elimination Bracket (4 Alliances)")\
+	X(3,AVG_SCORE_8_TEAM, "Average Score (8 Alliances)")\
+	X(4,ROUND_ROBIN_6_TEAM, "Round Robin (6 Alliances)")\
+	X(5,DOUBLE_ELIM_8_TEAM, "Double Elimination Bracket (8 Alliances)")\
+	X(6,BO5_FINALS,"Best of 5 Finals")
+
+enum class Playoff_type{
+	#define X(A,B,C) B,
+	TBA_PLAYOFF_TYPES(X)
+	#undef X
+};
+
+std::ostream& operator<<(std::ostream&,Playoff_type);
+
+Playoff_type decode(JSON const& in,const Playoff_type*);
+
+class Date{
+	//yyyy-mm-dd format
+	std::string s;
+
+	public:
+	explicit Date(std::string);
+	std::string str()const;
+};
+
+std::ostream& operator<<(std::ostream&,Date const&);
+Date decode(JSON const&,const Date*);
+
+#define TBA_EVENT(X)\
+	X(std::string,key)\
+	X(std::string,name)\
+	X(std::string,event_code)\
+	X(Event_type,event_type)\
+	X(std::optional<District_List>,district)\
+	X(std::optional<std::string>,city)\
+	X(std::optional<std::string>,state_prov)\
+	X(std::optional<std::string>,country)\
+	X(std::optional<Date>,start_date)\
+	X(std::optional<Date>,end_date)\
+	X(Year,year)\
+	X(std::optional<std::string>,short_name)\
+	X(std::string,event_type_string)\
+	X(std::optional<int>,week)\
+	X(std::optional<std::string>,address)\
+	X(std::optional<std::string>,postal_code)\
+	X(std::optional<std::string>,gmaps_place_id)\
+	X(std::optional<URL>,gmaps_url)\
+	X(std::optional<double>,lat)\
+	X(std::optional<double>,lng)\
+	X(std::optional<std::string>,location_name)\
+	X(std::optional<std::string>,timezone)\
+	X(std::optional<std::string>,website)\
+	X(std::optional<std::string>,first_event_id)\
+	X(std::optional<Webcast>,webcast)\
+	X(std::vector<Event_key>,division_keys)\
+	X(std::optional<std::string>,parent_event_key)\
+	X(std::optional<Playoff_type>,playoff_type)\
+	X(std::optional<std::string>,playoff_type_string)	
+	
+TBA_MAKE_INST(Event,TBA_EVENT)
+
+#define TBA_EVENT_SIMPLE(X)\
+	X(std::string,key)\
+	X(std::string,name)\
+	X(std::string,event_code)\
+	X(Event_type,event_type)\
+	X(std::optional<District_List>,district)\
+	X(std::optional<std::string>,city)\
+	X(std::optional<std::string>,state_prov)\
+	X(std::optional<std::string>,country)\
+	X(std::optional<tba::Date>,start_date)\
+	X(std::optional<tba::Date>,end_date)\
+	X(Year,year)
+
+TBA_MAKE_INST(Event_Simple,TBA_EVENT_SIMPLE)
+
+#define TBA_MEDIA_TYPES(X)\
+	X(YOUTUBE,youtube)\
+	X(CDPHOTOTHREAD,cdphotothread)\
+	X(IMGUR,imgur)\
+	X(FACEBOOK_PROFILE,facebook-profile)\
+	X(YOUTUBE_CHANNEL,youtube-channel)\
+	X(TWITTER_PROFILE,twitter-profile)\
+	X(GITHUB_PROFILE,github-profile)\
+	X(INSTAGRAM_PROFILE,instagram-profile)\
+	X(PREISCOPE_PROFILE,periscope-profile)\
+	X(GRABCAD,grabcad)\
+	X(PINTEREST_PROFILE,pinterest-profile)\
+	X(SNAPCHAT_PROFILE,snapchat-profile)\
+	X(TWITCH_CHANNEL,twitch-channel)\
+	X(TBA,tba)\
+	X(INSTAGRAM_IMAGE,instagram-image)\
+	X(EXTERNAL_LINK,external-link)
+//"tba" occurs, but is not documented.
+//same for "instagram-image", and for "external-link"
+
+enum class Media_type{
+	#define X(A,B) A,
+	TBA_MEDIA_TYPES(X)
+	#undef X
+};
+
+std::ostream& operator<<(std::ostream&,Media_type);
+Media_type decode(JSON const&,const Media_type*);
+
+#define TBA_MEDIA_DETAILS(X)\
+	X(std::optional<unsigned>,author_id)\
+	X(std::optional<std::string>,author_name)\
+	X(std::optional<std::string>,author_url)\
+	X(std::optional<std::nullptr_t>,height)\
+	X(std::optional<std::string>,html)\
+	X(std::optional<std::string>,media_id)\
+	X(std::optional<std::string>,provider_name)\
+	X(std::optional<std::string>,provider_url)\
+	X(std::optional<unsigned>,thumbnail_height)\
+	X(std::optional<std::string>,thumbnail_url)\
+	X(std::optional<unsigned>,thumbnail_width)\
+	X(std::optional<std::string>,title)\
+	X(std::optional<std::string>,type)\
+	X(std::optional<std::string>,version)\
+	X(std::optional<unsigned>,width)\
+	X(std::optional<std::string>,image_partial)
+
+TBA_MAKE_INST(Media_details,TBA_MEDIA_DETAILS)
+
+#define TBA_MEDIA(X)\
+	X(std::optional<std::string>,key)\
+	X(Media_type,type)\
+	X(std::optional<std::string>,foreign_key)\
+	X(std::optional<Media_details>,details)\
+	X(std::optional<bool>,preferred)
+
+TBA_MAKE_INST(Media,TBA_MEDIA)
+
+class M_score{
+	//score=-1 or null => not played
+	int i;
+
+	public:
+	explicit M_score(int i1);
+
+	bool valid()const;
+	int value()const;
+};
+
+std::ostream& operator<<(std::ostream&,M_score const&);
+M_score decode(JSON const&,const M_score*);
+
+#define TBA_MATCH_ALLIANCE(X)\
+	X(M_score,score)\
+	X(std::vector<Team_key>,team_keys)\
+	X(std::vector<Team_key>,surrogate_team_keys)
+
+TBA_MAKE_INST(Match_Alliance,TBA_MATCH_ALLIANCE)
+
+#define TBA_ALLIANCES(X)\
+	X(Match_Alliance,red)\
+	X(Match_Alliance,blue)
+
+TBA_MAKE_INST(Alliances,TBA_ALLIANCES)
+
+enum class Winning_alliance{red,blue,NONE};
+
+std::ostream& operator<<(std::ostream&,Winning_alliance);
+
+Winning_alliance decode(JSON const&,const Winning_alliance *);
+
+#define TBA_PLAYOFF_LEVELS(X) X(qm) X(ef) X(qf) X(sf) X(f)
+
+enum class Playoff_level{
+	#define X(A) A,
+	TBA_PLAYOFF_LEVELS(X)
+	#undef X
+};
+
+std::ostream& operator<<(std::ostream&,Playoff_level);
+Playoff_level decode(JSON const&,const Playoff_level*);
+
+using Competition_level=Playoff_level;//this is probably going to have to change.
+
+/*
+curiosly, this sometimes appears as just:
+    "score_breakdown": {
+      "blue": {
+        "auto": null, 
+        "foul": null
+      }, 
+      "red": {
+        "auto": null, 
+        "foul": null
+      }
+which basically means that nothing can be relied on to be there.
+*/
+#define TBA_MATCH_SCORE_BREAKDOWN_2015_ALLIANCE(X)\
+	X(std::optional<int>,auto_points)\
+	X(std::optional<int>,teleop_points)\
+	X(std::optional<int>,container_points)\
+	X(std::optional<int>,tote_points)\
+	X(std::optional<int>,litter_points)\
+	X(std::optional<int>,foul_points)\
+	X(std::optional<int>,adjust_points)\
+	X(std::optional<int>,total_points)\
+	X(std::optional<int>,foul_count)\
+	X(std::optional<int>,tote_count_far)\
+	X(std::optional<int>,tote_count_near)\
+	X(std::optional<bool>,tote_set)\
+	X(std::optional<bool>,tote_stack)\
+	X(std::optional<int>,container_count_level1)\
+	X(std::optional<int>,container_count_level2)\
+	X(std::optional<int>,container_count_level3)\
+	X(std::optional<int>,container_count_level4)\
+	X(std::optional<int>,container_count_level5)\
+	X(std::optional<int>,container_count_level6)\
+	X(std::optional<bool>,container_set)\
+	X(std::optional<int>,litter_count_container)\
+	X(std::optional<int>,litter_count_landfill)\
+	X(std::optional<int>,litter_count_unprocessed)\
+	X(std::optional<bool>,robot_set)
+
+TBA_MAKE_INST(Match_Score_Breakdown_2015_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2015_ALLIANCE)
+
+//docs do not include "Set"
+#define TBA_COOPERTITION_TYPES(X)\
+	X(None) X(Unknown) X(Stack) X(Set)
+
+enum class Coopertition{
+	#define X(A) A,
+	TBA_COOPERTITION_TYPES(X)
+	#undef X
+};
+
+std::ostream& operator<<(std::ostream&,Coopertition);
+Coopertition decode(JSON const& in,const Coopertition*);
+
+#define TBA_MATCH_SCORE_BREAKDOWN_2015(X)\
+	X(Match_Score_Breakdown_2015_Alliance,blue)\
+	X(Match_Score_Breakdown_2015_Alliance,red)\
+	X(std::optional<Coopertition>,coopertition)\
+	X(std::optional<int>,coopertition_points)
+
+TBA_MAKE_INST(Match_Score_Breakdown_2015,TBA_MATCH_SCORE_BREAKDOWN_2015)
+
+#define TBA_STR_OPT_INST(A) A,
+
+#define TBA_STR_OPTIONS(OPTIONS)\
+	enum class NAME{ OPTIONS(TBA_STR_OPT_INST) };\
+	std::ostream& operator<<(std::ostream&,NAME);\
+	NAME decode(JSON const&,const NAME *);\
+
+#define TBA_AUTO_2016_TYPES(X) X(Crossed) X(Reached) X(None)
+
+#define NAME Auto_2016
+TBA_STR_OPTIONS(TBA_AUTO_2016_TYPES)
+#undef NAME
+
+#define TBA_MATCH_SCORE_BREAKDOWN_2016_ALLIANCE(X)\
+	X(int,autoPoints)\
+	X(int,teleopPoints)\
+	X(std::optional<int>,breechPoints)\
+	X(int,foulPoints)\
+	X(int,capturePoints)\
+	X(std::optional<int>,adjustPoints)\
+	X(int,totalPoints)\
+	X(Auto_2016,robot1Auto)\
+	X(Auto_2016,robot2Auto)\
+	X(Auto_2016,robot3Auto)\
+	X(int,autoReachPoints)\
+	X(int,autoCrossingPoints)\
+	X(int,autoBouldersLow)\
+	X(int,autoBouldersHigh)\
+	X(int,teleopCrossingPoints)\
+	X(int,teleopBouldersLow)\
+	X(int,teleopBouldersHigh)\
+	X(int,teleopBoulderPoints)\
+	X(bool,teleopDefensesBreached)\
+	X(int,teleopChallengePoints)\
+	X(int,teleopScalePoints)\
+	X(bool,teleopTowerCaptured)\
+	X(std::string,towerFaceA)\
+	X(std::string,towerFaceB)\
+	X(std::string,towerFaceC)\
+	X(int,towerEndStrength)\
+	X(int,techFoulCount)\
+	X(int,foulCount)\
+	X(std::string,position2)\
+	X(std::string,position3)\
+	X(std::string,position4)\
+	X(std::string,position5)\
+	X(int,position1crossings)\
+	X(int,position2crossings)\
+	X(int,position3crossings)\
+	X(int,position4crossings)\
+	X(int,position5crossings)
+
+TBA_MAKE_INST(Match_Score_Breakdown_2016_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2016_ALLIANCE)
+
+#define TBA_MATCH_SCORE_BREAKDOWN_2016(X)\
+	X(Match_Score_Breakdown_2016_Alliance,blue)\
+	X(Match_Score_Breakdown_2016_Alliance,red)
+
+TBA_MAKE_INST(Match_Score_Breakdown_2016,TBA_MATCH_SCORE_BREAKDOWN_2016)
+
+#define TBA_AUTO_2017(X) X(Unknown) X(Mobility) X(None)
+#define NAME Auto_2017
+TBA_STR_OPTIONS(TBA_AUTO_2017)
+#undef NAME
+
+#define TBA_MATCH_SCORE_BREAKDOWN_2017_ALLIANCE(X)\
+	X(int,autoPoints)\
+	X(int,teleopPoints)\
+	X(std::optional<int>,breechPoints)\
+	X(int,foulPoints)\
+	X(std::optional<int>,capturePoints)\
+	X(std::optional<int>,adjustPoints)\
+	X(int,totalPoints)\
+	X(std::optional<Auto_2017>,robot1Auto)\
+	X(std::optional<Auto_2017>,robot2Auto)\
+	X(std::optional<Auto_2017>,robot3Auto)\
+	X(bool,rotor1Auto)\
+	X(bool,rotor2Auto)\
+	X(int,autoFuelLow)\
+	X(int,autoFuelHigh)\
+	X(int,autoMobilityPoints)\
+	X(std::optional<int>,autoRobotPoints)\
+	X(int,teleopFuelPoints)\
+	X(int,teleopFuelLow)\
+	X(int,teleopFuelHigh)\
+	X(int,teleopRotorPoints)\
+	X(std::optional<bool>,kPaRankingPointArchieved)\
+	X(int,teleopTakeoffPoints)\
+	X(int,kPaBonusPoints)\
+	X(int,rotorBonusPoints)\
+	X(bool,rotor1Engaged)\
+	X(bool,rotor2Engaged)\
+	X(bool,rotor3Engaged)\
+	X(bool,rotor4Engaged)\
+	X(bool,rotorRankingPointAchieved)\
+	X(std::optional<int>,techFoulCount)\
+	X(std::optional<int>,foulCount)\
+	X(std::optional<std::string>,touchpadNear)\
+	X(std::optional<std::string>,touchpadMiddle)\
+	X(std::optional<std::string>,touchpadFar)
+
+TBA_MAKE_INST(Match_Score_Breakdown_2017_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2017_ALLIANCE)
+
+#define TBA_MATCH_SCORE_BREAKDOWN_2017(X)\
+	X(Match_Score_Breakdown_2017_Alliance,blue)\
+	X(Match_Score_Breakdown_2017_Alliance,red)
+
+TBA_MAKE_INST(Match_Score_Breakdown_2017,TBA_MATCH_SCORE_BREAKDOWN_2017)
+
+#define TBA_MATCH_SCORE_BREAKDOWN_2014_ALLIANCE(X)\
+	X(int,assist,assist)\
+	X(int,auto_pts,auto)\
+	X(int,teleop_goal_and_foul,teleop_goal+foul)\
+	X(int,truss_and_catch,truss+catch)
+
+struct Match_Score_Breakdown_2014_Alliance{
+	#define X(A,B,C) A B;
+	TBA_MATCH_SCORE_BREAKDOWN_2014_ALLIANCE(X)
+	#undef X
+};
+
+std::ostream& operator<<(std::ostream&,Match_Score_Breakdown_2014_Alliance const&);
+Match_Score_Breakdown_2014_Alliance decode(JSON const&,const Match_Score_Breakdown_2014_Alliance*);
+
+#define TBA_MATCH_SCORE_BREAKDOWN_2014(X)\
+	X(Match_Score_Breakdown_2014_Alliance,blue)\
+	X(Match_Score_Breakdown_2014_Alliance,red)
+
+TBA_MAKE_INST(Match_Score_Breakdown_2014,TBA_MATCH_SCORE_BREAKDOWN_2014)
+
+
+using Match_Score_Breakdown=std::variant<
+	Match_Score_Breakdown_2017,
+	Match_Score_Breakdown_2014,
+	Match_Score_Breakdown_2016,
+	Match_Score_Breakdown_2015
+>;
+
+#define TBA_MATCH(X)\
+	X(std::string,key)\
+	X(Competition_level,comp_level)\
+	X(int,set_number)\
+	X(int,match_number)\
+	X(Alliances,alliances)\
+	X(Winning_alliance,winning_alliance)\
+	X(Event_key,event_key)\
+	X(std::optional<time_t>,time)\
+	X(std::optional<time_t>,actual_time)\
+	X(std::optional<time_t>,predicted_time)\
+	X(std::optional<time_t>,post_result_time)\
+	X(std::optional<Match_Score_Breakdown>,score_breakdown)\
+	X(std::vector<Media>,videos)
+
+//TODO: score_breakdown likely needs work.
+
+TBA_MAKE_INST(Match,TBA_MATCH)
+
+#define TBA_MATCH_SIMPLE(X)\
+	X(std::string,key)\
+	X(Competition_level,comp_level)\
+	X(int,set_number)\
+	X(int,match_number)\
+	X(Alliances,alliances)\
+	X(Winning_alliance,winning_alliance)\
+	X(Event_key,event_key)\
+	X(std::optional<time_t>,time)\
+	X(std::optional<time_t>,actual_time)\
+	X(std::optional<time_t>,predicted_time)
+
+TBA_MAKE_INST(Match_Simple,TBA_MATCH_SIMPLE)
+
+//at least one of these items should be set though.
+#define TBA_RECIPIENT(X)\
+	X(std::optional<Team_key>,team_key)\
+	X(std::optional<std::string>,awardee)
+
+TBA_MAKE_INST(Award_Recipient,TBA_RECIPIENT)
+
+#define TBA_AWARD_TYPES(X)\
+	X(CHAIRMANS,0)\
+	X(WINNER,1)\
+	X(FINALIST,2)\
+	\
+    X(WOODIE_FLOWERS,3)\
+	X(DEANS_LIST,4)\
+	X(VOLUNTEER,5)\
+	X(FOUNDERS,6)\
+	X(BART_KAMEN_MEMORIAL,7)\
+	X(MAKE_IT_LOUD,8)\
+	\
+    X(ENGINEERING_INSPIRATION,9)\
+	X(ROOKIE_ALL_STAR,10)\
+	X(GRACIOUS_PROFESSIONALISM,11)\
+	X(COOPERTITION,12)\
+	X(JUDGES,13)\
+	X(HIGHEST_ROOKIE_SEED,14)\
+	X(ROOKIE_INSPIRATION,15)\
+	X(INDUSTRIAL_DEESIGN,16)\
+	X(QUALITY,17)\
+	X(SAFETY,18)\
+	X(SPORTSMANSHIP,19)\
+	X(CREATIVITY,20)\
+	X(ENGINEERING_EXCELLENCE,21)\
+	X(ENTREPRENEURSHIP,22)\
+	X(EXCELLENCE_IN_DESIGN,23)\
+	X(EXCELLENCE_IN_DESIGN_CAD,24)\
+	X(EXCELLENCE_IN_DESIGN_ANIMATION,25)\
+	X(DRIVING_TOMORROWS_TECHNOLOGY,26)\
+	X(IMAGERY,27)\
+	X(MEDIA_AND_TECHNOLOGY,28)\
+	X(INNOVATION_IN_CONTROL,29)\
+	X(SPIRIT,30)\
+	X(WEBSITE,31)\
+	X(VISUALIZATION,32)\
+	X(AUTODESK_INVENTOR,33)\
+	X(FUTURE_INNOVATOR,34)\
+	X(RECOGNITION_OF_EXTRAORDINARY_SERVICE,35)\
+	X(OUTSTANDING_CART,36)\
+	X(WSU_AIM_HIGHER,37)\
+	X(LEADERSHIP_IN_CONTROL,38)\
+	X(NUM_1_SEED,39)\
+	X(INCREDIBLE_PLAY,40)\
+	X(PEOPLES_CHOICE_ANIMATION,41)\
+	X(VISUALIZATION_RISING_STAR,42)\
+	X(BEST_OFFENSIVE_ROUND,43)\
+	X(BEST_PLAY_OF_THE_DAY,44)\
+	X(FEATHERWEIGHT_IN_THE_FINALS,45)\
+	X(MOST_PHOTOGENIC,46)\
+	X(OUTSTANDING_DEFENSE,47)\
+	X(POWER_TO_SIMPLIFY,48)\
+	X(AGAINST_ALL_ODDS,49)\
+	X(RISING_STAR,50)\
+	X(CHAIRMANS_HONORABLE_MENTION,51)\
+	X(CONTENT_COMMUNICATION_HONORABLE_MENTION,52)\
+	X(TECHNICAL_EXECUTION_HONORABLE_MENTION,53)\
+	X(REALIZATION,54)\
+	X(REALIZATION_HONORABLE_MENTION,55)\
+	X(DESIGN_YOUR_FUTURE,56)\
+	X(DESIGN_YOUR_FUTURE_HONORABLE_MENTION,57)\
+	X(SPECIAL_RECOGNITION_CHARACTER_ANIMATION,58)\
+	X(HIGH_SCORE,59)\
+	X(TEACHER_PIONEER,60)\
+	X(BEST_CRAFTSMANSHIP,61)\
+	X(BEST_DEFENSIVE_MATCH,62)\
+	X(PLAY_OF_THE_DAY,63)\
+	X(PROGRAMMING,64)\
+	X(PROFESSIONALISM,65)\
+	X(GOLDEN_CORNDOG,66)\
+	X(MOST_IMPROVED_TEAM,67)\
+	X(WILDCARD,68)\
+	X(CHAIRMANS_FINALIST,69)\
+	X(OTHER,70)
+
+enum class Award_type{
+	#define X(A,B) A,
+	TBA_AWARD_TYPES(X)
+	#undef X
+};
+
+std::ostream& operator<<(std::ostream&,Award_type);
+Award_type decode(JSON const&,const Award_type *);
+
+#define TBA_AWARD(X)\
+	X(std::string,name)\
+	X(Award_type,award_type)\
+	X(Event_key,event_key)\
+	X(std::vector<Award_Recipient>,recipient_list)\
+	X(Year,year)
+
+TBA_MAKE_INST(Award,TBA_AWARD)
+
+#define TBA_RECORD(X)\
+	X(unsigned,losses)\
+	X(unsigned,wins)\
+	X(unsigned,ties)
+
+TBA_MAKE_INST(Record,TBA_RECORD)
+
+#define TBA_RANKING(X)\
+	X(std::optional<unsigned>,dq)\
+	X(unsigned,matches_played)\
+	X(std::optional<double>,qual_average)\
+	X(std::optional<unsigned>,rank)\
+	X(std::optional<Record>,record)\
+	X(std::optional<std::vector<double>>,sort_orders)\
+	X(Team_key,team_key)
+
+TBA_MAKE_INST(Ranking,TBA_RANKING)
+
+#define TBA_SORT_ORDER(X)\
+	X(std::string,name)\
+	X(int,precision)
+
+TBA_MAKE_INST(Sort_order,TBA_SORT_ORDER)
+
+#define TBA_TEAM_EVENT_STATUS_RANK(X)\
+	X(int,num_teams)\
+	X(Ranking,ranking)\
+	X(std::optional<std::vector<Sort_order>>,sort_order_info)\
+	X(std::string,status)
+
+TBA_MAKE_INST(Team_Event_Status_rank,TBA_TEAM_EVENT_STATUS_RANK)
+
+#define TBA_TEAM_EVENT_STATUS_ALLIANCE_BACKUP(X)\
+	X(std::string,out)\
+	X(std::string,in)
+
+TBA_MAKE_INST(Team_Event_Status_alliance_backup,TBA_TEAM_EVENT_STATUS_ALLIANCE_BACKUP)
+
+class Pick_order{
+	//docs say: 0-2; 0=captain
+	//note that doc says 0-2, but actually returns 3 sometimes, which makes sense given the recent championship formats.
+	//-1 can also be returned; seems to indicate being pulled in as a backup.
+	int i;
+
+	public:
+	explicit Pick_order(int);
+	int get()const;
+};
+
+std::ostream& operator<<(std::ostream&,Pick_order);
+Pick_order decode(JSON const&,const Pick_order *);
+
+#define TBA_TEAM_EVENT_STATUS_ALLIANCE(X)\
+	X(std::string,name)\
+	X(int,number)\
+	X(std::optional<Team_Event_Status_alliance_backup>,backup)\
+	X(Pick_order,pick)
+
+TBA_MAKE_INST(Team_Event_Status_alliance,TBA_TEAM_EVENT_STATUS_ALLIANCE)
+
+#define TBA_PLAYOFF_STATUS(X) X(won) X(eliminated) X(playing)
+
+enum class Playoff_status{
+	#define X(A) A,
+	TBA_PLAYOFF_STATUS(X)
+	#undef X
+};
+
+std::ostream& operator<<(std::ostream&,Playoff_status);
+
+Playoff_status decode(JSON const&,const Playoff_status*);
+
+#define TBA_TEAM_EVENT_STATUS_PLAYOFF(X)\
+	X(Playoff_level,level)\
+	X(std::optional<Record>,current_level_record)\
+	X(std::optional<Record>,record)\
+	X(Playoff_status,status)\
+	X(std::optional<double>,playoff_average)
+//docs say that playoff_average is an int; it isn't though.
+
+TBA_MAKE_INST(Team_Event_Status_playoff,TBA_TEAM_EVENT_STATUS_PLAYOFF)
+
+#define TBA_TEAM_STATUS(X)\
+	X(std::optional<Team_Event_Status_rank>,qual)\
+	X(std::optional<Team_Event_Status_alliance>,alliance)\
+	X(std::optional<Team_Event_Status_playoff>,playoff)\
+	X(std::string,alliance_status_str)\
+	X(std::string,playoff_status_str)\
+	X(std::string,overall_status_str)
+
+TBA_MAKE_INST(Team_Event_Status,TBA_TEAM_STATUS)
+
+#define TBA_EVENT_RANKING(X)\
+	X(std::optional<std::vector<Ranking>>,rankings)\
+	X(std::optional<std::vector<Sort_order>>,sort_order_info)
+
+TBA_MAKE_INST(Event_ranking,TBA_EVENT_RANKING)
+
+//not sure why "elim_points" shows up as double sometimes; should be integer.
+#define TBA_POINTS(X)\
+	X(int,alliance_points)\
+	X(int,award_points)\
+	X(int,qual_points)\
+	X(double,elim_points)\
+	X(double,total)
+
+TBA_MAKE_INST(Points,TBA_POINTS)
+
+#define TBA_TIEBREAKER(X)\
+	X(std::vector<int>,highest_qual_scores)\
+	X(int,qual_wins)
+
+TBA_MAKE_INST(Tiebreaker,TBA_TIEBREAKER)
+
+#define TBA_EVENT_DISTRICT_POINTS(X)\
+	X(std::map<TBA_SINGLE_ARG(Team_key,Points)>,points)\
+	X(std::map<TBA_SINGLE_ARG(Team_key,Tiebreaker)>,tiebreakers)
+
+TBA_MAKE_INST(Event_District_Points,TBA_EVENT_DISTRICT_POINTS)
+
+class Match_key{
+	std::string s;
+
+	public:
+	explicit Match_key(std::string);
+	std::string const& get()const;
+};
+
+std::ostream& operator<<(std::ostream&,Match_key const&);
+bool operator<(Match_key const&,Match_key const&);
+Match_key decode(JSON const&,const Match_key*);
+
+#define TBA_HIGH_SCORE(X)\
+	X(int,high_score)\
+	X(Match_key,match_key)\
+	X(std::string,match_name)
+
+struct High_score{
+	TBA_HIGH_SCORE(TBA_INST)
+};
+
+std::ostream& operator<<(std::ostream&,High_score const&);
+High_score decode(JSON const&,const High_score*);
+
+using D3=std::array<double,3>;
+using I3=std::array<int,3>;
+using IID=std::tuple<int,int,double>;
+
+#define TBA_EVENT_INSIGHTS_2016_DETAIL(X)\
+	X(IID,LowBar)\
+	X(IID,A_ChevalDeFrise)\
+	X(IID,A_Portcullis)\
+	X(IID,B_Ramparts)\
+	X(IID,B_Moat)\
+	X(IID,C_SallyPort)\
+	X(IID,C_Drawbridge)\
+	X(IID,D_RoughTerrain)\
+	X(IID,D_RockWall)\
+	X(double,average_high_goals)\
+	X(double,average_low_goals)\
+	X(IID,breaches)\
+	X(IID,scales)\
+	X(IID,challenges)\
+	X(IID,captures)\
+	X(double,average_win_score)\
+	X(double,average_score)\
+	X(double,average_auto_score)\
+	X(double,average_crossing_score)\
+	X(double,average_boulder_score)\
+	X(double,average_tower_score)\
+	X(double,average_foul_score)\
+	X(High_score,high_score)
+
+TBA_MAKE_INST(Event_Insights_2016_Detail,TBA_EVENT_INSIGHTS_2016_DETAIL)
+
+#define TBA_EVENT_INSIGHTS_2016(X)\
+	X(std::optional<Event_Insights_2016_Detail>,qual)\
+	X(std::optional<Event_Insights_2016_Detail>,playoff)
+
+TBA_MAKE_INST(Event_Insights_2016,TBA_EVENT_INSIGHTS_2016)
+
+#define TBA_EVENT_INSIGHTS_2017_DETAIL(X)\
+	X(double,average_foul_score)\
+	X(double,average_fuel_points)\
+	X(double,average_fuel_points_auto)\
+	X(double,average_fuel_points_teleop)\
+	X(double,average_high_goals)\
+	X(double,average_high_goals_auto)\
+	X(double,average_high_goals_teleop)\
+	X(double,average_low_goals)\
+	X(double,average_low_goals_auto)\
+	X(double,average_low_goals_teleop)\
+	X(double,average_mobility_points_auto)\
+	X(double,average_points_auto)\
+	X(double,average_points_teleop)\
+	X(double,average_rotor_points)\
+	X(double,average_rotor_points_auto)\
+	X(double,average_score)\
+	X(double,average_takeoff_points_teleop)\
+	X(double,average_win_margin)\
+	X(double,average_win_score)\
+	X(High_score,high_kpa)\
+	X(High_score,high_score)\
+	X(IID,kpa_achieved)\
+	X(IID,mobility_counts)\
+	X(IID,rotor_1_engaged)\
+	X(IID,rotor_1_engaged_auto)\
+	X(IID,rotor_2_engaged)\
+	X(IID,rotor_2_engaged_auto)\
+	X(IID,rotor_3_engaged)\
+	X(IID,rotor_4_engaged)\
+	X(IID,takeoff_counts)
+
+TBA_MAKE_INST(Event_Insights_2017_Detail,TBA_EVENT_INSIGHTS_2017_DETAIL)
+
+#define TBA_EVENT_INSIGHTS_2017(X)\
+	X(std::optional<Event_Insights_2017_Detail>,qual)\
+	X(std::optional<Event_Insights_2017_Detail>,playoff)
+
+TBA_MAKE_INST(Event_Insights_2017,TBA_EVENT_INSIGHTS_2017)
+
+using Event_insights=std::variant<std::nullptr_t,Event_Insights_2017,Event_Insights_2016>;
+
+#define TBA_EVENT_OPRS(X)\
+	X(std::map<TBA_SINGLE_ARG(Team_key,double)>,oprs)\
+	X(std::map<TBA_SINGLE_ARG(Team_key,double)>,dprs)\
+	X(std::map<TBA_SINGLE_ARG(Team_key,double)>,ccwms)
+
+TBA_MAKE_INST(Event_OPRs,TBA_EVENT_OPRS)
+
+using WLT_Record=Record;
+
+#define TBA_ELIMINATION_ALLIANCE_STATUS(X)\
+	X(std::optional<WLT_Record>,current_level_record)\
+	X(std::string,level)\
+	X(std::optional<double>,playoff_average)\
+	X(std::optional<WLT_Record>,record)\
+	X(std::optional<std::string>,status)
+
+TBA_MAKE_INST(Elimination_Alliance_status,TBA_ELIMINATION_ALLIANCE_STATUS)
+
+struct Unknown{};
+
+std::ostream& operator<<(std::ostream&,Unknown);
+Unknown decode(JSON const&,const Unknown *);
+
+using M_Elimination_Alliance_status=std::variant<Unknown,Elimination_Alliance_status>;
+
+#define TBA_ELIMINATION_ALLIANCE(X)\
+	X(std::optional<std::string>,name)\
+	X(std::optional<Team_Event_Status_alliance_backup>,backup)\
+	X(std::vector<Team_key>,declines)\
+	X(std::vector<Team_key>,picks)\
+	X(std::optional<M_Elimination_Alliance_status>,status)
+
+TBA_MAKE_INST(Elimination_Alliance,TBA_ELIMINATION_ALLIANCE)
+
+#define TBA_YEAR_INFO(X)\
+	X(std::string,abbreviation)\
+	X(std::string,display_name)\
+	X(District_key,key)\
+	X(Year,year)
+
+TBA_MAKE_INST(Year_info,TBA_YEAR_INFO)
+
+//start stuff for predictions, which is subject to change per the doc.
+#define TBA_BRIER_SCORES(X)\
+	X(std::optional<double>,gears)\
+	X(std::optional<double>,pressure)\
+	X(std::optional<double>,win_loss)
+
+TBA_MAKE_INST(Brier_scores,TBA_BRIER_SCORES)
+
+#define TBA_MATCH_PREDICTION_SET(X)\
+	X(Brier_scores,brier_scores)\
+	X(std::optional<double>,err_mean)\
+	X(std::optional<double>,err_var)\
+	X(std::optional<double>,wl_accuracy)\
+	X(std::optional<double>,wl_accuracy_75)
+
+TBA_MAKE_INST(Match_prediction_set,TBA_MATCH_PREDICTION_SET)
+
+#define TBA_MATCH_PREDICTION_STATS(X)\
+	X(std::optional<Match_prediction_set>,playoff)\
+	X(std::optional<Match_prediction_set>,qual)
+
+TBA_MAKE_INST(Match_prediction_stats,TBA_MATCH_PREDICTION_STATS)
+
+enum class Alliance_color{RED,BLUE};
+
+std::ostream& operator<<(std::ostream&,Alliance_color);
+
+Alliance_color decode(JSON const&,const Alliance_color *);
+
+#define TBA_ALLIANCE_PREDICTION(X)\
+	X(std::optional<double>,gears)\
+	X(std::optional<double>,gears_var)\
+	X(std::optional<double>,pressure)\
+	X(std::optional<double>,pressure_var)\
+	X(std::optional<double>,prob_gears)\
+	X(std::optional<double>,prob_pressure)\
+	X(double,score)\
+	X(double,score_var)
+	
+TBA_MAKE_INST(Alliance_prediction,TBA_ALLIANCE_PREDICTION)
+
+#define TBA_MATCH_PREDICTION(X)\
+	X(Alliance_prediction,blue)\
+	X(double,prob)\
+	X(Alliance_prediction,red)\
+	X(Alliance_color,winning_alliance)
+
+TBA_MAKE_INST(Match_prediction,TBA_MATCH_PREDICTION)
+
+using Ind_match_prediction_set=std::map<Match_key,Match_prediction>;
+
+#define TBA_PER_MATCH_PREDICTIONS(X)\
+	X(std::optional<Ind_match_prediction_set>,playoff)\
+	X(std::optional<Ind_match_prediction_set>,qual)
+
+TBA_MAKE_INST(Per_match_predictions,TBA_PER_MATCH_PREDICTIONS)
+
+#define TBA_RANKING_PREDICTION_STATS(X)\
+	X(std::optional<Match_key>,last_match_played)
+
+TBA_MAKE_INST(Ranking_prediction_stats,TBA_RANKING_PREDICTION_STATS)
+
+using Ranking_prediction=std::pair<Team_key,std::tuple<double,int,double,int,double,int,int>>;
+
+#define TBA_MEAN_VAR(X)\
+	X(std::map<TBA_SINGLE_ARG(Team_key,double)>,mean)\
+	X(std::map<TBA_SINGLE_ARG(Team_key,double)>,var)
+
+TBA_MAKE_INST(Mean_var,TBA_MEAN_VAR)
+
+#define TBA_STAT_MEAN_VAR_SET(X)\
+	X(std::optional<Mean_var>,gears)\
+	X(std::optional<Mean_var>,pressure)\
+	X(std::optional<Mean_var>,score)\
+
+TBA_MAKE_INST(Stat_mean_var_set,TBA_STAT_MEAN_VAR_SET)
+
+#define TBA_STAT_MEAN_VARS(X)\
+	X(Stat_mean_var_set,playoff)\
+	X(Stat_mean_var_set,qual)
+
+TBA_MAKE_INST(Stat_mean_vars,TBA_STAT_MEAN_VARS)
+
+#define TBA_EVENT_PREDICTIONS(X)\
+	X(std::optional<Match_prediction_stats>,match_prediction_stats)\
+	X(std::optional<Per_match_predictions>,match_predictions)\
+	X(std::optional<Ranking_prediction_stats>,ranking_prediction_stats)\
+	X(std::optional<std::vector<Ranking_prediction>>,ranking_predictions)\
+	X(std::optional<Stat_mean_vars>,stat_mean_vars)
+
+TBA_MAKE_INST(Event_predictions,TBA_EVENT_PREDICTIONS)
+
+}
+
+#endif
