@@ -118,6 +118,10 @@ std::ostream& operator<<(std::ostream& o,District_key const& a){
 	return o<<a.get();
 }
 
+bool operator==(District_key const& a,District_key const& b){
+	return a.get()==b.get();
+}
+
 District_key decode(JSON const& in,const District_key *){
 	return District_key{decode(in,(std::string*)nullptr)};
 }
@@ -142,6 +146,10 @@ std::string Team_key::str()const{ return s; }
 
 bool operator<(Team_key const& a,Team_key const& b){
 	return a.str()<b.str();
+}
+
+bool operator!=(Team_key const& a,Team_key const& b){
+	return a.str()!=b.str();
 }
 
 std::ostream& operator<<(std::ostream& o,Team_key const& a){
@@ -176,6 +184,10 @@ std::ostream& operator<<(std::ostream& o,Year a){
 	return o<<a.get();
 }
 
+bool operator!=(Year a,Year b){
+	return a.get()!=b.get();
+}
+
 bool operator<(Year a,Year b){
 	return a.get()<b.get();
 }
@@ -187,6 +199,12 @@ Year& operator++(Year& a){
 		throw std::range_error{"Year too high"};
 	}
 	return a;
+}
+
+Year operator++(Year& a,int){
+	auto r=a;
+	++a;
+	return r;
 }
 
 Year decode(JSON const& in,const Year*){

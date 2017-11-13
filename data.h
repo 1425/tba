@@ -37,8 +37,10 @@ class Year{
 };
 
 std::ostream& operator<<(std::ostream& o,Year);
+bool operator!=(Year,Year);
 bool operator<(Year,Year);
 Year& operator++(Year&);
+Year operator++(Year&,int);
 Year decode(JSON const&,const Year*);
 
 #define TBA_API_STATUS_APP_VERSION(X)\
@@ -66,6 +68,7 @@ class Team_key{
 };
 
 bool operator<(Team_key const&,Team_key const&);
+bool operator!=(Team_key const&,Team_key const&);
 std::ostream& operator<<(std::ostream&,Team_key const&);
 Team_key decode(JSON const& in,const Team_key*);
 
@@ -121,6 +124,7 @@ class District_key{
 };
 
 std::ostream& operator<<(std::ostream&,District_key const&);
+bool operator==(District_key const&,District_key const&);
 District_key decode(JSON const&,const District_key*);
 
 #define TBA_DISTRICT_LIST(X)\
@@ -241,7 +245,7 @@ std::ostream& operator<<(std::ostream&,Date const&);
 Date decode(JSON const&,const Date*);
 
 #define TBA_EVENT(X)\
-	X(std::string,key)\
+	X(Event_key,key)\
 	X(std::string,name)\
 	X(std::string,event_code)\
 	X(Event_type,event_type)\
@@ -274,7 +278,7 @@ Date decode(JSON const&,const Date*);
 TBA_MAKE_INST(Event,TBA_EVENT)
 
 #define TBA_EVENT_SIMPLE(X)\
-	X(std::string,key)\
+	X(Event_key,key)\
 	X(std::string,name)\
 	X(std::string,event_code)\
 	X(Event_type,event_type)\

@@ -75,6 +75,7 @@ class Cache{
 	Cache_policy policy;
 
 	Cache();
+	explicit Cache(const char *filename);
 
 	void add(URL,std::pair<HTTP_Date,Data>);
 	std::optional<std::pair<HTTP_Date,Data>> fetch(URL url);
