@@ -220,7 +220,8 @@ Event_type decode(JSON const& in,const Event_type *);
 	X(3,AVG_SCORE_8_TEAM, "Average Score (8 Alliances)")\
 	X(4,ROUND_ROBIN_6_TEAM, "Round Robin (6 Alliances)")\
 	X(5,DOUBLE_ELIM_8_TEAM, "Double Elimination Bracket (8 Alliances)")\
-	X(6,BO5_FINALS,"Best of 5 Finals")
+	X(6,BO5_FINALS,"Best of 5 Finals")\
+	X(7,BO3_FINALS,"Best of 3 Finals")
 
 enum class Playoff_type{
 	#define X(A,B,C) B,
@@ -308,9 +309,10 @@ TBA_MAKE_INST(Event_Simple,TBA_EVENT_SIMPLE)
 	X(TWITCH_CHANNEL,twitch-channel)\
 	X(TBA,tba)\
 	X(INSTAGRAM_IMAGE,instagram-image)\
-	X(EXTERNAL_LINK,external-link)
+	X(EXTERNAL_LINK,external-link)\
+	X(AVATAR,avatar)
 //"tba" occurs, but is not documented.
-//same for "instagram-image", and for "external-link"
+//"instagram-image", and "external-link" were originally not documented but are as of 2019.
 
 enum class Media_type{
 	#define X(A,B) A,
@@ -322,7 +324,7 @@ std::ostream& operator<<(std::ostream&,Media_type);
 Media_type decode(JSON const&,const Media_type*);
 
 #define TBA_MEDIA_DETAILS(X)\
-	X(std::optional<unsigned>,author_id)\
+	X(std::optional<int64_t>,author_id)\
 	X(std::optional<std::string>,author_name)\
 	X(std::optional<std::string>,author_url)\
 	X(std::optional<std::nullptr_t>,height)\
@@ -567,6 +569,62 @@ TBA_MAKE_INST(Match_Score_Breakdown_2017_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2017
 
 TBA_MAKE_INST(Match_Score_Breakdown_2017,TBA_MATCH_SCORE_BREAKDOWN_2017)
 
+#define TBA_MATCH_SCORE_BREAKDOWN_2019(X)\
+        X(int,adjustPoints)\
+        X(int,autoPoints)\
+        X(std::string,bay1)\
+        X(std::string,bay2)\
+        X(std::string,bay3)\
+        X(std::string,bay4)\
+        X(std::string,bay5)\
+        X(std::string,bay6)\
+        X(std::string,bay7)\
+        X(std::string,bay8)\
+        X(int,cargoPoints)\
+        X(bool,completeRocketRankingPoint)\
+        X(bool,completedRocketFar)\
+        X(bool,completedRocketNear)\
+        X(std::string,endgameRobot1)\
+        X(std::string,endgameRobot2)\
+        X(std::string,endgameRobot3)\
+        X(int,foulCount)\
+        X(int,foulPoints)\
+        X(int,habClimbPoints)\
+        X(bool,habDockingRankingPoint)\
+        X(std::string,habLineRobot1)\
+        X(std::string,habLineRobot2)\
+        X(std::string,habLineRobot3)\
+        X(int,hatchPanelPoints)\
+        X(std::string,lowLeftRocketFar)\
+        X(std::string,lowLeftRocketNear)\
+        X(std::string,lowRightRocketFar)\
+        X(std::string,lowRightRocketNear)\
+        X(std::string,midLeftRocketFar)\
+        X(std::string,midLeftRocketNear)\
+        X(std::string,midRightRocketFar)\
+        X(std::string,midRightRocketNear)\
+        X(std::string,preMatchBay1)\
+        X(std::string,preMatchBay2)\
+        X(std::string,preMatchBay3)\
+        X(std::string,preMatchBay6)\
+        X(std::string,preMatchBay7)\
+        X(std::string,preMatchBay8)\
+        X(std::string,preMatchLevelRobot1)\
+        X(std::string,preMatchLevelRobot2)\
+        X(std::string,preMatchLevelRobot3)\
+        X(int,rp)\
+        X(int,sandStormBonusPoints)\
+        X(int,techFoulCount)\
+        X(int,teleopPoints)\
+        X(std::string,topLeftRocketFar)\
+        X(std::string,topLeftRocketNear)\
+        X(std::string,topRightRocketFar)\
+        X(std::string,topRightRocketNear)\
+        X(int,totalPoints)
+
+
+//TBA_MAKE_INST(Match_Score_Breakdown_2018,TBA_MATCH_SCORE_BREAKDOWN_2018)
+
 #define TBA_MATCH_SCORE_BREAKDOWN_2014_ALLIANCE(X)\
 	X(int,assist,assist)\
 	X(int,auto_pts,auto)\
@@ -709,7 +767,8 @@ TBA_MAKE_INST(Award_Recipient,TBA_RECIPIENT)
 	X(MOST_IMPROVED_TEAM,67)\
 	X(WILDCARD,68)\
 	X(CHAIRMANS_FINALIST,69)\
-	X(OTHER,70)
+	X(OTHER,70)\
+	X(AUTONOMOUS,71)
 
 enum class Award_type{
 	#define X(A,B) A,
@@ -950,12 +1009,120 @@ TBA_MAKE_INST(Event_Insights_2017_Detail,TBA_EVENT_INSIGHTS_2017_DETAIL)
 
 TBA_MAKE_INST(Event_Insights_2017,TBA_EVENT_INSIGHTS_2017)
 
-using Event_insights=std::variant<std::nullptr_t,Event_Insights_2017,Event_Insights_2016>;
+using ISS=std::tuple<int,std::string,std::string>;
 
+#define TBA_EVENT_INSIGHTS_2018_DETAIL(X)\
+	X(IID,auto_quest_achieved)\
+	X(double,average_boost_played)\
+	X(double,average_endgame_points)\
+	X(double,average_force_played)\
+	X(double,average_foul_score)\
+	X(double,average_points_auto)\
+	X(double,average_points_teleop)\
+	X(double,average_run_points_auto)\
+	X(double,average_scale_ownership_points)\
+	X(double,average_scale_ownership_points_auto)\
+	X(double,average_scale_ownership_points_teleop)\
+	X(double,average_score)\
+	X(double,average_switch_ownership_points)\
+	X(double,average_switch_ownership_points_auto)\
+	X(double,average_switch_ownership_points_teleop)\
+	X(double,average_vault_points)\
+	X(double,average_win_margin)\
+	X(double,average_win_score)\
+	X(IID,boost_played_counts)\
+	X(IID,climb_counts)\
+	X(IID,face_the_boss_achieved)\
+	X(IID,force_played_counts)\
+	X(ISS,high_score)\
+	X(IID,levitate_played_counts)\
+	X(IID,run_counts_auto)\
+	X(double,scale_neutral_percentage)\
+	X(double,scale_neutral_percentage_auto)\
+	X(double,scale_neutral_percentage_teleop)\
+	X(IID,switch_owned_counts_auto)\
+	X(IID,unicorn_matches)\
+	X(double,winning_opp_switch_denial_percentage_teleop)\
+	X(double,winning_own_switch_ownership_percentage)\
+	X(double,winning_own_switch_ownership_percentage_auto)\
+	X(double,winning_own_switch_ownership_percentage_teleop)\
+	X(double,winning_scale_ownership_percentage)\
+	X(double,winning_scale_ownership_percentage_auto)\
+	X(double,winning_scale_ownership_percentage_teleop)
+
+TBA_MAKE_INST(Event_Insights_2018_Detail,TBA_EVENT_INSIGHTS_2018_DETAIL)
+
+#define TBA_EVENT_INSIGHTS_2018(X)\
+	X(std::optional<Event_Insights_2018_Detail>,playoff)\
+	X(std::optional<Event_Insights_2018_Detail>,qual)
+
+TBA_MAKE_INST(Event_Insights_2018,TBA_EVENT_INSIGHTS_2018)
+
+using D8=std::array<double,8>;
+using D6=std::array<double,6>;
+
+#define TBA_AVERAGE_ROCKET_COUNT(X)\
+	X(double,lowLeftFar)\
+	X(double,lowLeftNear)\
+	X(double,lowRightNear)\
+	X(double,midLeftFar)\
+	X(double,midLeftNear)\
+	X(double,midRightNear)\
+	X(double,midRightFar)\
+	X(double,topLeftFar)\
+	X(double,topLeftNear)\
+	X(double,topRightFar)\
+	X(double,topRightNear)
+
+TBA_MAKE_INST(Average_rocket_count,TBA_AVERAGE_ROCKET_COUNT)
+
+#define TBA_EVENT_INSIGHTS_2019_DETAIL(X)\
+	X(double,average_cargo_points)\
+	X(D8,average_cargo_ship_cargo_count)\
+	X(D6,average_cargo_ship_cargo_preload_count)\
+	X(D8,average_cargo_ship_hatch_panel_count)\
+	X(D6,average_cargo_ship_hatch_panel_preload_count)\
+	X(double,average_foul_score)\
+	X(double,average_hab_climb_teleop)\
+	X(Average_rocket_count,average_rocket_cargo_count)\
+	X(Average_rocket_count,average_rocket_hatch_panel_count)\
+	X(double,average_sandstorm_bonus_auto)\
+	X(double,average_score)\
+	X(double,average_win_margin)\
+	X(double,average_win_score)\
+	X(IID,climb_rp_achieved)\
+	X(IID,complete_1_rocket_count)\
+	X(IID,complete_2_rockets_count)\
+	X(IID,cross_hab_line_count)\
+	X(IID,cross_hab_line_sandstorm_count)\
+	X(ISS,high_score)\
+	X(IID,level1_climb_count)\
+	X(IID,level2_climb_count)\
+	X(IID,level3_climb_count)\
+	X(IID,rocket_rp_achieved)\
+	X(IID,unicorn_matches)
+
+TBA_MAKE_INST(Event_Insights_2019_Detail,TBA_EVENT_INSIGHTS_2019_DETAIL)
+
+#define TBA_EVENT_INSIGHTS_2019(X)\
+	X(std::optional<Event_Insights_2019_Detail>,playoff)\
+	X(std::optional<Event_Insights_2019_Detail>,qual)
+
+TBA_MAKE_INST(Event_Insights_2019,TBA_EVENT_INSIGHTS_2019)
+
+using Event_insights=std::variant<
+	std::nullptr_t,
+	Event_Insights_2017,
+	Event_Insights_2016,
+	Event_Insights_2018,
+	Event_Insights_2019
+>;
+
+//These come back as null rather than empty lists for events that don't have these calculated yet.
 #define TBA_EVENT_OPRS(X)\
-	X(std::map<TBA_SINGLE_ARG(Team_key,double)>,oprs)\
-	X(std::map<TBA_SINGLE_ARG(Team_key,double)>,dprs)\
-	X(std::map<TBA_SINGLE_ARG(Team_key,double)>,ccwms)
+	X(std::optional<std::map<TBA_SINGLE_ARG(Team_key,double)>>,oprs)\
+	X(std::optional<std::map<TBA_SINGLE_ARG(Team_key,double)>>,dprs)\
+	X(std::optional<std::map<TBA_SINGLE_ARG(Team_key,double)>>,ccwms)
 
 TBA_MAKE_INST(Event_OPRs,TBA_EVENT_OPRS)
 

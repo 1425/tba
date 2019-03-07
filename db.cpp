@@ -95,13 +95,28 @@ Cache::Cache():Cache("cache.db"){
 }
 
 void escape(std::ostream& o,std::string const& s){
-	std::for_each(begin(s),end(s),[&](char c){
-		if(c=='\''){
-			o<<"\\'";
+	for(size_t i=0;i<s.size();i++){
+		if(s[i]=='\''){
+			//TBA_PRINT(s.substr(i,10));
+			//TBA_NYI
+			//ignore
+		}else if(s[i]=='\\'){
+			if(s[i+1]=='"'){
+				o<<s[i];
+				o<<s[i+1];
+				i++;
+			}else{
+				if(s[i+1]=='\'' || s[i+1]=='"'){
+					TBA_PRINT(s.substr(i,10));
+					TBA_NYI
+				}else{
+					//ignore
+				}
+			}
 		}else{
-			o<<c;
+			o<<s[i];
 		}
-	});
+	}
 }
 			
 void Cache::add(URL url,std::pair<Date,Data> p){

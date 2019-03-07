@@ -7,6 +7,7 @@
 #include<variant>
 
 #define TBA_NYI { std::cout<<"NYI "<<__FILE__<<":"<<__LINE__<<"\n"; exit(1); }
+#define TBA_PRINT(X) { std::cout<<""#X<<":"<<(X)<<"\n"; }
 
 namespace tba{
 
@@ -55,6 +56,15 @@ template<typename... A>
 std::ostream& operator<<(std::ostream& o,std::variant<A...> const& a){
 	std::visit([&](auto &&elem){ o<<elem; },a);
 	return o;
+}
+
+template<typename T,size_t N>
+std::ostream& operator<<(std::ostream& o,std::array<T,N> const& a){
+	o<<"[ ";
+	for(auto const& elem:a){
+		o<<elem<<" ";
+	}
+	return o<<"]";
 }
 
 template<typename A,typename B,typename C>

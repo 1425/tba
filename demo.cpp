@@ -53,8 +53,33 @@ std::string to_string(T a){
 template<typename T>
 std::vector<T> take(size_t num,std::vector<T> in){
 	std::vector<T> out;
-	copy_n(begin(in),min(num,in.size()),back_inserter(out));
+	copy_n(begin(in),std::min(num,in.size()),back_inserter(out));
 	return out;
+}
+
+template<typename T>
+std::vector<T> take_last(size_t num,std::vector<T> in){
+	std::vector<T> out;
+	auto num_out=std::min(num,in.size());
+	copy_n(begin(in)+(in.size()-num_out),num_out,back_inserter(out));
+	return out;
+}
+
+std::vector<std::string> args(int argc,char **argv){
+	std::vector<std::string> r;
+	for(int i=1;i<argc;i++){
+		r|=std::string{argv[i]};
+	}
+	return r;
+}
+
+template<typename T>
+std::vector<T> tail(std::vector<T> a){
+	std::vector<T> r;
+	for(size_t i=1;i<a.size();i++){
+		r|=a[i];
+	}
+	return r;
 }
 
 //start program-specific stuff
@@ -62,8 +87,15 @@ std::vector<T> take(size_t num,std::vector<T> in){
 int main1(int argc,char **argv){
 	std::string tba_key;
 
-	if(argc==2){
-		tba_key=argv[1];
+	auto a=args(argc,argv);
+	bool quick=0;
+	if(a.size() && a[0]=="--short"){
+		quick=1;
+		a=tail(a);
+	}
+
+	if(a.size()){
+		tba_key=a[1];
 	}else{
 		std::ifstream f("auth_key");
 		if(!f.good()){
@@ -79,7 +111,7 @@ int main1(int argc,char **argv){
 	
 	Cached_fetcher f{Fetcher{Nonempty_string{tba_key}},Cache{}};
 
-	auto years=range(Year{1992},Year{2019});//could get this via the API.
+	auto years=range(Year{1992},Year{2020});//could get this via the API.
 
 	std::vector<Event_key> event_key_list;
 
@@ -94,7 +126,15 @@ int main1(int argc,char **argv){
 
 	std::vector<Match_key> match_keys;
 
-	for(auto event_key:event_key_list){
+	auto select=[&](auto a){
+		if(quick){
+			return take_last(10,a);
+		}
+		return a;
+	};
+	using namespace std;
+
+	for(auto event_key:select(event_key_list)){
 		null_stream<<event(f,event_key)<<"\n";
 		null_stream<<event_simple(f,event_key)<<"\n";
 		null_stream<<event_alliances(f,event_key)<<"\n";
@@ -112,7 +152,7 @@ int main1(int argc,char **argv){
 		null_stream<<event_awards(f,event_key)<<"\n";
 	}
 
-	for(auto match_key:reversed(match_keys)){
+	for(auto match_key:select(reversed(match_keys))){
 		null_stream<<match(f,match_key)<<"\n";
 		null_stream<<match_simple(f,match_key)<<"\n";
 	}
@@ -127,7 +167,7 @@ int main1(int argc,char **argv){
 
 	std::vector<District_key> district_keys;//TODO: Fill this in.
 	
-	for(auto year:years){
+	for(auto year:select(years)){
 		auto d=districts(f,year);
 		for(auto a:d){
 			district_keys|=a.key;
@@ -135,7 +175,7 @@ int main1(int argc,char **argv){
 	}
 
 	//These are all known to work
-	for(auto district:district_keys){
+	for(auto district:select(district_keys)){
 		null_stream<<district_events(f,district)<<"\n";
 		null_stream<<district_events_keys(f,district)<<"\n";
 		null_stream<<district_events_simple(f,district)<<"\n";
@@ -151,26 +191,26 @@ int main1(int argc,char **argv){
 
 	auto add_to_queue=[&](std::function<int(void)> f){
 		q.push(async(f));
-		while(q.size()>150){
+		while(q.size()>1000){
 			q.front().get();
 			q.pop();
 		}
 	};
 
-	for(auto team:team_keys1){
+	for(auto team:select(team_keys1)){
 		add_to_queue([&f,team](){ team_events(f,team); return 0; });
 		add_to_queue([&f,team](){ team_events_simple(f,team); return 66; });
 		add_to_queue([&f,team](){ team_events_keys(f,team); return 67; });
 		add_to_queue([&f,team](){ team_districts(f,team); return 68; });
 	}
 
-	for(auto event:reversed(event_key_list)){
+	for(auto event:select(reversed(event_key_list))){
 		null_stream<<event_teams(f,event)<<"\n";
 		null_stream<<event_teams_simple(f,event)<<"\n";
 		//std::cout<<event<<".";
 		//std::cout.flush();
 		auto team_keys=event_teams_keys(f,event);
-		for(auto team:team_keys){
+		for(auto team:select(team_keys)){
 			null_stream<<team_event_matches(f,team,event).size()<<"\n";
 			q.push(std::async(
 				[&f,team,event](){ team_event_matches_simple(f,team,event); return 0; }
@@ -201,7 +241,7 @@ int main1(int argc,char **argv){
 		}
 	}
 
-	for(auto team:team_keys1){
+	for(auto team:select(team_keys1)){
 		add_to_queue([&f,team](){ team_awards(f,team); return 20; });
 		for(auto year:years){
 			add_to_queue([&f,team,year](){ team_awards_year(f,team,year); return 21; });
