@@ -122,6 +122,10 @@ bool operator==(District_key const& a,District_key const& b){
 	return a.get()==b.get();
 }
 
+bool operator==(District_key const& a,std::string const& b){
+	return a.get()==b;
+}
+
 District_key decode(JSON const& in,const District_key *){
 	return District_key{decode(in,(std::string*)nullptr)};
 }
@@ -146,6 +150,10 @@ std::string Team_key::str()const{ return s; }
 
 bool operator<(Team_key const& a,Team_key const& b){
 	return a.str()<b.str();
+}
+
+bool operator==(Team_key const& a,Team_key const& b){
+	return a.str()==b.str();
 }
 
 bool operator!=(Team_key const& a,Team_key const& b){

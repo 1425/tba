@@ -68,6 +68,7 @@ class Team_key{
 };
 
 bool operator<(Team_key const&,Team_key const&);
+bool operator==(Team_key const&,Team_key const&);
 bool operator!=(Team_key const&,Team_key const&);
 std::ostream& operator<<(std::ostream&,Team_key const&);
 Team_key decode(JSON const& in,const Team_key*);
@@ -125,6 +126,7 @@ class District_key{
 
 std::ostream& operator<<(std::ostream&,District_key const&);
 bool operator==(District_key const&,District_key const&);
+bool operator==(District_key const&,std::string const&);
 District_key decode(JSON const&,const District_key*);
 
 #define TBA_DISTRICT_LIST(X)\
