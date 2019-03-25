@@ -5,6 +5,7 @@
 #include<queue>
 #include<variant>
 #include<fstream>
+#include<optional>
 #include "data.h"
 #include "rapidjson/document.h"
 #include "curl.h"
@@ -84,6 +85,68 @@ std::vector<T> tail(std::vector<T> a){
 
 //start program-specific stuff
 
+#define nyi TBA_NYI
+
+using namespace std;
+
+void do_indent(int indent){
+	for(auto i:range(indent)){
+		(void)i;
+		std::cout<<"\t";
+	}
+}
+
+template<typename T>
+void print_r(int indent,T t){
+	do_indent(indent);
+	std::cout<<t<<"\n";
+}
+
+template<typename T>
+void print_r(int indent,std::optional<T> const& a){
+	if(a) return print_r(indent,*a);
+	nyi
+}
+
+template<typename A,typename B>
+void print_r(int indent,std::pair<A,B> const& p){
+	do_indent(indent);
+	cout<<"pair\n";
+	indent++;
+	print_r(indent,p.first);
+	print_r(indent,p.second);
+}
+
+template<typename K,typename V>
+void print_r(int indent,std::map<K,V> const& m){
+	do_indent(indent);
+	cout<<"map\n";
+	indent++;
+	for(auto p:m){
+		print_r(indent,p);
+	}
+}
+
+void print_r(int,int)TBA_NYI
+
+void print_r(int indent,Event_OPRs const& e){
+	do_indent(indent);
+	std::cout<<"Event_OPRs\n";
+	indent++;
+	#define X(A,B) {\
+		do_indent(indent);\
+		std::cout<<""#B<<"\n";\
+		print_r(indent+1,e.B);\
+	}
+	TBA_EVENT_OPRS(X)
+	#undef X
+}
+
+template<typename T>
+void print_r(T t){
+	print_r(0,t);
+}
+
 int main1(int argc,char **argv){
 	std::string tba_key;
 
@@ -91,6 +154,14 @@ int main1(int argc,char **argv){
 	bool quick=0;
 	if(a.size() && a[0]=="--short"){
 		quick=1;
+		a=tail(a);
+	}
+
+	std::optional<Event_key> opr_event;
+	if(a.size() && a[0]=="--opr"){
+		a=tail(a);
+		assert(a.size());
+		opr_event=Event_key{a[0]};
 		a=tail(a);
 	}
 
@@ -110,6 +181,13 @@ int main1(int argc,char **argv){
 	}
 	
 	Cached_fetcher f{Fetcher{Nonempty_string{tba_key}},Cache{}};
+
+	if(opr_event){
+		auto d=event_oprs(f,*opr_event);
+		//std::cout<<d<<"\n";//TBA_NYI
+		print_r(d);
+		return 0;
+	}
 
 	auto years=range(Year{1992},Year{2020});//could get this via the API.
 
