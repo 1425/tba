@@ -189,7 +189,8 @@ int main1(int argc,char **argv){
 		return 0;
 	}
 
-	auto years=range(Year{1992},Year{2020});//could get this via the API.
+	//auto years=range(Year{1992},Year{2020});//could get this via the API.
+	auto years=range(Year{2020},Year{2021});//could get this via the API.
 
 	std::vector<Event_key> event_key_list;
 
@@ -212,7 +213,7 @@ int main1(int argc,char **argv){
 	};
 	using namespace std;
 
-	for(auto event_key:select(event_key_list)){
+	for(auto event_key:take(10,select(event_key_list))){
 		null_stream<<event(f,event_key)<<"\n";
 		null_stream<<event_simple(f,event_key)<<"\n";
 		null_stream<<event_alliances(f,event_key)<<"\n";
@@ -275,7 +276,7 @@ int main1(int argc,char **argv){
 		}
 	};
 
-	for(auto team:select(team_keys1)){
+	for(auto team:take(5,select(team_keys1))){
 		add_to_queue([&f,team](){ team_events(f,team); return 0; });
 		add_to_queue([&f,team](){ team_events_simple(f,team); return 66; });
 		add_to_queue([&f,team](){ team_events_keys(f,team); return 67; });
@@ -288,7 +289,7 @@ int main1(int argc,char **argv){
 		//std::cout<<event<<".";
 		//std::cout.flush();
 		auto team_keys=event_teams_keys(f,event);
-		for(auto team:select(team_keys)){
+		for(auto team:take(5,select(team_keys))){
 			null_stream<<team_event_matches(f,team,event).size()<<"\n";
 			q.push(std::async(
 				[&f,team,event](){ team_event_matches_simple(f,team,event); return 0; }
@@ -319,7 +320,7 @@ int main1(int argc,char **argv){
 		}
 	}
 
-	for(auto team:select(team_keys1)){
+	for(auto team:take(5,select(team_keys1))){
 		add_to_queue([&f,team](){ team_awards(f,team); return 20; });
 		for(auto year:years){
 			add_to_queue([&f,team,year](){ team_awards_year(f,team,year); return 21; });

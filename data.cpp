@@ -292,6 +292,7 @@ Playoff_type decode(JSON const& in,const Playoff_type*){
 	#define X(A,B,C) if(i==A) return Playoff_type::B;
 	TBA_PLAYOFF_TYPES(X)
 	#undef X
+	TBA_PRINT(in);
 	assert(0);
 }
 
@@ -542,6 +543,10 @@ MAKE_INST(Event_Insights_2018,TBA_EVENT_INSIGHTS_2018)
 MAKE_INST(Event_Insights_2019_Detail,TBA_EVENT_INSIGHTS_2019_DETAIL)
 
 MAKE_INST(Event_Insights_2019,TBA_EVENT_INSIGHTS_2019)
+
+MAKE_INST(Event_Insights_2020_Detail,TBA_EVENT_INSIGHTS_2020_DETAIL)
+
+MAKE_INST(Event_Insights_2020,TBA_EVENT_INSIGHTS_2020)
 
 MAKE_INST(Average_rocket_count,TBA_AVERAGE_ROCKET_COUNT)
 

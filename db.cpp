@@ -176,6 +176,7 @@ std::pair<Date,Data> Cached_fetcher::fetch(URL url){
 	if(c) return *c;
 	auto f=fetcher.fetch(url);
 	cache.add(url,f);
+	TBA_PRINT(url);
 	return f;
 }
 

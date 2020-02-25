@@ -223,7 +223,8 @@ Event_type decode(JSON const& in,const Event_type *);
 	X(4,ROUND_ROBIN_6_TEAM, "Round Robin (6 Alliances)")\
 	X(5,DOUBLE_ELIM_8_TEAM, "Double Elimination Bracket (8 Alliances)")\
 	X(6,BO5_FINALS,"Best of 5 Finals")\
-	X(7,BO3_FINALS,"Best of 3 Finals")
+	X(7,BO3_FINALS,"Best of 3 Finals")\
+	X(8,CUSTOM,"Custom playoff type")
 
 enum class Playoff_type{
 	#define X(A,B,C) B,
@@ -1112,12 +1113,58 @@ TBA_MAKE_INST(Event_Insights_2019_Detail,TBA_EVENT_INSIGHTS_2019_DETAIL)
 
 TBA_MAKE_INST(Event_Insights_2019,TBA_EVENT_INSIGHTS_2019)
 
+#define TBA_EVENT_INSIGHTS_2020_DETAIL(X)\
+	X(IID,achieve_stage1_count)\
+	X(IID,achieve_stage2_count)\
+	X(IID,achieve_stage3_count)\
+	X(double,average_cell_count)\
+	X(double,average_cell_count_auto)\
+	X(double,average_cell_count_bottom)\
+	X(double,average_cell_count_bottom_auto)\
+	X(double,average_cell_count_bottom_teleop)\
+	X(double,average_cell_count_inner)\
+	X(double,average_cell_count_inner_auto)\
+	X(double,average_cell_count_inner_teleop)\
+	X(double,average_cell_count_outer)\
+	X(double,average_cell_count_outer_auto)\
+	X(double,average_cell_count_outer_teleop)\
+	X(double,average_cell_points_auto)\
+	X(double,average_cell_points_teleop)\
+	X(double,average_cell_score)\
+	X(double,average_control_panel_points)\
+	X(double,average_endgame_points)\
+	X(double,average_foul_score)\
+	X(double,average_init_line_points_auto)\
+	X(double,average_num_robots_hanging)\
+	X(double,average_points_auto)\
+	X(double,average_points_teleop)\
+	X(double,average_score)\
+	X(double,average_win_margin)\
+	X(double,average_win_score)\
+	X(IID,exit_init_line_count)\
+	X(IID,generator_energized_rp_achieved)\
+	X(IID,generator_level_count)\
+	X(IID,generator_operational_rp_achieved)\
+	X(IID,hang_count)\
+	X(ISS,high_score)\
+	X(IID,park_count)\
+	X(IID,unicorn_matches)
+
+TBA_MAKE_INST(Event_Insights_2020_Detail,TBA_EVENT_INSIGHTS_2020_DETAIL)
+
+#define TBA_EVENT_INSIGHTS_2020(X)\
+	X(std::optional<Event_Insights_2020_Detail>,playoff)\
+	X(std::optional<Event_Insights_2020_Detail>,qual)
+
+TBA_MAKE_INST(Event_Insights_2020,TBA_EVENT_INSIGHTS_2020)
+
 using Event_insights=std::variant<
 	std::nullptr_t,
 	Event_Insights_2017,
 	Event_Insights_2016,
 	Event_Insights_2018,
-	Event_Insights_2019
+	Event_Insights_2019,
+	Event_Insights_2020
 >;
 
 //These come back as null rather than empty lists for events that don't have these calculated yet.
