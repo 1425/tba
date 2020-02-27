@@ -56,16 +56,26 @@ std::pair<Date,Data> Fetcher::fetch(URL url){
 	);
 
 	auto f=std::find_if(g.headers.begin(),g.headers.end(),[](auto const& p){ return p.first=="Last-Modified"; });
+	if(f!=g.headers.end()){
+		return make_pair(f->second,g.data);
+	}
 
-	if(f==g.headers.end()){
+	auto f2=std::find_if(g.headers.begin(),g.headers.end(),[](auto const& p){ return p.first=="Date"; });
+	if(f2!=g.headers.end()){
+		return make_pair(f2->second,g.data);
+	}
+
+	{
 		std::ostringstream ss;
 		ss<<"fetching:"<<url<<"\n";
-		ss<<"got:"<<g.headers<<"\n";
+		//ss<<"got:"<<g.headers<<"\n";
+		ss<<"got:\n";
+		for(auto elem:g.headers) ss<<elem<<"\n";
 		ss<<"Error: Did not find Last-Modified header";
 		throw std::runtime_error{ss.str()};
 	}
 
-	return make_pair(f->second,g.data);
+
 }
 
 Cache_policy::Cache_policy(Type type1):type_(type1){}

@@ -649,8 +649,112 @@ Match_Score_Breakdown_2014_Alliance decode(JSON const&,const Match_Score_Breakdo
 
 TBA_MAKE_INST(Match_Score_Breakdown_2014,TBA_MATCH_SCORE_BREAKDOWN_2014)
 
+#define TBA_INIT_LINE_OPTIONS(X)\
+	X(Exited)\
+	X(None)
+
+enum class Init_line{
+	#define X(A) A,
+	TBA_INIT_LINE_OPTIONS(X)
+	#undef X
+};
+
+std::ostream& operator<<(std::ostream&,Init_line);
+Init_line decode(JSON const&,Init_line const*);
+
+#define TBA_ENDGAME_OPTIONS(X)\
+	X(Park)\
+	X(None)\
+	X(Hang)
+
+enum class Endgame{
+	#define X(A) A,
+	TBA_ENDGAME_OPTIONS(X)
+	#undef X
+};
+
+std::ostream& operator<<(std::ostream&,Endgame);
+Endgame decode(JSON const&,Endgame const*);
+
+#define TBA_TARGET_COLOR_OPTIONS(X)\
+	X(Unknown)\
+
+enum class Target_color{
+	#define X(A) A,
+	TBA_TARGET_COLOR_OPTIONS(X)
+	#undef X
+};
+
+std::ostream& operator<<(std::ostream&,Target_color);
+Target_color decode(JSON const&,Target_color const*);
+
+#define TBA_RUNG_LEVEL_OPTIONS(X)\
+	X(NotLevel)\
+	X(IsLevel)
+
+enum class Rung_level{
+	#define X(A) A,
+	TBA_RUNG_LEVEL_OPTIONS(X)
+	#undef X
+};
+
+std::ostream& operator<<(std::ostream&,Rung_level);
+Rung_level decode(JSON const&,Rung_level const*);
+
+#define TBA_MATCH_SCORE_BREAKDOWN_2020_ALLIANCE(X)\
+	X(Init_line,initLineRobot1)\
+	X(Endgame,endgameRobot1)\
+	X(Init_line,initLineRobot2)\
+	X(Endgame,endgameRobot2)\
+	X(Init_line,initLineRobot3)\
+	X(Endgame,endgameRobot3)\
+	X(int,autoCellsBottom)\
+	X(int,autoCellsOuter)\
+	X(int,autoCellsInner)\
+	X(int,teleopCellsBottom)\
+	X(int,teleopCellsOuter)\
+	X(int,teleopCellsInner)\
+	X(bool,stage1Activated)\
+	X(bool,stage2Activated)\
+	X(bool,stage3Activated)\
+	X(Target_color,stage3TargetColor)\
+	X(Rung_level,endgameRungIsLevel)\
+	X(int,autoInitLinePoints)\
+	X(int,autoCellPoints)\
+	X(int,autoPoints)\
+	X(int,teleopCellPoints)\
+	X(int,controlPanelPoints)\
+	X(int,endgamePoints)\
+	X(int,teleopPoints)\
+	X(bool,shieldOperationalRankingPoint)\
+	X(bool,shieldEnergizedRankingPoint)\
+	X(bool,tba_shieldEnergizedRankingPointFromFoul)\
+	X(int,tba_numRobotsHanging)\
+	X(int,foulCount)\
+	X(int,techFoulCount)\
+	X(int,adjustPoints)\
+	X(int,foulPoints)\
+	X(int,rp)\
+	X(int,totalPoints)
+
+struct Match_Score_Breakdown_2020_Alliance{
+	#define X(A,B) A B;
+	TBA_MATCH_SCORE_BREAKDOWN_2020_ALLIANCE(X)
+	#undef X
+};
+
+std::ostream& operator<<(std::ostream&,Match_Score_Breakdown_2020_Alliance const&);
+Match_Score_Breakdown_2020_Alliance decode(JSON const&,const Match_Score_Breakdown_2020_Alliance*);
+
+
+#define TBA_MATCH_SCORE_BREAKDOWN_2020(X)\
+	X(Match_Score_Breakdown_2020_Alliance,blue)\
+	X(Match_Score_Breakdown_2020_Alliance,red)
+
+TBA_MAKE_INST(Match_Score_Breakdown_2020,TBA_MATCH_SCORE_BREAKDOWN_2020)
 
 using Match_Score_Breakdown=std::variant<
+	Match_Score_Breakdown_2020,
 	Match_Score_Breakdown_2017,
 	Match_Score_Breakdown_2014,
 	Match_Score_Breakdown_2016,

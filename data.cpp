@@ -609,6 +609,10 @@ MAKE_INST(Match_Score_Breakdown_2017_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2017_ALL
 
 MAKE_INST(Match_Score_Breakdown_2017,TBA_MATCH_SCORE_BREAKDOWN_2017)
 
+MAKE_INST(Match_Score_Breakdown_2020_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2020_ALLIANCE)
+
+MAKE_INST(Match_Score_Breakdown_2020,TBA_MATCH_SCORE_BREAKDOWN_2020)
+
 MAKE_INST(Elimination_Alliance_status,TBA_ELIMINATION_ALLIANCE_STATUS)
 
 MAKE_INST(Elimination_Alliance,TBA_ELIMINATION_ALLIANCE)
@@ -675,6 +679,71 @@ Unknown decode(JSON const& in,const Unknown*){
 	std::ostringstream ss;
 	ss<<"Expected \"unknown\", but got:"<<in;
 	throw std::invalid_argument{ss.str()};
+}
+
+std::ostream& operator<<(std::ostream& o,Init_line a){
+	#define X(A) if(a==Init_line::A) return o<<""#A;
+	TBA_INIT_LINE_OPTIONS(X)
+	#undef X
+	assert(0);
+}
+
+Init_line decode(JSON const& in,Init_line const*){
+	auto s=decode(in,(std::string*)nullptr);
+	#define X(A) if(s==""#A) return Init_line::A;
+	TBA_INIT_LINE_OPTIONS(X)
+	#undef X
+	TBA_PRINT(s);
+	TBA_NYI
+	//throw std::invalid_argument{s};
+}
+
+std::ostream& operator<<(std::ostream& o,Endgame a){
+	#define X(A) if(a==Endgame::A) return o<<""#A;
+	TBA_ENDGAME_OPTIONS(X)
+	#undef X
+	assert(0); 
+}
+
+Endgame decode(JSON const& in,Endgame const*){
+	auto s=decode(in,(std::string*)nullptr);
+	#define X(A) if(s==""#A) return Endgame::A;
+	TBA_ENDGAME_OPTIONS(X)
+	#undef X
+	TBA_PRINT(s);
+	TBA_NYI
+}
+
+std::ostream& operator<<(std::ostream& o,Target_color a){
+	#define X(A) if(a==Target_color::A) return o<<""#A;
+	TBA_TARGET_COLOR_OPTIONS(X)
+	#undef X
+	assert(0);
+}
+
+Target_color decode(JSON const& in,Target_color const*){
+	auto s=decode(in,(std::string*)nullptr);
+	#define X(A) if(s==""#A) return Target_color::A;
+	TBA_TARGET_COLOR_OPTIONS(X)
+	#undef X
+	TBA_PRINT(s);
+	TBA_NYI
+}
+
+std::ostream& operator<<(std::ostream& o,Rung_level a){
+	#define X(A) if(a==Rung_level::A) return o<<""#A;
+	TBA_RUNG_LEVEL_OPTIONS(X)
+	#undef X
+	assert(0);
+}
+
+Rung_level decode(JSON const& in,Rung_level const*){
+	auto s=decode(in,(std::string*)nullptr);
+	#define X(A) if(s==""#A) return Rung_level::A;
+	TBA_RUNG_LEVEL_OPTIONS(X)
+	#undef X
+	TBA_PRINT(s);
+	TBA_NYI
 }
 
 }
