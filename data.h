@@ -145,6 +145,7 @@ class Event_key{
 	std::string const& get()const;
 };
 
+bool operator==(Event_key const&,Event_key const&);
 std::ostream& operator<<(std::ostream&,Event_key const&);
 Event_key decode(JSON const& in,const Event_key*);
 

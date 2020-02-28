@@ -233,6 +233,10 @@ std::string const& Event_key::get()const{
 	return s;
 }
 
+bool operator==(Event_key const& a,Event_key const& b){
+	return a.get()==b.get();
+}
+
 std::ostream& operator<<(std::ostream& o,Event_key const& a){
 	return o<<a.get();
 }
