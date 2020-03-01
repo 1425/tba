@@ -166,6 +166,9 @@ std::map<A,B> decode(rapidjson::GenericValue<rapidjson::UTF8<>> const& in,const 
 }
 
 template<typename T>
+std::optional<T> decode(rapidjson::GenericValue<rapidjson::UTF8<>> const& in,const std::optional<T>*);
+
+template<typename T>
 std::vector<T> decode(rapidjson::GenericValue<rapidjson::UTF8<>> const& in,const std::vector<T> *x){
 	if(!in.IsArray()){
 		throw Decode_error{typeid(x).name(),in,"expected array"};

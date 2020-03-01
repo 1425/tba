@@ -147,6 +147,45 @@ void print_r(T t){
 	print_r(0,t);
 }
 
+template<typename Func,typename T>
+auto mapf(Func f,std::vector<T> const& a){
+	std::vector<decltype(f(a[0]))> r;
+	for(auto elem:a){
+		r|=f(elem);
+	}
+	return r;
+}
+
+template<typename Func,typename T>
+auto mapv(Func f,std::vector<T> const& a){
+	for(auto const& elem:a){
+		f(elem);
+	}
+}
+
+void csv_export(Zebra const& a){
+	cout<<"event,time,";
+	for(auto x:a.alliances.red){
+		cout<<x.team_key<<"_x,"<<x.team_key<<"_y,";
+	}
+	for(auto x:a.alliances.blue){
+		cout<<x.team_key<<"_x,"<<x.team_key<<"_y,";
+	}
+	cout<<"\n";
+
+	for(auto i:range(a.times.size())){
+		cout<<a.key<<",";
+		cout<<a.times[i]<<",";
+		auto show_team=[&](Zebra_team x){
+			cout<<x.xs[i]<<",";
+			cout<<x.ys[i]<<",";
+		};
+		mapv(show_team,a.alliances.red);
+		mapv(show_team,a.alliances.blue);
+		cout<<"\n";
+	}
+}
+
 int main1(int argc,char **argv){
 	std::string tba_key;
 
@@ -181,6 +220,15 @@ int main1(int argc,char **argv){
 	}
 	
 	Cached_fetcher f{Fetcher{Nonempty_string{tba_key}},Cache{}};
+
+	static const bool ZEBRA_DEMO=0;
+	if(ZEBRA_DEMO){
+		Match_key match{"2019cc_qm3"};
+		auto z=zebra_motionworks(f,match);
+		//TBA_PRINT(z);
+		csv_export(z);
+		exit(0);
+	}
 
 	if(opr_event){
 		auto d=event_oprs(f,*opr_event);

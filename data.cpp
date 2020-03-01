@@ -672,6 +672,9 @@ MAKE_INST(Stat_mean_var_set,TBA_STAT_MEAN_VAR_SET)
 MAKE_INST(Stat_mean_vars,TBA_STAT_MEAN_VARS)
 MAKE_INST(Event_predictions,TBA_EVENT_PREDICTIONS)
 MAKE_INST(Alliance_prediction,TBA_ALLIANCE_PREDICTION)
+MAKE_INST(Zebra_team,TBA_ZEBRA_TEAM)
+MAKE_INST(Zebra_alliances,TBA_ZEBRA_ALLIANCES)
+MAKE_INST(Zebra,TBA_ZEBRA)
 
 std::ostream& operator<<(std::ostream& o,Unknown){
 	return o<<"unknown";

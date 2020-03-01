@@ -116,6 +116,8 @@ TBA_QUERY1(team_districts,std::vector<District_List>,"team/", Team_key,"/distric
 TBA_QUERY2(team_event_matches_keys,std::vector<Match_key>,"team/", Team_key, "/event/",Event_key ,"/matches/keys")
 TBA_QUERY2(team_event_matches_simple,std::vector<Match_Simple>,"team/", Team_key, "/event/",Event_key ,"/matches/simple")
 
+TBA_QUERY1(zebra_motionworks,Zebra,"match/",Match_key,"/zebra_motionworks")
+
 }
 
 #endif

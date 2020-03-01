@@ -1407,6 +1407,26 @@ TBA_MAKE_INST(Stat_mean_vars,TBA_STAT_MEAN_VARS)
 
 TBA_MAKE_INST(Event_predictions,TBA_EVENT_PREDICTIONS)
 
+#define TBA_ZEBRA_TEAM(X)\
+	X(Team_key,team_key)\
+	X(std::vector<std::optional<double>>,xs)\
+	X(std::vector<std::optional<double>>,ys)
+
+TBA_MAKE_INST(Zebra_team,TBA_ZEBRA_TEAM)
+
+#define TBA_ZEBRA_ALLIANCES(X)\
+	X(std::vector<Zebra_team>,red)\
+	X(std::vector<Zebra_team>,blue)
+
+TBA_MAKE_INST(Zebra_alliances,TBA_ZEBRA_ALLIANCES)
+
+#define TBA_ZEBRA(X)\
+	X(Match_key,key)\
+	X(std::vector<double>,times)\
+	X(Zebra_alliances,alliances)
+
+TBA_MAKE_INST(Zebra,TBA_ZEBRA)
+
 }
 
 #endif
