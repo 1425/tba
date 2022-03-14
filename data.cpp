@@ -59,9 +59,9 @@ MAKE_INST(District_Ranking,TBA_DISTRICT_RANKING)
 
 Match_key::Match_key(std::string s1):s(move(s1)){
 	//format: event_key / "_" / level / (maybe set # and 'm') / match #
-	auto check=[=](bool b){
+	auto check=[&](bool b){
 		if(b) return;
-		throw std::invalid_argument{[=](){
+		throw std::invalid_argument{[&](){
 			std::ostringstream ss;
 			ss<<"Expected Match_key, found:"<<s;
 			return ss.str();
@@ -102,7 +102,7 @@ District_key::District_key(std::string s1):s(move(s1)){
 	Year{atoi(s.c_str())};//check that starts with a year
 	//then a 2-3 letter code.
 	if( !(s.size()>=6 && s.size()<=7) ){
-		throw std::invalid_argument{[=](){
+		throw std::invalid_argument{[&](){
 			std::ostringstream ss;
 			ss<<"Expected District_key, found:"<<s;
 			return ss.str();
@@ -131,7 +131,7 @@ District_key decode(JSON const& in,const District_key *){
 }
 
 Team_key::Team_key(std::string s1):s(s1){
-	auto check=[=](bool b){
+	auto check=[&](bool b){
 		if(b) return;
 		std::ostringstream ss;
 		ss<<"Invalid Team_key: \""<<s<<"\"";
@@ -226,7 +226,9 @@ MAKE_INST(Team_Simple,TBA_TEAM_SIMPLE)
 Event_key::Event_key(std::string s1):s(move(s1)){
 	if(s.size()<6) throw std::invalid_argument{"Event_key:"+s};
 	//starts with a year then has at least 2 more chars.
-	Year{atoi(s.c_str())};
+	if(!s.starts_with("202121")){
+		Year{atoi(s.c_str())};
+	}
 }
 
 std::string const& Event_key::get()const{
@@ -310,7 +312,7 @@ std::array<char,LEN> take(std::string const& s){
 }
 
 Date::Date(std::string s1):s(s1){
-	auto check=[=](bool b){
+	auto check=[*this](bool b){
 		if(b) return;
 		throw std::invalid_argument{"Date:"+s};
 	};
@@ -552,6 +554,10 @@ MAKE_INST(Event_Insights_2020_Detail,TBA_EVENT_INSIGHTS_2020_DETAIL)
 
 MAKE_INST(Event_Insights_2020,TBA_EVENT_INSIGHTS_2020)
 
+MAKE_INST(Event_Insights_2022_Detail,TBA_EVENT_INSIGHTS_2022_DETAIL)
+
+MAKE_INST(Event_Insights_2022,TBA_EVENT_INSIGHTS_2022)
+
 MAKE_INST(Average_rocket_count,TBA_AVERAGE_ROCKET_COUNT)
 
 MAKE_INST(Event_OPRs,TBA_EVENT_OPRS)
@@ -616,6 +622,19 @@ MAKE_INST(Match_Score_Breakdown_2017,TBA_MATCH_SCORE_BREAKDOWN_2017)
 MAKE_INST(Match_Score_Breakdown_2020_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2020_ALLIANCE)
 
 MAKE_INST(Match_Score_Breakdown_2020,TBA_MATCH_SCORE_BREAKDOWN_2020)
+
+#define YES_NO_OPTIONS(X) X(Yes) X(No)
+#define NAME Yes_no
+STR_OPTIONS(YES_NO_OPTIONS)
+#undef NAME
+
+#define NAME Endgame_2022
+STR_OPTIONS(TBA_ENDGAME_2022_OPTIONS)
+#undef NAME
+
+MAKE_INST(Match_Score_Breakdown_2022_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2022_ALLIANCE)
+
+MAKE_INST(Match_Score_Breakdown_2022,TBA_MATCH_SCORE_BREAKDOWN_2022)
 
 MAKE_INST(Elimination_Alliance_status,TBA_ELIMINATION_ALLIANCE_STATUS)
 

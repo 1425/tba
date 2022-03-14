@@ -237,8 +237,8 @@ int main1(int argc,char **argv){
 		return 0;
 	}
 
-	//auto years=range(Year{1992},Year{2020});//could get this via the API.
-	auto years=range(Year{2020},Year{2021});//could get this via the API.
+	//auto years=range(Year{1992},Year{2023});//could get this via the API.
+	auto years=range(Year{2021},Year{2023});//could get this via the API.
 
 	std::vector<Event_key> event_key_list;
 

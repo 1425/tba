@@ -203,6 +203,7 @@ TBA_MAKE_INST(Webcast,TBA_WEBCAST)
 	X(CMP_FINALS,4)\
 	X(DISTRICT_CMP_DIVISION,5)\
 	X(FOC,6)\
+	X(REMOTE,7)\
 	X(OFFSEASON,99)\
 	X(PRESEASON,100)\
 	X(UNLABLED,-1)
@@ -679,6 +680,10 @@ Endgame decode(JSON const&,Endgame const*);
 
 #define TBA_TARGET_COLOR_OPTIONS(X)\
 	X(Unknown)\
+	X(Blue)\
+	X(Green)\
+	X(Yellow)\
+	X(Red)
 
 enum class Target_color{
 	#define X(A) A,
@@ -754,7 +759,74 @@ Match_Score_Breakdown_2020_Alliance decode(JSON const&,const Match_Score_Breakdo
 
 TBA_MAKE_INST(Match_Score_Breakdown_2020,TBA_MATCH_SCORE_BREAKDOWN_2020)
 
+enum class Yes_no{
+	Yes,No //not all-caps to preserve being as documented in API
+};
+
+#define TBA_ENDGAME_2022_OPTIONS(X)\
+	X(Traversal)\
+	X(High)\
+	X(Mid)\
+	X(Low)\
+	X(None)
+
+enum class Endgame_2022{
+	#define X(A) A,
+	TBA_ENDGAME_2022_OPTIONS(X)
+	#undef X
+};
+
+#define TBA_MATCH_SCORE_BREAKDOWN_2022_ALLIANCE(X)\
+	X(Yes_no,taxiRobot1)\
+	X(Endgame_2022,endgameRobot1)\
+	X(Yes_no,taxiRobot2)\
+	X(Endgame_2022,endgameRobot2)\
+	X(Yes_no,taxiRobot3)\
+	X(Endgame_2022,endgameRobot3)\
+	X(int,autoCargoLowerNear)\
+	X(int,autoCargoLowerFar)\
+	X(int,autoCargoLowerBlue)\
+	X(int,autoCargoLowerRed)\
+	X(int,autoCargoUpperNear)\
+	X(int,autoCargoUpperFar)\
+	X(int,autoCargoUpperBlue)\
+	X(int,autoCargoUpperRed)\
+	X(int,autoCargoTotal)\
+	X(int,teleopCargoLowerNear)\
+	X(int,teleopCargoLowerFar)\
+	X(int,teleopCargoLowerBlue)\
+	X(int,teleopCargoLowerRed)\
+	X(int,teleopCargoUpperNear)\
+	X(int,teleopCargoUpperFar)\
+	X(int,teleopCargoUpperBlue)\
+	X(int,teleopCargoUpperRed)\
+	X(int,teleopCargoTotal)\
+	X(int,matchCargoTotal)\
+	X(int,autoTaxiPoints)\
+	X(int,autoCargoPoints)\
+	X(int,autoPoints)\
+	X(bool,quintetAchieved)\
+	X(int,teleopCargoPoints)\
+	X(int,endgamePoints)\
+	X(int,cargoBonusRankingPoint)\
+	X(int,hangarBonusRankingPoint)\
+	X(int,foulCount)\
+	X(int,techFoulCount)\
+	X(int,adjustPoints)\
+	X(int,foulPoints)\
+	X(int,rp)\
+	X(int,totalPoints)
+
+TBA_MAKE_INST(Match_Score_Breakdown_2022_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2022_ALLIANCE)
+
+#define TBA_MATCH_SCORE_BREAKDOWN_2022(X)\
+	X(Match_Score_Breakdown_2022_Alliance,blue)\
+	X(Match_Score_Breakdown_2022_Alliance,red)
+
+TBA_MAKE_INST(Match_Score_Breakdown_2022,TBA_MATCH_SCORE_BREAKDOWN_2022)
+
 using Match_Score_Breakdown=std::variant<
+	Match_Score_Breakdown_2022,
 	Match_Score_Breakdown_2020,
 	Match_Score_Breakdown_2017,
 	Match_Score_Breakdown_2014,
@@ -876,7 +948,15 @@ TBA_MAKE_INST(Award_Recipient,TBA_RECIPIENT)
 	X(WILDCARD,68)\
 	X(CHAIRMANS_FINALIST,69)\
 	X(OTHER,70)\
-	X(AUTONOMOUS,71)
+	X(AUTONOMOUS,71)\
+	X(INNOVATION_CHALLENGE_SEMI_FINALIST,72)\
+	X(ROOKIE_GAME_CHANGER,73)\
+	X(SKILLS_COMPETITION_WINNER,74)\
+	X(SKILLS_COMPETITION_FINALIST,75)\
+	X(ROOKIE_DESIGN,76)\
+	X(ENGINEERING_DESIGN,77)\
+	X(DESIGNERS,78)\
+	X(CONCEPT,79)
 
 enum class Award_type{
 	#define X(A,B) A,
@@ -1263,13 +1343,54 @@ TBA_MAKE_INST(Event_Insights_2020_Detail,TBA_EVENT_INSIGHTS_2020_DETAIL)
 
 TBA_MAKE_INST(Event_Insights_2020,TBA_EVENT_INSIGHTS_2020)
 
+#define TBA_EVENT_INSIGHTS_2022_DETAIL(X)\
+	X(double,average_cargo_count)\
+	X(double,average_cargo_count_auto)\
+	X(double,average_cargo_count_teleop)\
+	X(double,average_cargo_points)\
+	X(double,average_cargo_points_auto)\
+	X(double,average_cargo_points_teleop)\
+	X(double,average_endgame_points)\
+	X(double,average_foul_score)\
+	X(double,average_lower_cargo_count)\
+	X(double,average_lower_cargo_count_auto)\
+	X(double,average_lower_cargo_count_teleop)\
+	X(double,average_points_auto)\
+	X(double,average_points_teleop)\
+	X(double,average_score)\
+	X(double,average_taxi_points)\
+	X(double,average_upper_cargo_count)\
+	X(double,average_upper_cargo_count_auto)\
+	X(double,average_upper_cargo_count_teleop)\
+	X(double,average_win_margin)\
+	X(double,average_win_score)\
+	X(IID,cargo_bonus_rp)\
+	X(IID,hangar_bonus_rp)\
+	X(IID,high_climb_count)\
+	X(High_score,high_score)\
+	X(IID,low_climb_count)\
+	X(IID,mid_climb_count)\
+	X(IID,quintet_count)\
+	X(IID,taxi_count)\
+	X(IID,traversal_climb_count)\
+	X(IID,unicorn_matches)
+
+TBA_MAKE_INST(Event_Insights_2022_Detail,TBA_EVENT_INSIGHTS_2022_DETAIL)
+
+#define TBA_EVENT_INSIGHTS_2022(X)\
+	X(Event_Insights_2022_Detail,playoff)\
+	X(Event_Insights_2022_Detail,qual)
+
+TBA_MAKE_INST(Event_Insights_2022,TBA_EVENT_INSIGHTS_2022)
+
 using Event_insights=std::variant<
 	std::nullptr_t,
 	Event_Insights_2017,
 	Event_Insights_2016,
 	Event_Insights_2018,
 	Event_Insights_2019,
-	Event_Insights_2020
+	Event_Insights_2020,
+	Event_Insights_2022
 >;
 
 //These come back as null rather than empty lists for events that don't have these calculated yet.

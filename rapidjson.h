@@ -143,6 +143,35 @@ std::variant<A,B,C,D,E,F> decode(rapidjson::GenericValue<rapidjson::UTF8<>> cons
 	return decode(in,(F*)nullptr);
 }
 
+template<typename A,typename B,typename C,typename D,typename E,typename F,typename G>
+std::variant<A,B,C,D,E,F,G> decode(rapidjson::GenericValue<rapidjson::UTF8<>> const& in,const std::variant<A,B,C,D,E,F,G>*){
+	try{
+		return decode(in,(A*)nullptr);
+	}catch(...){
+	}
+	try{
+		return decode(in,(B*)nullptr);
+	}catch(...){
+	}
+	try{
+		return decode(in,(C*)nullptr);
+	}catch(...){
+	}
+	try{
+		return decode(in,(D*)nullptr);
+	}catch(...){
+	}
+	try{
+		return decode(in,(E*)nullptr);
+	}catch(...){
+	}
+	try{
+		return decode(in,(F*)nullptr);
+	}catch(...){
+	}
+	return decode(in,(G*)nullptr);
+}
+
 
 template<typename A,typename B>
 std::map<A,B> decode(rapidjson::GenericValue<rapidjson::UTF8<>> const& in,const std::map<A,B> *x){

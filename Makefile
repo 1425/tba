@@ -1,4 +1,4 @@
-CXXFLAGS=-std=c++17 -Wall -Wextra -pedantic -Ofast -flto
+CXXFLAGS=-std=c++20 -Wall -Wextra -pedantic -Ofast -flto
 
 LIBS=-lcurl -lsqlite3 -lpthread
 
