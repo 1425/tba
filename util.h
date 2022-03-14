@@ -5,13 +5,12 @@
 #include<map>
 #include<vector>
 #include<variant>
+#include<optional>
 
 #define TBA_NYI { std::cout<<"NYI "<<__FILE__<<":"<<__LINE__<<"\n"; exit(1); }
 #define TBA_PRINT(X) { std::cout<<""#X<<":"<<(X)<<"\n"; }
 
 namespace tba{
-
-std::ostream& operator<<(std::ostream&,nullptr_t);
 
 template<typename A,typename B>
 std::ostream& operator<<(std::ostream& o,std::pair<A,B> const& p){
