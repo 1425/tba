@@ -55,14 +55,18 @@ std::pair<Date,Data> Fetcher::fetch(URL url){
 		{"X-TBA-Auth-Key: "+auth_key}
 	);
 
-	auto f=std::find_if(g.headers.begin(),g.headers.end(),[](auto const& p){ return p.first=="Last-Modified"; });
-	if(f!=g.headers.end()){
-		return make_pair(f->second,g.data);
+	{
+		auto f=std::find_if(g.headers.begin(),g.headers.end(),[](auto const& p){ return p.first=="Last-Modified"; });
+		if(f!=g.headers.end()){
+			return make_pair(f->second,g.data);
+		}
 	}
 
-	auto f2=std::find_if(g.headers.begin(),g.headers.end(),[](auto const& p){ return p.first=="Date"; });
-	if(f2!=g.headers.end()){
-		return make_pair(f2->second,g.data);
+	{
+		auto f2=std::find_if(g.headers.begin(),g.headers.end(),[](auto const& p){ return p.first=="Date" || p.first=="date"; });
+		if(f2!=g.headers.end()){
+			return make_pair(f2->second,g.data);
+		}
 	}
 
 	{
