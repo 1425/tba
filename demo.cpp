@@ -148,15 +148,6 @@ void print_r(T t){
 }
 
 template<typename Func,typename T>
-auto mapf(Func f,std::vector<T> const& a){
-	std::vector<decltype(f(a[0]))> r;
-	for(auto elem:a){
-		r|=f(elem);
-	}
-	return r;
-}
-
-template<typename Func,typename T>
 auto mapv(Func f,std::vector<T> const& a){
 	for(auto const& elem:a){
 		f(elem);
@@ -238,7 +229,7 @@ int main1(int argc,char **argv){
 	}
 
 	//auto years=range(Year{1992},Year{2023});//could get this via the API.
-	auto years=range(Year{2021},Year{2023});//could get this via the API.
+	auto years=range(Year{2022},Year{2023});//could get this via the API.
 
 	std::vector<Event_key> event_key_list;
 
@@ -269,7 +260,13 @@ int main1(int argc,char **argv){
 		null_stream<<event_oprs(f,event_key)<<"\n";
 		null_stream<<event_predictions(f,event_key)<<"\n";
 		null_stream<<event_rankings(f,event_key)<<"\n";
-		null_stream<<event_district_points(f,event_key)<<"\n";
+
+		//skip district points for now.
+		try{
+			null_stream<<event_district_points(f,event_key)<<"\n";
+		}catch(Decode_error e){
+			cout<<"event_district_points(...)\n";
+		}
 
 		null_stream<<event_matches(f,event_key)<<"\n";
 		null_stream<<event_matches_simple(f,event_key)<<"\n";
@@ -280,8 +277,16 @@ int main1(int argc,char **argv){
 	}
 
 	for(auto match_key:select(reversed(match_keys))){
-		null_stream<<match(f,match_key)<<"\n";
-		null_stream<<match_simple(f,match_key)<<"\n";
+		try{
+			null_stream<<match(f,match_key)<<"\n";
+		}catch(Decode_error){
+			cout<<"match(...)\n";
+		}
+		try{
+			null_stream<<match_simple(f,match_key)<<"\n";
+		}catch(Decode_error){
+			cout<<"match_simple(...)";
+		}
 	}
 
 	std::vector<Team_key> team_keys1;
@@ -299,6 +304,8 @@ int main1(int argc,char **argv){
 		for(auto a:d){
 			district_keys|=a.key;
 		}
+		TBA_PRINT(year);
+		TBA_PRINT(district_keys);
 	}
 
 	//These are all known to work

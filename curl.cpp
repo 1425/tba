@@ -111,6 +111,8 @@ Get_result get_url(std::string const& url,std::vector<std::string> const& reques
 		return get_url_inner(url,request_headers);
 	}catch(std::string const& s){
 		std::cout<<"Failure:"<<s<<" Going to retry.\n";
+		std::cout<<"URL:"<<url<<"\n";
+		std::cout<<"headers:"<<request_headers<<"\n";
 		return get_url_inner(url,request_headers);
 	}
 }

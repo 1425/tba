@@ -37,11 +37,17 @@ std::ostream& operator<<(std::ostream& o,std::optional<T> const& a){
 	return o<<"NULL";
 }
 
+}
+
+namespace std{
 template<typename T>
 std::vector<T>& operator|=(std::vector<T> &a,T t){
 	a.push_back(t);
 	return a;
 }
+}
+
+namespace tba{
 
 template<typename T>
 std::vector<T>& operator|=(std::vector<T> &a,std::vector<T> b){
@@ -86,6 +92,15 @@ std::ostream& operator<<(std::ostream& o,std::tuple<A,B,C,D,E,F,G> const& a){
 
 std::vector<size_t> range(size_t);
 std::vector<int> range(int,int);
+
+template<typename Func,typename T>
+auto mapf(Func f,std::vector<T> const& a){
+	std::vector<decltype(f(a[0]))> r;
+	for(auto elem:a){
+		r|=f(elem);
+	}
+	return r;
+}
 
 }
 

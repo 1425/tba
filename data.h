@@ -776,6 +776,8 @@ enum class Endgame_2022{
 	#undef X
 };
 
+std::ostream& operator<<(std::ostream&,Endgame_2022);
+
 #define TBA_MATCH_SCORE_BREAKDOWN_2022_ALLIANCE(X)\
 	X(Yes_no,taxiRobot1)\
 	X(Endgame_2022,endgameRobot1)\
@@ -808,8 +810,8 @@ enum class Endgame_2022{
 	X(bool,quintetAchieved)\
 	X(int,teleopCargoPoints)\
 	X(int,endgamePoints)\
-	X(int,cargoBonusRankingPoint)\
-	X(int,hangarBonusRankingPoint)\
+	X(bool,cargoBonusRankingPoint)\
+	X(bool,hangarBonusRankingPoint)\
 	X(int,foulCount)\
 	X(int,techFoulCount)\
 	X(int,adjustPoints)\
