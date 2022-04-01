@@ -315,7 +315,8 @@ TBA_MAKE_INST(Event_Simple,TBA_EVENT_SIMPLE)
 	X(TBA,tba)\
 	X(INSTAGRAM_IMAGE,instagram-image)\
 	X(EXTERNAL_LINK,external-link)\
-	X(AVATAR,avatar)
+	X(AVATAR,avatar)\
+	X(ONSHAPE,onshape)
 //"tba" occurs, but is not documented.
 //"instagram-image", and "external-link" were originally not documented but are as of 2019.
 

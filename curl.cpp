@@ -33,6 +33,11 @@ size_t header_callback(char *ptr,size_t size,size_t nmemb,void *userdata){
 
 	size_t at=0;
 	while(at<len && ptr[at]!=':') at++;
+	if(at>=len){
+		// std::cout<<"got:"<<std::string(ptr,len)<<"\n";
+		//std::cout<<"Unusual...HTTP/2 ? skipping header.\n";
+		return len;
+	}
 	assert(at<len);
 	std::string name{ptr,at};
 	at++;//skip space
