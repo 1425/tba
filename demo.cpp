@@ -177,26 +177,99 @@ void csv_export(Zebra const& a){
 	}
 }
 
-int main1(int argc,char **argv){
-	std::string tba_key;
-
-	auto a=args(argc,argv);
+struct Args{
 	bool quick=0;
-	if(a.size() && a[0]=="--short"){
-		quick=1;
-		a=tail(a);
-	}
-
 	std::optional<Event_key> opr_event;
-	if(a.size() && a[0]=="--opr"){
-		a=tail(a);
-		assert(a.size());
-		opr_event=Event_key{a[0]};
-		a=tail(a);
+	std::optional<std::string> tba_key;
+};
+
+Args parse_args(int argc,char **argv){
+	auto a=args(argc,argv);
+	Args r;
+
+	struct Flag{
+		string s;
+		size_t args;
+		std::function<void(std::vector<std::string>)> f;
+	};
+
+	vector<Flag> flags{
+		Flag{
+			"--short",0,
+			[&](vector<string>){
+				r.quick=1;
+			}
+		},
+		Flag{
+			"--opr",1,
+			[&](vector<string> v){
+				r.opr_event=Event_key{v[0]};
+			}
+		},
+		Flag{
+			"--tba_key",1,
+			[&](vector<string> v){
+				r.tba_key=v[0];
+			}
+		}
+	};
+
+	flags|=Flag{
+		"--help",0,
+		[&](vector<string>){
+			cout<<"./demo";
+			for(auto flag:flags){
+				cout<<" ["<<flag.s;
+				for(auto _:range(flag.args)){
+					(void)_;
+					cout<<" ARG";
+				}
+				cout<<"]";
+			}
+			cout<<"\n";
+			exit(0);
+		}
+	};
+
+	auto find=[&](auto s)->optional<Flag>{
+		for(auto f:flags){
+			if(f.s==s){
+				return f;
+			}
+		}
+		return std::nullopt;
+	};
+
+	for(auto at=a.begin();at!=a.end();){
+		cout<<"at:"<<(*at)<<"\n";
+		auto f=find(*at);
+		if(!f){
+			cerr<<"Unrecognized flag: \""<<*at<<"\"\n";
+			exit(1);
+		}
+		at++;
+		vector<string> v;
+		for(size_t i=0;i<f->args && at!=a.end();i++,++at){
+			v|=*at;
+		}
+		if(v.size()<f->args){
+			cerr<<"Error: missing argument to "<<f->s<<"\n";
+			exit(1);
+		}
+		f->f(v);
 	}
 
-	if(a.size()){
-		tba_key=a[1];
+	return r;
+}
+
+int main1(int argc,char **argv){
+	auto aa=parse_args(argc,argv);
+	std::string tba_key;
+	bool quick=aa.quick;
+	std::optional<Event_key> opr_event=aa.opr_event;
+
+	if(aa.tba_key){
+		tba_key=*aa.tba_key;
 	}else{
 		std::ifstream f("auth_key");
 		if(!f.good()){
