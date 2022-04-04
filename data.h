@@ -122,10 +122,11 @@ class District_key{
 	public:
 	explicit District_key(std::string);
 	std::string const& get()const;
+
+	auto operator<=>(District_key const&)const=default;
 };
 
 std::ostream& operator<<(std::ostream&,District_key const&);
-bool operator==(District_key const&,District_key const&);
 bool operator==(District_key const&,std::string const&);
 District_key decode(JSON const&,const District_key*);
 

@@ -118,10 +118,6 @@ std::ostream& operator<<(std::ostream& o,District_key const& a){
 	return o<<a.get();
 }
 
-bool operator==(District_key const& a,District_key const& b){
-	return a.get()==b.get();
-}
-
 bool operator==(District_key const& a,std::string const& b){
 	return a.get()==b;
 }
