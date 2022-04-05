@@ -64,7 +64,7 @@ class Team_key{
 
 	public:
 	explicit Team_key(std::string);
-	std::string str()const;
+	std::string const& str()const;
 };
 
 bool operator<(Team_key const&,Team_key const&);
@@ -144,9 +144,11 @@ class Event_key{
 	public:
 	explicit Event_key(std::string);
 	std::string const& get()const;
+
+	auto operator<=>(Event_key const&)const=default;
 };
 
-bool operator==(Event_key const&,Event_key const&);
+bool operator==(Event_key const&,const char *);
 std::ostream& operator<<(std::ostream&,Event_key const&);
 Event_key decode(JSON const& in,const Event_key*);
 
@@ -246,6 +248,8 @@ class Date{
 	public:
 	explicit Date(std::string);
 	std::string str()const;
+
+	auto operator<=>(Date const&)const=default;
 };
 
 std::ostream& operator<<(std::ostream&,Date const&);

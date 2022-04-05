@@ -142,7 +142,7 @@ Team_key::Team_key(std::string s1):s(s1){
 	//can also be just "frc", oddly.
 }
 
-std::string Team_key::str()const{ return s; }
+std::string const& Team_key::str()const{ return s; }
 
 bool operator<(Team_key const& a,Team_key const& b){
 	return a.str()<b.str();
@@ -231,8 +231,9 @@ std::string const& Event_key::get()const{
 	return s;
 }
 
-bool operator==(Event_key const& a,Event_key const& b){
-	return a.get()==b.get();
+bool operator==(Event_key const& a,const char *s){
+	if(!s) return 0;
+	return a.get()==s;
 }
 
 std::ostream& operator<<(std::ostream& o,Event_key const& a){
