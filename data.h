@@ -33,12 +33,11 @@ class Year{
 	explicit Year(int);
 	int get()const;
 
+	auto operator<=>(Year const&)const=default;
 	friend Year& operator++(Year&);
 };
 
 std::ostream& operator<<(std::ostream& o,Year);
-bool operator!=(Year,Year);
-bool operator<(Year,Year);
 Year& operator++(Year&);
 Year operator++(Year&,int);
 Year decode(JSON const&,const Year*);
@@ -65,11 +64,10 @@ class Team_key{
 	public:
 	explicit Team_key(std::string);
 	std::string const& str()const;
+
+	auto operator<=>(Team_key const&)const=default;
 };
 
-bool operator<(Team_key const&,Team_key const&);
-bool operator==(Team_key const&,Team_key const&);
-bool operator!=(Team_key const&,Team_key const&);
 std::ostream& operator<<(std::ostream&,Team_key const&);
 Team_key decode(JSON const& in,const Team_key*);
 
@@ -1108,10 +1106,11 @@ class Match_key{
 	public:
 	explicit Match_key(std::string);
 	std::string const& get()const;
+
+	auto operator<=>(Match_key const&)const=default;
 };
 
 std::ostream& operator<<(std::ostream&,Match_key const&);
-bool operator<(Match_key const&,Match_key const&);
 Match_key decode(JSON const&,const Match_key*);
 
 #define TBA_HIGH_SCORE(X)\

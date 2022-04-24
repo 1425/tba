@@ -12,6 +12,12 @@
 
 namespace tba{
 
+template<typename A,typename B,typename C,typename D,typename E,typename F,typename G>
+std::ostream& operator<<(std::ostream& o,std::tuple<A,B,C,D,E,F,G> const& a);
+
+template<typename T>
+std::ostream& operator<<(std::ostream& o,std::optional<T> const& a);
+
 template<typename A,typename B>
 std::ostream& operator<<(std::ostream& o,std::pair<A,B> const& p){
 	return o<<"("<<p.first<<","<<p.second<<")";
@@ -37,17 +43,11 @@ std::ostream& operator<<(std::ostream& o,std::optional<T> const& a){
 	return o<<"NULL";
 }
 
-}
-
-namespace std{
 template<typename T>
 std::vector<T>& operator|=(std::vector<T> &a,T t){
 	a.push_back(t);
 	return a;
 }
-}
-
-namespace tba{
 
 template<typename T>
 std::vector<T>& operator|=(std::vector<T> &a,std::vector<T> b){

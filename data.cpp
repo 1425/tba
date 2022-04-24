@@ -26,12 +26,12 @@ namespace tba{
 	}
 
 template<typename T>
-T decode(nullptr_t,const T *x){
+T decode(std::nullptr_t,const T *x){
 	throw Decode_error(typeid(x).name(),"null","wrong type");
 }
 
 template<typename T>
-std::optional<T> decode(nullptr_t,const std::optional<T>*){
+std::optional<T> decode(std::nullptr_t,const std::optional<T>*){
 	return {};
 }
 
@@ -94,10 +94,6 @@ std::ostream& operator<<(std::ostream& o,Match_key const& a){
 	return o<<a.get();
 }
 
-bool operator<(Match_key const& a,Match_key const& b){
-	return a.get()<b.get();
-}
-
 District_key::District_key(std::string s1):s(move(s1)){
 	Year{atoi(s.c_str())};//check that starts with a year
 	//then a 2-3 letter code.
@@ -144,18 +140,6 @@ Team_key::Team_key(std::string s1):s(s1){
 
 std::string const& Team_key::str()const{ return s; }
 
-bool operator<(Team_key const& a,Team_key const& b){
-	return a.str()<b.str();
-}
-
-bool operator==(Team_key const& a,Team_key const& b){
-	return a.str()==b.str();
-}
-
-bool operator!=(Team_key const& a,Team_key const& b){
-	return a.str()!=b.str();
-}
-
 std::ostream& operator<<(std::ostream& o,Team_key const& a){
 	//return o<<"Team_key("<<a.str()<<")";
 	return o<<a.str();
@@ -186,14 +170,6 @@ int Year::get()const{
 
 std::ostream& operator<<(std::ostream& o,Year a){
 	return o<<a.get();
-}
-
-bool operator!=(Year a,Year b){
-	return a.get()!=b.get();
-}
-
-bool operator<(Year a,Year b){
-	return a.get()<b.get();
 }
 
 Year& operator++(Year& a){
