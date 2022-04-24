@@ -181,6 +181,7 @@ struct Args{
 	bool quick=0;
 	std::optional<Event_key> opr_event;
 	std::optional<std::string> tba_key;
+	bool show_cache=0;
 };
 
 Args parse_args(int argc,char **argv){
@@ -189,44 +190,62 @@ Args parse_args(int argc,char **argv){
 
 	struct Flag{
 		string s;
-		size_t args;
+		vector<string> args;
+		std::string help;
 		std::function<void(std::vector<std::string>)> f;
 	};
 
 	vector<Flag> flags{
 		Flag{
-			"--short",0,
+			"--short",vector<string>{},
+			"Pull down and check less data",
 			[&](vector<string>){
 				r.quick=1;
 			}
 		},
 		Flag{
-			"--opr",1,
+			"--opr",{"EVENT_CODE"},
+			"Show the OPRs from the given event code",
 			[&](vector<string> v){
 				r.opr_event=Event_key{v[0]};
 			}
 		},
 		Flag{
-			"--tba_key",1,
+			"--tba_key",{"KEY"},
+			"Specify the key to use when talking to The Blue Alliance, rather than having it be read from a file",
 			[&](vector<string> v){
 				r.tba_key=v[0];
+			}
+		},
+		Flag{
+			"--show_cache",vector<string>{},
+			"Show what's in the cache",
+			[&](vector<string> const& v){
+				assert(v.empty());
+				r.show_cache=1;
 			}
 		}
 	};
 
 	flags|=Flag{
-		"--help",0,
+		"--help",{},
+		"Show this message",
 		[&](vector<string>){
 			cout<<"./demo";
 			for(auto flag:flags){
 				cout<<" ["<<flag.s;
-				for(auto _:range(flag.args)){
-					(void)_;
-					cout<<" ARG";
+				for(auto arg:flag.args){
+					cout<<" "<<arg;
 				}
 				cout<<"]";
 			}
-			cout<<"\n";
+			cout<<"\n\n";
+
+			for(auto flag:flags){
+				cout<<flag.s<<"\n";
+				cout<<"\t"<<flag.help<<"\n";
+			}
+
 			exit(0);
 		}
 	};
@@ -241,7 +260,6 @@ Args parse_args(int argc,char **argv){
 	};
 
 	for(auto at=a.begin();at!=a.end();){
-		cout<<"at:"<<(*at)<<"\n";
 		auto f=find(*at);
 		if(!f){
 			cerr<<"Unrecognized flag: \""<<*at<<"\"\n";
@@ -249,10 +267,10 @@ Args parse_args(int argc,char **argv){
 		}
 		at++;
 		vector<string> v;
-		for(size_t i=0;i<f->args && at!=a.end();i++,++at){
+		for(size_t i=0;i<f->args.size() && at!=a.end();i++,++at){
 			v|=*at;
 		}
-		if(v.size()<f->args){
+		if(v.size()<f->args.size()){
 			cerr<<"Error: missing argument to "<<f->s<<"\n";
 			exit(1);
 		}
@@ -260,6 +278,12 @@ Args parse_args(int argc,char **argv){
 	}
 
 	return r;
+}
+
+void show_cache(){
+	Sqlite db("cache.db");//TODO: Make this configurable
+	auto x=db.query("SELECT url,date FROM cache");
+	print_lines(x);
 }
 
 int main1(int argc,char **argv){
@@ -282,7 +306,12 @@ int main1(int argc,char **argv){
 			return 1;
 		}
 	}
-	
+
+	if(aa.show_cache){
+		show_cache();
+		return 0;
+	}
+
 	Cached_fetcher f{Fetcher{Nonempty_string{tba_key}},Cache{}};
 
 	static const bool ZEBRA_DEMO=0;

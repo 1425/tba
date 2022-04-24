@@ -102,6 +102,13 @@ auto mapf(Func f,std::vector<T> const& a){
 	return r;
 }
 
+template<typename T>
+void print_lines(T t){
+	for(auto elem:t){
+		std::cout<<elem<<"\n";
+	}
+}
+
 }
 
 #endif
