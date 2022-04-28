@@ -5,6 +5,7 @@
 #include<optional>
 #include<map>
 #include<variant>
+#include<array>
 #include "rapidjson/document.h"
 
 #define TBA_SINGLE_ARG(A,B) A,B
