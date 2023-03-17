@@ -228,7 +228,9 @@ Event_type decode(JSON const& in,const Event_type *);
 	X(5,DOUBLE_ELIM_8_TEAM, "Double Elimination Bracket (8 Alliances)")\
 	X(6,BO5_FINALS,"Best of 5 Finals")\
 	X(7,BO3_FINALS,"Best of 3 Finals")\
-	X(8,CUSTOM,"Custom playoff type")
+	X(8,CUSTOM,"Custom playoff type")\
+	X(9,EB2,"Elimination Bracket (2 Alliances)")\
+	X(10,DE8,"Double Elimination Bracket (8 Alliances)")
 
 enum class Playoff_type{
 	#define X(A,B,C) B,
@@ -961,7 +963,8 @@ TBA_MAKE_INST(Award_Recipient,TBA_RECIPIENT)
 	X(ROOKIE_DESIGN,76)\
 	X(ENGINEERING_DESIGN,77)\
 	X(DESIGNERS,78)\
-	X(CONCEPT,79)
+	X(CONCEPT,79)\
+	X(SUSTAINABILITY,82)
 
 enum class Award_type{
 	#define X(A,B) A,
@@ -1389,6 +1392,37 @@ TBA_MAKE_INST(Event_Insights_2022_Detail,TBA_EVENT_INSIGHTS_2022_DETAIL)
 
 TBA_MAKE_INST(Event_Insights_2022,TBA_EVENT_INSIGHTS_2022)
 
+#define TBA_EVENT_INSIGHTS_2023_DETAIL(X)\
+	X(IID,activation_bonus_rp)\
+	X(IID,auto_docked_count)\
+	X(IID,auto_engaged_count)\
+	X(double,average_charge_station_points_auto)\
+	X(double,average_charge_station_points_teleop)\
+	X(double,average_foul_score)\
+	X(double,average_link_points)\
+	X(double,average_mobility_points)\
+	X(double,average_park_points)\
+	X(double,average_piece_points_auto)\
+	X(double,average_piece_points_teleop)\
+	X(double,average_points_auto)\
+	X(double,average_points_teleop)\
+	X(double,average_score)\
+	X(double,average_win_margin)\
+	X(double,average_win_score)\
+	X(IID,coopertition)\
+	X(High_score,high_score)\
+	X(IID,mobility_count)\
+	X(IID,sustainability_bonus_rp)\
+	X(IID,unicorn_matches)
+
+TBA_MAKE_INST(Event_Insights_2023_Detail,TBA_EVENT_INSIGHTS_2023_DETAIL)
+
+#define TBA_EVENT_INSIGHTS_2023(X)\
+	X(Event_Insights_2023_Detail,playoff)\
+	X(Event_Insights_2023_Detail,qual)
+
+TBA_MAKE_INST(Event_Insights_2023,TBA_EVENT_INSIGHTS_2023)
+
 using Event_insights=std::variant<
 	std::nullptr_t,
 	Event_Insights_2017,
@@ -1396,7 +1430,8 @@ using Event_insights=std::variant<
 	Event_Insights_2018,
 	Event_Insights_2019,
 	Event_Insights_2020,
-	Event_Insights_2022
+	Event_Insights_2022,
+	Event_Insights_2023
 >;
 
 //These come back as null rather than empty lists for events that don't have these calculated yet.

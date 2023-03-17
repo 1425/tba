@@ -272,7 +272,7 @@ Playoff_type decode(JSON const& in,const Playoff_type*){
 	TBA_PLAYOFF_TYPES(X)
 	#undef X
 	TBA_PRINT(in);
-	assert(0);
+	throw std::invalid_argument(std::string()+"Playoff_type"+in.GetString());
 }
 
 MAKE_INST(Event,TBA_EVENT)
@@ -530,6 +530,10 @@ MAKE_INST(Event_Insights_2020,TBA_EVENT_INSIGHTS_2020)
 MAKE_INST(Event_Insights_2022_Detail,TBA_EVENT_INSIGHTS_2022_DETAIL)
 
 MAKE_INST(Event_Insights_2022,TBA_EVENT_INSIGHTS_2022)
+
+MAKE_INST(Event_Insights_2023_Detail,TBA_EVENT_INSIGHTS_2023_DETAIL)
+
+MAKE_INST(Event_Insights_2023,TBA_EVENT_INSIGHTS_2023)
 
 MAKE_INST(Average_rocket_count,TBA_AVERAGE_ROCKET_COUNT)
 
