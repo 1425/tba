@@ -230,7 +230,8 @@ Event_type decode(JSON const& in,const Event_type *);
 	X(7,BO3_FINALS,"Best of 3 Finals")\
 	X(8,CUSTOM,"Custom playoff type")\
 	X(9,EB2,"Elimination Bracket (2 Alliances)")\
-	X(10,DE8,"Double Elimination Bracket (8 Alliances)")
+	X(10,DE8,"Double Elimination Bracket (8 Alliances)")\
+	X(11,DE4,"Double Elimination Bracket (4 Alliances)")
 
 enum class Playoff_type{
 	#define X(A,B,C) B,
