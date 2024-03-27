@@ -236,6 +236,7 @@ std::vector<T> decode(rapidjson::GenericValue<rapidjson::UTF8<>> const& in,const
 		throw Decode_error{typeid(x).name(),in,"expected array"};
 	}
 	std::vector<T> out;
+	out.reserve(in.Size());
 	std::transform(
 		in.Begin(),
 		in.End(),
