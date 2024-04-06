@@ -181,10 +181,23 @@ Year& operator++(Year& a){
 	return a;
 }
 
+Year& Year::operator--(){
+	i--;
+	if(!valid()){
+		i++;
+		throw std::range_error{"Year too low"};
+	}
+	return *this;
+}
+
 Year operator++(Year& a,int){
 	auto r=a;
 	++a;
 	return r;
+}
+
+Year operator-(Year a,int b){
+	return Year{a.get()-b};
 }
 
 Year decode(JSON const& in,const Year*){

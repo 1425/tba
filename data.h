@@ -18,7 +18,10 @@ using URL=std::string;
 #define TBA_INST(A,B) A B;
 
 #define TBA_MAKE_INST(NAME,ITEMS)\
-	struct NAME{ ITEMS(TBA_INST) };\
+	struct NAME{ \
+		ITEMS(TBA_INST) \
+		auto operator<=>(NAME const&)const=default;\
+	};\
 	std::ostream& operator<<(std::ostream&,NAME const&);\
 	NAME decode(JSON const& in,const NAME*);\
 
@@ -34,6 +37,8 @@ class Year{
 	explicit Year(int);
 	int get()const;
 
+	Year& operator--();
+
 	auto operator<=>(Year const&)const=default;
 	friend Year& operator++(Year&);
 };
@@ -41,6 +46,7 @@ class Year{
 std::ostream& operator<<(std::ostream& o,Year);
 Year& operator++(Year&);
 Year operator++(Year&,int);
+Year operator-(Year,int);
 Year decode(JSON const&,const Year*);
 
 #define TBA_API_STATUS_APP_VERSION(X)\
