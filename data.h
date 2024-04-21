@@ -12,6 +12,8 @@
 
 namespace tba{
 
+std::strong_ordering operator<=>(std::optional<std::nullptr_t> const&,std::optional<std::nullptr_t> const&);
+
 using JSON=rapidjson::GenericValue<rapidjson::UTF8<>>;
 using URL=std::string;
 
@@ -380,6 +382,8 @@ class M_score{
 
 	bool valid()const;
 	int value()const;
+
+	auto operator<=>(M_score const&)const=default;
 };
 
 std::ostream& operator<<(std::ostream&,M_score const&);
@@ -654,6 +658,8 @@ struct Match_Score_Breakdown_2014_Alliance{
 	#define X(A,B,C) A B;
 	TBA_MATCH_SCORE_BREAKDOWN_2014_ALLIANCE(X)
 	#undef X
+
+	auto operator<=>(Match_Score_Breakdown_2014_Alliance const&)const=default;
 };
 
 std::ostream& operator<<(std::ostream&,Match_Score_Breakdown_2014_Alliance const&);
@@ -761,6 +767,8 @@ struct Match_Score_Breakdown_2020_Alliance{
 	#define X(A,B) A B;
 	TBA_MATCH_SCORE_BREAKDOWN_2020_ALLIANCE(X)
 	#undef X
+
+	auto operator<=>(Match_Score_Breakdown_2020_Alliance const&)const=default;
 };
 
 std::ostream& operator<<(std::ostream&,Match_Score_Breakdown_2020_Alliance const&);
@@ -1040,6 +1048,8 @@ class Pick_order{
 	public:
 	explicit Pick_order(int);
 	int get()const;
+
+	auto operator<=>(Pick_order const&)const=default;
 };
 
 std::ostream& operator<<(std::ostream&,Pick_order);
@@ -1133,6 +1143,8 @@ Match_key decode(JSON const&,const Match_key*);
 
 struct High_score{
 	TBA_HIGH_SCORE(TBA_INST)
+
+	auto operator<=>(High_score const&)const=default;
 };
 
 std::ostream& operator<<(std::ostream&,High_score const&);
@@ -1462,7 +1474,9 @@ using WLT_Record=Record;
 
 TBA_MAKE_INST(Elimination_Alliance_status,TBA_ELIMINATION_ALLIANCE_STATUS)
 
-struct Unknown{};
+struct Unknown{
+	auto operator<=>(Unknown const&)const=default;
+};
 
 std::ostream& operator<<(std::ostream&,Unknown);
 Unknown decode(JSON const&,const Unknown *);

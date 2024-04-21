@@ -4,6 +4,19 @@
 
 namespace tba{
 
+std::strong_ordering operator<=>(std::optional<std::nullptr_t> const& a,std::optional<std::nullptr_t> const& b){
+	if(a){
+		if(b){
+			return std::strong_ordering::equal;
+		}
+		return std::strong_ordering::greater;
+	}
+	if(b){
+		return std::strong_ordering::less;
+	}
+	return std::strong_ordering::equal;
+}
+
 #define INST(A,B) A B;
 #define PRINT_ITEM(A,B) o<<""#B<<":"<<a.B<<" ";
 
@@ -57,7 +70,7 @@ MAKE_INST(API_Status_App_Version,TBA_API_STATUS_APP_VERSION)
 MAKE_INST(API_Status,TBA_API_STATUS)
 MAKE_INST(District_Ranking,TBA_DISTRICT_RANKING)
 
-Match_key::Match_key(std::string s1):s(move(s1)){
+Match_key::Match_key(std::string s1):s(std::move(s1)){
 	//format: event_key / "_" / level / (maybe set # and 'm') / match #
 	auto check=[&](bool b){
 		if(b) return;
@@ -94,7 +107,7 @@ std::ostream& operator<<(std::ostream& o,Match_key const& a){
 	return o<<a.get();
 }
 
-District_key::District_key(std::string s1):s(move(s1)){
+District_key::District_key(std::string s1):s(std::move(s1)){
 	Year{atoi(s.c_str())};//check that starts with a year
 	//then a 2-3 letter code.
 	if( !(s.size()>=6 && s.size()<=7) ){
@@ -208,7 +221,7 @@ MAKE_INST(Team_Robot,TBA_TEAM_ROBOT)
 
 MAKE_INST(Team_Simple,TBA_TEAM_SIMPLE)
 
-Event_key::Event_key(std::string s1):s(move(s1)){
+Event_key::Event_key(std::string s1):s(std::move(s1)){
 	if(s.size()<6) throw std::invalid_argument{"Event_key:"+s};
 	//starts with a year then has at least 2 more chars.
 	if(!s.starts_with("202121")){
