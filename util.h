@@ -6,6 +6,7 @@
 #include<vector>
 #include<variant>
 #include<optional>
+#include<sstream>
 
 #define TBA_NYI { std::cout<<"NYI "<<__FILE__<<":"<<__LINE__<<"\n"; exit(1); }
 #define TBA_PRINT(X) { std::cout<<""#X<<":"<<(X)<<"\n"; }
@@ -107,6 +108,12 @@ void print_lines(T t){
 	for(auto elem:t){
 		std::cout<<elem<<"\n";
 	}
+}
+
+auto as_string(auto const& x){
+	std::stringstream ss;
+	ss<<x;
+	return ss.str();
 }
 
 }

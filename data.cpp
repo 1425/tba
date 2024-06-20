@@ -1,6 +1,6 @@
 #include "data.h"
 #include "util.h"
-#include "rapidjson.h"
+#include "simdjson.h"
 
 namespace tba{
 
@@ -20,6 +20,41 @@ std::strong_ordering operator<=>(std::optional<std::nullptr_t> const& a,std::opt
 #define INST(A,B) A B;
 #define PRINT_ITEM(A,B) o<<""#B<<":"<<a.B<<" ";
 
+#define DECODE_B1(A,B) std::optional<A> VAR_##B;
+
+#define DECODE_B2(A,B) if(k==""#B) VAR_##B=decode(p.value,(A*)nullptr);
+
+template<typename T>
+T decode(std::nullptr_t,const T *x){
+	throw Decode_error(
+		typeid(x).name(),
+		"null",
+		"wrong type"
+	);
+}
+
+#define DECODE_B3(A,B) [&](){\
+	if(VAR_##B){ \
+		return *VAR_##B;\
+	}\
+	return decode(nullptr,(A*)0);\
+}(),
+
+#define DECODE_B(NAME,ITEMS) \
+	NAME decode(JSON_object in,const NAME*){\
+		ITEMS(DECODE_B1)\
+		for(auto p:in){\
+			std::string_view k=p.key;\
+			try{\
+				ITEMS(DECODE_B2)\
+			}catch(Decode_error e){\
+				e.path.push_back(""#NAME);\
+				throw e;\
+			}\
+		}\
+		return NAME{ITEMS(DECODE_B3)};\
+	}
+
 #define MAKE_INST(NAME,ITEMS)\
 	std::ostream& operator<<(std::ostream& o,NAME const& a){\
 		o<<""#NAME<<"(";\
@@ -36,17 +71,22 @@ std::strong_ordering operator<=>(std::optional<std::nullptr_t> const& a,std::opt
 			e.path.push_back(""#NAME);\
 			throw e;\
 		}\
+	}\
+	DECODE_B(NAME,ITEMS)\
+	NAME decode(JSON_array,const NAME*){\
+		std::cout<<"hello2\n";\
+		TBA_NYI\
+	}\
+	NAME decode(JSON_value in,NAME const* x){\
+		if(in.type()!=simdjson::dom::element_type::OBJECT){\
+			throw Decode_error{""#NAME,as_string(in),"expected object"};\
+		}\
+		return decode(in.get_object(),x);\
+	}\
+	NAME decode(std::nullptr_t,NAME const*){\
+		throw Decode_error{""#NAME,"null","exprected object"};\
 	}
 
-template<typename T>
-T decode(std::nullptr_t,const T *x){
-	throw Decode_error(typeid(x).name(),"null","wrong type");
-}
-
-template<typename T>
-std::optional<T> decode(std::nullptr_t,const std::optional<T>*){
-	return {};
-}
 
 #define DECODE(A,B) [&](){ \
 	if(!in.IsObject()){\
@@ -60,6 +100,26 @@ std::optional<T> decode(std::nullptr_t,const std::optional<T>*){
 		}\
 		return decode(in[""#B],(A*)nullptr); \
 	}catch(Decode_error e){\
+		e.path.push_back(""#B);\
+		throw e;\
+	}\
+}(),
+
+#define DECODE2(A,B) [&](){ \
+	if(!in.is_object()){\
+		std::ostringstream ss; \
+		ss<<"Expected obj, got:"<<in;\
+		throw Decode_error{""#B,as_string(in),"expected object"}; \
+	}\
+	try{\
+		try{\
+			return decode(in[""#B],(A*)nullptr); \
+		}catch(simdjson::simdjson_error const&){\
+			return decode(nullptr,(A*)nullptr); \
+		}\
+	}catch(Decode_error e){\
+		try{\
+		}catch(...){}\
 		e.path.push_back(""#B);\
 		throw e;\
 	}\
@@ -103,6 +163,10 @@ Match_key decode(JSON const& in,const Match_key*){
 	return Match_key{decode(in,(std::string*)nullptr)};
 }
 
+Match_key decode(JSON_value in,const Match_key*){
+	return Match_key{decode(in,(std::string*)nullptr)};
+}
+
 std::ostream& operator<<(std::ostream& o,Match_key const& a){
 	return o<<a.get();
 }
@@ -135,6 +199,10 @@ District_key decode(JSON const& in,const District_key *){
 	return District_key{decode(in,(std::string*)nullptr)};
 }
 
+District_key decode(JSON_value in,const District_key *){
+	return District_key{decode(in,(std::string*)nullptr)};
+}
+
 Team_key::Team_key(std::string s1):s(s1){
 	auto check=[&](bool b){
 		if(b) return;
@@ -159,6 +227,10 @@ std::ostream& operator<<(std::ostream& o,Team_key const& a){
 }
 
 Team_key decode(JSON const& in,const Team_key*){
+	return Team_key{decode(in,(std::string*)0)};
+}
+
+Team_key decode(JSON_value in,const Team_key*){
 	return Team_key{decode(in,(std::string*)0)};
 }
 
@@ -217,6 +289,10 @@ Year decode(JSON const& in,const Year*){
 	return Year{decode(in,(int*)nullptr)};
 }
 
+Year decode(JSON_value in,const Year*){
+	return Year{decode(in,(int*)nullptr)};
+}
+
 MAKE_INST(Team_Robot,TBA_TEAM_ROBOT)
 
 MAKE_INST(Team_Simple,TBA_TEAM_SIMPLE)
@@ -246,6 +322,10 @@ Event_key decode(JSON const& in,const Event_key*){
 	return Event_key{decode(in,(std::string*)nullptr)};
 }
 
+Event_key decode(JSON_value in,const Event_key*){
+	return Event_key{decode(in,(std::string*)nullptr)};
+}
+
 MAKE_INST(District_List,TBA_DISTRICT_LIST)
 
 std::ostream& operator<<(std::ostream& o,Webcast_type a){
@@ -256,6 +336,14 @@ std::ostream& operator<<(std::ostream& o,Webcast_type a){
 }
 
 Webcast_type decode(JSON const& in,const Webcast_type*){
+	auto s=decode(in,(std::string*)nullptr);
+	#define X(A) if(s==""#A) return Webcast_type::A;
+	TBA_WEBCAST_TYPES(X)
+	#undef X
+	throw std::invalid_argument{"Webcast_type:"+s};
+}
+
+Webcast_type decode(JSON_value in,const Webcast_type*){
 	auto s=decode(in,(std::string*)nullptr);
 	#define X(A) if(s==""#A) return Webcast_type::A;
 	TBA_WEBCAST_TYPES(X)
@@ -285,6 +373,16 @@ Event_type decode(JSON const& in,const Event_type *){
 	throw std::invalid_argument{ss.str()};
 }
 
+Event_type decode(JSON_value in,const Event_type *){
+	auto i=decode(in,(int*)nullptr);
+	#define X(A,B) if(i==B) return Event_type::A;
+	TBA_EVENT_TYPES(X)
+	#undef X
+	std::ostringstream ss;
+	ss<<"Event_type:"<<i;
+	throw std::invalid_argument{ss.str()};
+}
+
 std::ostream& operator<<(std::ostream& o,Playoff_type a){
 	#define X(A,B,C) if(a==Playoff_type::B) return o<<C;
 	TBA_PLAYOFF_TYPES(X)
@@ -297,8 +395,17 @@ Playoff_type decode(JSON const& in,const Playoff_type*){
 	#define X(A,B,C) if(i==A) return Playoff_type::B;
 	TBA_PLAYOFF_TYPES(X)
 	#undef X
-	TBA_PRINT(in);
 	throw std::invalid_argument(std::string()+"Playoff_type"+in.GetString());
+}
+
+Playoff_type decode(JSON_value in,const Playoff_type*){
+	auto i=decode(in,(int*)0);
+	#define X(A,B,C) if(i==A) return Playoff_type::B;
+	TBA_PLAYOFF_TYPES(X)
+	#undef X
+	std::stringstream ss;
+	ss<<"Playoff_type"<<i;
+	throw std::invalid_argument(ss.str());
 }
 
 MAKE_INST(Event,TBA_EVENT)
@@ -340,6 +447,10 @@ Date decode(JSON const& in,const Date*){
 	return Date{decode(in,(std::string*)nullptr)};
 }
 
+Date decode(JSON_value in,const Date*){
+	return Date{decode(in,(std::string*)nullptr)};
+}
+
 MAKE_INST(Event_Simple,TBA_EVENT_SIMPLE)
 
 std::ostream& operator<<(std::ostream& o,Media_type a){
@@ -355,6 +466,14 @@ Media_type decode(JSON const& in,const Media_type*){
 	TBA_MEDIA_TYPES(X)
 	#undef X
 	throw Decode_error{"Media_type",in,"unrecognized option"};
+}
+
+Media_type decode(JSON_value in,const Media_type*){
+	auto s=decode(in,(std::string*)nullptr);
+	#define X(A,B) if(s==""#B) return Media_type::A;
+	TBA_MEDIA_TYPES(X)
+	#undef X
+	throw Decode_error{"Media_type",as_string(in),"unrecognized option"};
 }
 
 MAKE_INST(Media_details,TBA_MEDIA_DETAILS)
@@ -388,6 +507,13 @@ M_score decode(JSON const& in,const M_score*){
 	return M_score(decode(in,(int*)nullptr));
 }
 
+M_score decode(JSON_value in,const M_score*){
+	if(in.is_null()){
+		return M_score(-1);
+	}
+	return M_score(decode(in,(int*)nullptr));
+}
+
 MAKE_INST(Match_Alliance,TBA_MATCH_ALLIANCE)
 
 MAKE_INST(Alliances,TBA_ALLIANCES)
@@ -409,6 +535,14 @@ Winning_alliance decode(JSON const& in,const Winning_alliance *){
 	throw Decode_error{"Winning_alliance",in,"unrecognized option"};
 }
 
+Winning_alliance decode(JSON_value in,const Winning_alliance *){
+	auto s=decode(in,(std::string*)nullptr);
+	if(s=="red") return Winning_alliance::red;
+	if(s=="blue") return Winning_alliance::blue;
+	if(s=="") return Winning_alliance::NONE;
+	throw Decode_error{"Winning_alliance",s,"unrecognized option"};
+}
+
 #define PLAYOFF_LEVELS(X)\
 	X(qm) X(ef) X(qf) X(sf) X(f)
 
@@ -427,6 +561,14 @@ Playoff_level decode(JSON const& in,const Playoff_level*){
 	throw Decode_error{"Playoff_level",in,"unrecognized option"};
 }
 
+Playoff_level decode(JSON_value in,const Playoff_level*){
+	auto s=decode(in,(std::string*)nullptr);
+	#define X(A) if(s==""#A) return Playoff_level::A;
+	PLAYOFF_LEVELS(X)
+	#undef X
+	throw Decode_error{"Playoff_level",s,"unrecognized option"};
+}
+
 MAKE_INST(Match,TBA_MATCH)
 
 MAKE_INST(Match_Simple,TBA_MATCH_SIMPLE)
@@ -441,6 +583,16 @@ std::ostream& operator<<(std::ostream& o,Award_type a){
 }
 
 Award_type decode(JSON const& in,const Award_type *){
+	auto i=decode(in,(int*)nullptr);
+	#define X(A,B) if(i==B) return Award_type::A;
+	TBA_AWARD_TYPES(X)
+	#undef X
+	std::ostringstream ss;
+	ss<<"Award_type:"<<i;
+	throw std::invalid_argument(ss.str());
+}
+
+Award_type decode(JSON_value in,const Award_type *){
 	auto i=decode(in,(int*)nullptr);
 	#define X(A,B) if(i==B) return Award_type::A;
 	TBA_AWARD_TYPES(X)
@@ -482,6 +634,10 @@ Pick_order decode(JSON const& in,const Pick_order *){
 	return Pick_order{decode(in,(int*)nullptr)};
 }
 
+Pick_order decode(JSON_value in,const Pick_order *){
+	return Pick_order{decode(in,(int*)nullptr)};
+}
+
 MAKE_INST(Team_Event_Status_alliance,TBA_TEAM_EVENT_STATUS_ALLIANCE)
 
 std::ostream& operator<<(std::ostream& o,Playoff_status a){
@@ -492,6 +648,14 @@ std::ostream& operator<<(std::ostream& o,Playoff_status a){
 }
 
 Playoff_status decode(JSON const& in,const Playoff_status*){
+	auto s=decode(in,(std::string*)nullptr);
+	#define X(A) if(s==""#A) return Playoff_status::A;
+	TBA_PLAYOFF_STATUS(X)
+	#undef X
+	throw std::invalid_argument{"Playoff_status:"+s};
+}
+
+Playoff_status decode(JSON_value in,const Playoff_status*){
 	auto s=decode(in,(std::string*)nullptr);
 	#define X(A) if(s==""#A) return Playoff_status::A;
 	TBA_PLAYOFF_STATUS(X)
@@ -530,6 +694,23 @@ High_score decode(JSON const& in,const High_score*){
 		decode(in[0],(int*)nullptr),
 		decode(in[1],(Match_key*)nullptr),
 		decode(in[2],(std::string*)nullptr),
+	};
+}
+
+High_score decode(JSON_value in,const High_score*){
+	auto check=[&](bool b){
+		if(b) return;
+		std::ostringstream ss;
+		ss<<"High_score:"<<in;
+		throw std::invalid_argument{ss.str()};
+	};
+	check(in.is_array());
+	auto a=in.get_array();
+	check(a.size()==3);
+	return High_score{
+		decode(a.at(0),(int*)nullptr),
+		decode(a.at(1),(Match_key*)nullptr),
+		decode(a.at(2),(std::string*)nullptr),
 	};
 }
 
@@ -582,6 +763,14 @@ Coopertition decode(JSON const& in,const Coopertition*){
 	throw std::invalid_argument{"Coopertition:"+s};
 }
 
+Coopertition decode(JSON_value in,const Coopertition*){
+	auto s=decode(in,(std::string*)nullptr);
+	#define X(A) if(s==""#A) return Coopertition::A;
+	TBA_COOPERTITION_TYPES(X)
+	#undef X
+	throw std::invalid_argument{"Coopertition:"+s};
+}
+
 MAKE_INST(Match_Score_Breakdown_2015,TBA_MATCH_SCORE_BREAKDOWN_2015)
 
 //#define EVENT_PREDICTTIONS(X)
@@ -599,6 +788,11 @@ MAKE_INST(Match_Score_Breakdown_2015,TBA_MATCH_SCORE_BREAKDOWN_2015)
 		assert(0); \
 	}\
 	NAME decode(JSON const& in,const NAME *){\
+		auto s=decode(in,(std::string*)nullptr);\
+		OPTIONS(STR_OPT_DEC)\
+		throw std::invalid_argument{STR(NAME)+std::string{":"}+s};\
+	}\
+	NAME decode(JSON_value in,NAME const*){\
 		auto s=decode(in,(std::string*)nullptr);\
 		OPTIONS(STR_OPT_DEC)\
 		throw std::invalid_argument{STR(NAME)+std::string{":"}+s};\
@@ -657,6 +851,25 @@ Match_Score_Breakdown_2014_Alliance decode(JSON const& in,const Match_Score_Brea
 	};
 }
 
+#define TAKE2(A,B,C) X(A,B)
+
+//DECODE_B(Match_Score_Breakdown_2014_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2014_ALLIANCE(TAKE2))
+
+Match_Score_Breakdown_2014_Alliance decode(JSON_value in,const Match_Score_Breakdown_2014_Alliance*){
+	if(!in.is_object()){
+		throw Decode_error{
+			"Match_Score_Breakdown_2014_Alliance",
+			as_string(in),
+			"Expected object"
+		};
+	}
+	return Match_Score_Breakdown_2014_Alliance{
+		#define X(A,B,C) DECODE2(A,C)
+		TBA_MATCH_SCORE_BREAKDOWN_2014_ALLIANCE(X)
+		#undef X
+	};
+}
+
 std::ostream& operator<<(std::ostream& o,Match_Score_Breakdown_2014_Alliance const& a){
 	o<<"Match_score_breakdown_2014_alliance(";
 	#define X(A,B,C) PRINT_ITEM(A,B)
@@ -680,6 +893,13 @@ std::ostream& operator<<(std::ostream &o,Alliance_color a){
 }
 
 Alliance_color decode(JSON const& in,const Alliance_color*){
+	auto s=decode(in,(std::string*)nullptr);
+	if(s=="red") return Alliance_color::RED;
+	if(s=="blue") return Alliance_color::BLUE;
+	throw std::invalid_argument{"Alliance color:"+s};
+}
+
+Alliance_color decode(JSON_value in,const Alliance_color*){
 	auto s=decode(in,(std::string*)nullptr);
 	if(s=="red") return Alliance_color::RED;
 	if(s=="blue") return Alliance_color::BLUE;
@@ -710,6 +930,14 @@ Unknown decode(JSON const& in,const Unknown*){
 	throw std::invalid_argument{ss.str()};
 }
 
+Unknown decode(JSON_value in,const Unknown*){
+	auto s=decode(in,(std::string*)nullptr);
+	if(s=="unknown") return Unknown{};
+	std::ostringstream ss;
+	ss<<"Expected \"unknown\", but got:"<<in;
+	throw std::invalid_argument{ss.str()};
+}
+
 std::ostream& operator<<(std::ostream& o,Init_line a){
 	#define X(A) if(a==Init_line::A) return o<<""#A;
 	TBA_INIT_LINE_OPTIONS(X)
@@ -722,9 +950,15 @@ Init_line decode(JSON const& in,Init_line const*){
 	#define X(A) if(s==""#A) return Init_line::A;
 	TBA_INIT_LINE_OPTIONS(X)
 	#undef X
-	TBA_PRINT(s);
-	TBA_NYI
-	//throw std::invalid_argument{s};
+	throw std::invalid_argument{s};
+}
+
+Init_line decode(JSON_value in,Init_line const*){
+	auto s=decode(in,(std::string*)nullptr);
+	#define X(A) if(s==""#A) return Init_line::A;
+	TBA_INIT_LINE_OPTIONS(X)
+	#undef X
+	throw std::invalid_argument{s};
 }
 
 std::ostream& operator<<(std::ostream& o,Endgame a){
@@ -743,6 +977,14 @@ Endgame decode(JSON const& in,Endgame const*){
 	TBA_NYI
 }
 
+Endgame decode(JSON_value in,Endgame const*){
+	auto s=decode(in,(std::string*)nullptr);
+	#define X(A) if(s==""#A) return Endgame::A;
+	TBA_ENDGAME_OPTIONS(X)
+	#undef X
+	throw Decode_error("Endgame",as_string(in),"unexpected string");
+}
+
 std::ostream& operator<<(std::ostream& o,Target_color a){
 	#define X(A) if(a==Target_color::A) return o<<""#A;
 	TBA_TARGET_COLOR_OPTIONS(X)
@@ -759,6 +1001,15 @@ Target_color decode(JSON const& in,Target_color const*){
 	TBA_NYI
 }
 
+Target_color decode(JSON_value in,Target_color const*){
+	auto s=decode(in,(std::string*)nullptr);
+	#define X(A) if(s==""#A) return Target_color::A;
+	TBA_TARGET_COLOR_OPTIONS(X)
+	#undef X
+	TBA_PRINT(s);
+	TBA_NYI
+}
+
 std::ostream& operator<<(std::ostream& o,Rung_level a){
 	#define X(A) if(a==Rung_level::A) return o<<""#A;
 	TBA_RUNG_LEVEL_OPTIONS(X)
@@ -767,6 +1018,15 @@ std::ostream& operator<<(std::ostream& o,Rung_level a){
 }
 
 Rung_level decode(JSON const& in,Rung_level const*){
+	auto s=decode(in,(std::string*)nullptr);
+	#define X(A) if(s==""#A) return Rung_level::A;
+	TBA_RUNG_LEVEL_OPTIONS(X)
+	#undef X
+	TBA_PRINT(s);
+	TBA_NYI
+}
+
+Rung_level decode(JSON_value in,Rung_level const*){
 	auto s=decode(in,(std::string*)nullptr);
 	#define X(A) if(s==""#A) return Rung_level::A;
 	TBA_RUNG_LEVEL_OPTIONS(X)

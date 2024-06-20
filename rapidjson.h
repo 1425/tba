@@ -21,6 +21,7 @@ struct Decode_error{
 	std::string description;
 
 	Decode_error(const char *,const char *,std::string);
+	Decode_error(const char *,std::string,std::string);
 	Decode_error(const char *,JSON const&,std::string);
 	Decode_error(std::vector<std::string>,JSON const&,std::string);
 };

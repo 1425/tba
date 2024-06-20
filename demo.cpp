@@ -7,11 +7,10 @@
 #include<fstream>
 #include<optional>
 #include "data.h"
-#include "rapidjson/document.h"
 #include "curl.h"
 #include "db.h"
 #include "util.h"
-#include "rapidjson.h"
+#include "simdjson.h"
 
 namespace tba{
 
@@ -511,10 +510,15 @@ int main(int argc,char **argv){
 	}catch(std::string const& s){
 		std::cout<<s<<"\n";
 		return 1;
+	}catch(const char *s){
+		assert(s);
+		std::cout<<s<<"\n";
+		return 1;
 	}catch(std::invalid_argument const& e){
 		std::cout<<e<<"\n";
 		return 1;
-	}catch(tba::Decode_error const& e){
+	}
+	catch(tba::Decode_error const& e){
 		std::cout<<e<<"\n";
 		return 1;
 	}

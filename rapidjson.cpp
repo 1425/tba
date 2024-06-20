@@ -29,6 +29,10 @@ Decode_error::Decode_error(const char *s,const char *value1,std::string what):
 	path({s}),value(value1),description(what)
 {}
 
+Decode_error::Decode_error(const char *s,std::string value1,std::string what):
+	path({s}),value(value1),description(what)
+{}
+
 Decode_error::Decode_error(const char *s,JSON const& json,std::string what):
 	path({s}),value(to_string(json)),description(std::move(what))
 {}

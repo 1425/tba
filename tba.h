@@ -4,16 +4,28 @@
 #include<string>
 #include "rapidjson.h"
 #include "data.h"
+#include "simdjson.h"
 
 namespace tba{
 
 template<typename Fetch,typename T>
 auto run(Fetch& fetcher,std::string const& url,const T*){
 	auto json=fetcher.fetch(url.c_str()).second;
-	rapidjson::Document a;
-	a.Parse(json.c_str());
+	simdjson::dom::parser parser;
+	simdjson::padded_string str(json);
+	auto doc=parser.parse(str);
 	try{
-		return decode(a,(T*)nullptr);
+		switch(doc.type()){
+			case simdjson::dom::element_type::ARRAY:
+				return decode(doc.get_array(),(T*)nullptr);
+			case simdjson::dom::element_type::OBJECT:
+				return decode(doc.get_object(),(T*)nullptr);
+			case simdjson::dom::element_type::NULL_VALUE:
+				return decode(nullptr,(T*)nullptr);
+			default:
+				TBA_PRINT(doc.type());
+				TBA_NYI
+		}
 	}catch(...){
 		std::cout<<"Fail on "<<url<<"\n";
 		std::cout<<json<<"\n";
