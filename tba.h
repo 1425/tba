@@ -22,8 +22,7 @@ auto run(Fetch& fetcher,std::string const& url,const T*){
 			case simdjson::dom::element_type::NULL_VALUE:
 				return decode(nullptr,(T*)nullptr);
 			default:
-				TBA_PRINT(doc.type());
-				TBA_NYI
+				throw Decode_error{typeid(T).name(),"","unexpected type"};
 		}
 	}catch(...){
 		std::cout<<"Fail on "<<url<<"\n";
