@@ -2,7 +2,6 @@
 #define TBA_TBA_H
 
 #include<string>
-#include "rapidjson.h"
 #include "data.h"
 #include "simdjson.h"
 
