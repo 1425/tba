@@ -110,12 +110,6 @@ void print_lines(T t){
 	}
 }
 
-auto as_string(auto const& x){
-	std::stringstream ss;
-	ss<<x;
-	return ss.str();
-}
-
 }
 
 #endif

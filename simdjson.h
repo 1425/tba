@@ -4,7 +4,6 @@
 #include<simdjson.h>
 #include<map>
 #include<variant>
-#include "util.h"
 
 namespace tba{
 
@@ -64,6 +63,12 @@ std::variant<A,B,C,D,E,F,G> decode(JSON_object in,std::variant<A,B,C,D,E,F,G> co
 
 template<typename A,typename B,typename C,typename D,typename E,typename F,typename G>
 auto decode(JSON_value in,std::tuple<A,B,C,D,E,F,G> const*);
+
+auto as_string(auto const& x){
+	std::stringstream ss;
+	ss<<x;
+	return ss.str();
+}
 
 template<typename K,typename V>
 std::map<K,V> decode(JSON_value in,std::map<K,V> const*){
@@ -157,7 +162,7 @@ std::variant<Ts...> decode(JSON_object,std::variant<Ts...> const*){
 
 template<typename ...Ts>
 std::variant<Ts...> decode(JSON_array,std::variant<Ts...> const*){
-	TBA_NYI
+	assert(0);//TBA_NYI
 }
 
 /*template<typename ...Ts>
@@ -211,12 +216,15 @@ auto decode(JSON_value in,std::tuple<A,B,C,D,E,F,G> const*){
 
 template<typename ...Ts>
 std::tuple<Ts...> decode(JSON_value,std::tuple<Ts...> const*){
-	TBA_PRINT(sizeof...(Ts));
-	TBA_NYI
+	assert(0);
+	/*TBA_PRINT(sizeof...(Ts));
+	TBA_NYI*/
 }
 
 template<typename T,size_t N>
-std::array<T,N> decode(JSON_value,std::array<T,N> const*)TBA_NYI
+std::array<T,N> decode(JSON_value,std::array<T,N> const*){
+	assert(0);
+}
 
 template<typename T>
 std::optional<T> decode(JSON_value in,std::optional<T> const*);
@@ -295,7 +303,7 @@ template<typename T>
 std::vector<T> decode(JSON_array a,std::vector<T> const*){
 	std::vector<T> r;
 	for(auto elem:a){
-		r|=decode(elem,(T*)nullptr);
+		r.push_back(decode(elem,(T*)nullptr));
 	}
 	return r;
 }
