@@ -104,7 +104,8 @@ void print_r(int indent,T t){
 template<typename T>
 void print_r(int indent,std::optional<T> const& a){
 	if(a) return print_r(indent,*a);
-	nyi
+	do_indent(indent);
+	cout<<"NULL\n";
 }
 
 template<typename A,typename B>
