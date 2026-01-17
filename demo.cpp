@@ -6,6 +6,7 @@
 #include<variant>
 #include<fstream>
 #include<optional>
+#include<set>
 #include "data.h"
 #include "curl.h"
 #include "db.h"
@@ -127,6 +128,16 @@ void print_r(int indent,std::map<K,V> const& m){
 	}
 }
 
+template<typename T>
+void print_r(int indent,std::vector<T> const& a){
+	do_indent(indent);
+	cout<<"vector\n";
+	indent++;
+	for(auto x:a){
+		print_r(indent,x);
+	}
+}
+
 void print_r(int,int)TBA_NYI
 
 void print_r(int indent,Event_OPRs const& e){
@@ -141,6 +152,26 @@ void print_r(int indent,Event_OPRs const& e){
 	TBA_EVENT_OPRS(X)
 	#undef X
 }
+
+#define PRINT_R_ITEM(A,B) {\
+		do_indent(indent);\
+		std::cout<<""#B<<"\n";\
+		print_r(indent+1,a.B);\
+	}
+
+#define PRINT_R(NAME,LIST)\
+	void print_r(int indent,NAME const& a){\
+		do_indent(indent);\
+		std::cout<<""#NAME<<"\n";\
+		indent++;\
+		LIST(PRINT_R_ITEM)\
+	}
+
+
+PRINT_R(Event,TBA_EVENT)
+PRINT_R(Dcmp_history,TBA_DCMP_HISTORY)
+PRINT_R(District_data,TBA_DISTRICT_DATA)
+PRINT_R(District_insights,TBA_DISTRICT_INSIGHTS)
 
 template<typename T>
 void print_r(T t){
@@ -286,6 +317,11 @@ void show_cache(){
 	print_lines(x);
 }
 
+template<typename T>
+auto to_set(std::vector<T> a){
+	return std::set<T>{a.begin(),a.end()};
+}
+
 int main1(int argc,char **argv){
 	auto aa=parse_args(argc,argv);
 	std::string tba_key;
@@ -314,6 +350,24 @@ int main1(int argc,char **argv){
 
 	Cached_fetcher f{Fetcher{Nonempty_string{tba_key}},Cache{}};
 
+	//auto s=status(f);
+	//TBA_PRINT(s);
+
+	for(auto name:{"ca","pnw","fma","mar"}){
+		auto d=dcmp_history(f,name);
+		auto d1=history(f,name);
+		auto d2=insights(f,name);
+		//print_r(d2);
+	}
+	for(District_key k:vector{District_key("2025pnw")}){
+		auto a1=advancement(f,k);
+		//TBA_PRINT(a1);
+		auto a2=awards(f,k);
+		//TBA_PRINT(a2);
+	}
+
+	TBA_PRINT(team(f,Team_key(1425)));
+
 	static const bool ZEBRA_DEMO=0;
 	if(ZEBRA_DEMO){
 		Match_key match{"2019cc_qm3"};
@@ -331,7 +385,7 @@ int main1(int argc,char **argv){
 	}
 
 	//auto years=range(Year{1992},Year{2023});//could get this via the API.
-	auto years=range(Year{2023},Year{2024});//could get this via the API.
+	auto years=range(Year{2026},Year{2027});//could get this via the API.
 
 	std::vector<Event_key> event_key_list;
 

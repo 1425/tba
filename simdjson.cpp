@@ -11,6 +11,12 @@ Decode_error::Decode_error(const char *s,std::string value1,std::string what):
 	path({s}),value(value1),description(what)
 {}
 
+Decode_error::Decode_error(std::string a,std::string b,std::string c):
+	path({a}),
+	value(b),
+	description(c)
+{}
+
 std::ostream& operator<<(std::ostream& o,Decode_error const& a){
 	o<<"Decode_error(\n";
 	o<<"\tfrom:"<<a.value<<"\n";
@@ -39,6 +45,8 @@ int decode(JSON_value a,int const*){
 			return a.get_int64();
 		case simdjson::dom::element_type::NULL_VALUE:
 			throw Decode_error{"int",as_string(a),"wrong type, got null"};
+		case simdjson::dom::element_type::ARRAY:
+			throw Decode_error{"array",as_string(a),"wrong type, got array"};
 		default:
 			TBA_PRINT(a.type())
 			TBA_NYI
@@ -108,8 +116,8 @@ std::nullptr_t decode(JSON_object in,std::nullptr_t const*){
 	TBA_NYI
 }
 
-std::string decode2(std::string_view,std::string const*){
-	TBA_NYI
+std::string decode2(std::string_view a,std::string const*){
+	return std::string(a);
 }
 
 std::nullptr_t decode(std::nullptr_t,std::nullptr_t const*){

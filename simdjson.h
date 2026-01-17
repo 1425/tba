@@ -14,6 +14,7 @@ struct Decode_error{
 
 	Decode_error(const char *,const char *,std::string);
 	Decode_error(const char *,std::string,std::string);
+	Decode_error(std::string,std::string,std::string);
 };
 std::ostream& operator<<(std::ostream&,Decode_error const&);
 
@@ -29,9 +30,8 @@ std::vector<T> decode(JSON_object,std::vector<T> const*){
 std::string decode2(std::string_view,std::string const*);
 
 template<typename T>
-T decode2(std::string_view a,T const*){
-	//for perf, could go make all the things take string_view
-	return T{std::string{a}};
+T decode2(std::string_view a,T const* t){
+	return decode(a,t);
 }
 
 int decode(JSON_value,int const*);
@@ -71,18 +71,33 @@ auto as_string(auto const& x){
 }
 
 template<typename K,typename V>
-std::map<K,V> decode(JSON_value in,std::map<K,V> const*){
-	if(in.type()!=simdjson::dom::element_type::OBJECT){
-		throw Decode_error{"std::map",as_string(in),"wrong type"};
-	}
-	auto obj=in.get_object();
+std::map<K,V> decode(JSON_array in,std::map<K,V> const*){
+	throw Decode_error("std::map",as_string(in),"wrong type");
+}
+
+template<typename K,typename V>
+std::map<K,V> decode(std::nullptr_t in,std::map<K,V> const*){
+	throw Decode_error("std::map",as_string(in),"wrong type");
+}
+
+template<typename K,typename V>
+std::map<K,V> decode(JSON_object in,std::map<K,V> const*){
 	std::map<K,V> r;
-	for(auto [k,v]:obj){
+	for(auto [k,v]:in){
 		auto k1=decode2(k,(K*)nullptr);
 		auto v1=decode(v,(V*)nullptr);
 		r[k1]=v1;
 	}
 	return r;
+}
+
+template<typename K,typename V>
+std::map<K,V> decode(JSON_value in,std::map<K,V> const* x){
+	if(in.type()!=simdjson::dom::element_type::OBJECT){
+		throw Decode_error{"std::map",as_string(in),"wrong type"};
+	}
+	auto obj=in.get_object();
+	return decode(obj,x);
 }
 
 template<typename A,typename B>

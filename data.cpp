@@ -22,12 +22,19 @@ std::strong_ordering operator<=>(std::optional<std::nullptr_t> const& a,std::opt
 
 #define DECODE_B1(A,B) std::optional<A> VAR_##B;
 
-#define DECODE_B2(A,B) if(k==""#B) VAR_##B=decode(p.value,(A*)nullptr);
+#define DECODE_B2(A,B) \
+	try{\
+		if(k==""#B) VAR_##B=decode(p.value,(A*)nullptr);\
+	}catch(Decode_error e){\
+		e.path.push_back(""#B);\
+		throw e;\
+	}\
 
 template<typename T>
 T decode(std::nullptr_t,const T *x){
+	assert(0);
 	throw Decode_error(
-		typeid(x).name(),
+		typeid(*x).name(),
 		"null",
 		"wrong type"
 	);
@@ -152,6 +159,10 @@ Match_key decode(JSON_value in,const Match_key*){
 	return Match_key{decode(in,(std::string*)nullptr)};
 }
 
+Match_key decode2(std::string_view a,Match_key const*){
+	return Match_key{std::string(a)};
+}
+
 std::ostream& operator<<(std::ostream& o,Match_key const& a){
 	return o<<a.get();
 }
@@ -166,6 +177,13 @@ District_key::District_key(std::string s1):s(std::move(s1)){
 			return ss.str();
 		}()};
 	}
+}
+
+District_key::District_key(const char *s){
+	if(!s){
+		throw std::invalid_argument("null");
+	}
+	*this=District_key(std::string(s));
 }
 
 std::string const& District_key::get()const{
@@ -200,6 +218,12 @@ Team_key::Team_key(std::string s1):s(s1){
 	//can also be just "frc", oddly.
 }
 
+Team_key::Team_key(int x){
+	std::stringstream ss;
+	ss<<"frc"<<x;
+	s=ss.str();
+}
+
 std::string const& Team_key::str()const{ return s; }
 
 std::ostream& operator<<(std::ostream& o,Team_key const& a){
@@ -211,6 +235,9 @@ Team_key decode(JSON_value in,const Team_key*){
 	return Team_key{decode(in,(std::string*)0)};
 }
 
+Team_key decode2(std::string_view in,Team_key const*){
+	return Team_key{std::string(in)};
+}
 
 MAKE_INST(Team,TBA_TEAM)
 
@@ -264,6 +291,10 @@ Year operator-(Year a,int b){
 
 Year decode(JSON_value in,const Year*){
 	return Year{decode(in,(int*)nullptr)};
+}
+
+Year decode(std::string_view a,Year const*){
+	return Year(stoi(std::string(a)));
 }
 
 MAKE_INST(Team_Robot,TBA_TEAM_ROBOT)
@@ -830,5 +861,12 @@ Rung_level decode(JSON_value in,Rung_level const*){
 	TBA_PRINT(s);
 	TBA_NYI
 }
+
+MAKE_INST(Dcmp_history,TBA_DCMP_HISTORY)
+MAKE_INST(District_insights,TBA_DISTRICT_INSIGHTS)
+MAKE_INST(Team_data,TBA_TEAM_DATA)
+MAKE_INST(District_data,TBA_DISTRICT_DATA)
+MAKE_INST(Year_data,TBA_YEAR_DATA)
+MAKE_INST(Advancement_status,TBA_ADVANCEMENT_STATUS)
 
 }

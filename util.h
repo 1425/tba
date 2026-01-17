@@ -94,9 +94,10 @@ std::vector<size_t> range(size_t);
 std::vector<int> range(int,int);
 
 template<typename Func,typename T>
-auto mapf(Func f,std::vector<T> const& a){
+constexpr auto mapf(Func f,std::vector<T> const& a){
 	std::vector<decltype(f(a[0]))> r;
-	for(auto elem:a){
+	r.reserve(a.size());
+	for(auto const& elem:a){
 		r|=f(elem);
 	}
 	return r;
@@ -104,7 +105,7 @@ auto mapf(Func f,std::vector<T> const& a){
 
 template<typename T>
 void print_lines(T t){
-	for(auto elem:t){
+	for(auto const& elem:t){
 		std::cout<<elem<<"\n";
 	}
 }

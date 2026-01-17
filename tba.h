@@ -31,6 +31,14 @@ auto run(Fetch& fetcher,std::string const& url,const T*){
 	}
 }
 
+#define TBA_QUERY0(NAME,RETURN_TYPE,URL)\
+	template<typename T>\
+	RETURN_TYPE NAME(T& fetcher){\
+		std::ostringstream ss;\
+		ss<<"https://www.thebluealliance.com/api/v3/"<<URL;\
+		return run(fetcher,ss.str(),(RETURN_TYPE*)0);\
+	}
+
 #define TBA_QUERY1(NAME,RETURN_TYPE,URL1,TYPE1,URL2) \
 	template<typename T>\
 	RETURN_TYPE NAME(T& fetcher,TYPE1 arg1){\
@@ -47,6 +55,7 @@ auto run(Fetch& fetcher,std::string const& url,const T*){
 		return run(fetcher,ss.str(),(RETURN_TYPE*)nullptr);\
 	}
 
+TBA_QUERY0(status,API_Status,"status")
 TBA_QUERY1(teams,std::vector<Team>,"teams/",Page,"")
 TBA_QUERY1(teams_simple,std::vector<Team_Simple>,"teams/",Page,"/simple")
 TBA_QUERY1(team_keys,std::vector<Team_key>,"teams/",Page,"/keys")
@@ -127,6 +136,13 @@ TBA_QUERY2(team_event_matches_keys,std::vector<Match_key>,"team/", Team_key, "/e
 TBA_QUERY2(team_event_matches_simple,std::vector<Match_Simple>,"team/", Team_key, "/event/",Event_key ,"/matches/simple")
 
 TBA_QUERY1(zebra_motionworks,Zebra,"match/",Match_key,"/zebra_motionworks")
+
+TBA_QUERY1(dcmp_history,std::vector<Dcmp_history>,"district/",District_abbreviation,"/dcmp_history")
+TBA_QUERY1(history,std::vector<District_List>,"district/",District_abbreviation,"/history")
+TBA_QUERY1(insights,District_insights,"district/",District_abbreviation,"/insights")
+TBA_QUERY1(advancement,Advancement,"district/",District_key,"/advancement")
+TBA_QUERY1(awards,std::vector<Award>,"district/",District_key,"/awards")
+TBA_QUERY1(team,Team,"team/",Team_key,"")
 
 }
 

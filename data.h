@@ -24,9 +24,9 @@ using URL=std::string;
 		auto operator<=>(NAME const&)const=default;\
 	};\
 	std::ostream& operator<<(std::ostream&,NAME const&);\
-	NAME decode(JSON_value,const NAME*);\
-	NAME decode(JSON_object,const NAME*);\
-	NAME decode(JSON_array,const NAME*);\
+	NAME decode(tba::JSON_value,const NAME*);\
+	NAME decode(tba::JSON_object,const NAME*);\
+	NAME decode(tba::JSON_array,const NAME*);\
 	NAME decode(std::nullptr_t,NAME const*);\
 
 using Page=unsigned;
@@ -52,6 +52,7 @@ Year& operator++(Year&);
 Year operator++(Year&,int);
 Year operator-(Year,int);
 Year decode(JSON_value,const Year*);
+Year decode(std::string_view,Year const*);
 
 #define TBA_API_STATUS_APP_VERSION(X)\
 	X(int,min_app_version)\
@@ -74,6 +75,8 @@ class Team_key{
 
 	public:
 	explicit Team_key(std::string);
+	explicit Team_key(int);
+
 	std::string const& str()const;
 
 	auto operator<=>(Team_key const&)const=default;
@@ -81,6 +84,7 @@ class Team_key{
 
 std::ostream& operator<<(std::ostream&,Team_key const&);
 Team_key decode(JSON_value,Team_key const*);
+Team_key decode2(std::string_view,Team_key const*);
 
 #define TBA_TEAM(X)\
 	X(Team_key,key)\
@@ -130,6 +134,8 @@ class District_key{
 
 	public:
 	explicit District_key(std::string);
+	explicit District_key(const char *);
+
 	std::string const& get()const;
 
 	auto operator<=>(District_key const&)const=default;
@@ -138,6 +144,8 @@ class District_key{
 std::ostream& operator<<(std::ostream&,District_key const&);
 bool operator==(District_key const&,std::string const&);
 District_key decode(JSON_value,const District_key*);
+
+using District_abbreviation=std::string;
 
 #define TBA_DISTRICT_LIST(X)\
 	X(std::string,abbreviation)\
@@ -1138,6 +1146,7 @@ class Match_key{
 
 std::ostream& operator<<(std::ostream&,Match_key const&);
 Match_key decode(JSON_value,Match_key const*);
+Match_key decode2(std::string_view,Match_key const*);
 
 #define TBA_HIGH_SCORE(X)\
 	X(int,high_score)\
@@ -1614,6 +1623,64 @@ TBA_MAKE_INST(Zebra_alliances,TBA_ZEBRA_ALLIANCES)
 	X(Zebra_alliances,alliances)
 
 TBA_MAKE_INST(Zebra,TBA_ZEBRA)
+
+#define TBA_DCMP_HISTORY(X)\
+	X(std::vector<Award>,awards)\
+	X(Event,event)
+
+TBA_MAKE_INST(Dcmp_history,TBA_DCMP_HISTORY)
+
+using map_Year_int=std::map<Year,int>;
+using map_Year_teams=std::map<Year,std::vector<Team_key>>;
+
+#define TBA_YEAR_DATA(X)\
+	X(map_Year_int,yearly_active_team_count)\
+	X(map_Year_int,yearly_event_count)\
+	X(map_Year_teams,yearly_gained_teams)\
+	X(map_Year_teams,yearly_lost_teams)
+
+TBA_MAKE_INST(Year_data,TBA_YEAR_DATA)
+
+using Region_data=std::map<std::string,Year_data>;
+
+#define TBA_DISTRICT_DATA(X)\
+	X(Region_data,region_data)\
+	X(Year_data,district_wide_data)\
+
+TBA_MAKE_INST(District_data,TBA_DISTRICT_DATA)
+
+#define TBA_TEAM_DATA(X)\
+	X(int,district_seasons)\
+	X(int,total_district_points)\
+	X(int,total_pre_dcmp_district_points)\
+	X(int,district_event_wins)\
+	X(int,dcmp_wins)\
+	X(int,team_awards)\
+	X(int,individual_awards)\
+	X(Record,quals_record)\
+	X(Record,elims_record)\
+	X(int,in_district_extra_play_count)\
+	X(int,total_matches_played)\
+	X(int,dcmp_appearances)\
+	X(int,cmp_appearances)
+
+TBA_MAKE_INST(Team_data,TBA_TEAM_DATA)
+
+using map_Team_data=std::map<Team_key,Team_data>;
+
+#define TBA_DISTRICT_INSIGHTS(X)\
+	X(std::optional<District_data>,district_data)\
+	X(std::optional<map_Team_data>,team_data)
+
+TBA_MAKE_INST(District_insights,TBA_DISTRICT_INSIGHTS)
+
+#define TBA_ADVANCEMENT_STATUS(X)\
+	X(bool,dcmp)\
+	X(bool,cmp)
+
+TBA_MAKE_INST(Advancement_status,TBA_ADVANCEMENT_STATUS)\
+
+using Advancement=std::map<Team_key,Advancement_status>;
 
 }
 
