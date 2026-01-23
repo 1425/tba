@@ -1,4 +1,4 @@
-CXXFLAGS=-std=c++20 -Wall -Wextra -pedantic -Ofast
+CXXFLAGS=-std=c++20 -Wall -Wextra -pedantic -Ofast -fdiagnostics-color=always
 
 LIBS=-lcurl -lsqlite3 -lpthread -lsimdjson
 

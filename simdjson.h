@@ -7,6 +7,12 @@
 
 namespace tba{
 
+auto as_string(auto const& x){
+	std::stringstream ss;
+	ss<<x;
+	return ss.str();
+}
+
 struct Decode_error{
 	std::vector<std::string> path;
 	std::string value;
@@ -61,14 +67,41 @@ template<
 >
 std::variant<A,B,C,D,E,F,G> decode(JSON_object in,std::variant<A,B,C,D,E,F,G> const*);
 
+template<
+	typename A,
+	typename B,
+	typename C,
+	typename D,
+	typename E,
+	typename F,
+	typename G,
+	typename H
+>
+std::variant<A,B,C,D,E,F,G,H> decode(JSON_object in,std::variant<A,B,C,D,E,F,G,H> const*);
+
+template<
+	typename A,
+	typename B,
+	typename C,
+	typename D,
+	typename E,
+	typename F,
+	typename G,
+	typename H,
+	typename I
+>
+std::variant<A,B,C,D,E,F,G,H,I> decode(JSON_object in,std::variant<A,B,C,D,E,F,G,H,I> const*);
+
+template<typename A,typename B,typename C,typename D,typename E,typename F,typename G>
+std::variant<A,B,C,D,E,F,G> decode(JSON_value in,std::variant<A,B,C,D,E,F,G> const* x){
+	if(in.is_object()){
+		return decode(in.get_object(),x);
+	}
+	throw Decode_error("std::variant",as_string(in),"wrong_type");
+}
+
 template<typename A,typename B,typename C,typename D,typename E,typename F,typename G>
 auto decode(JSON_value in,std::tuple<A,B,C,D,E,F,G> const*);
-
-auto as_string(auto const& x){
-	std::stringstream ss;
-	ss<<x;
-	return ss.str();
-}
 
 template<typename K,typename V>
 std::map<K,V> decode(JSON_array in,std::map<K,V> const*){
@@ -169,6 +202,44 @@ std::variant<A,B,C,D,E,F,G,H> decode(JSON_object in,std::variant<A,B,C,D,E,F,G,H
 	return decode(in,(H*)nullptr);
 }
 
+template<
+	typename A,
+	typename B,
+	typename C,
+	typename D,
+	typename E,
+	typename F,
+	typename G,
+	typename H,
+	typename I
+>
+std::variant<A,B,C,D,E,F,G,H,I> decode(JSON_object in,std::variant<A,B,C,D,E,F,G,H,I> const*){
+	#define X(NAME) try{\
+		return decode(in,(NAME*)nullptr);\
+	}catch(...){\
+	}
+	X(A) X(B) X(C) X(D) X(E) X(F) X(G) X(H)
+	#undef X
+	return decode(in,(I*)nullptr);
+}
+
+template<
+	typename A,typename B,typename C,typename D,
+	typename E,typename F,typename G,typename H,
+	typename I,typename J
+>
+std::variant<A,B,C,D,E,F,G,H,I,J> decode(JSON_object in,std::variant<A,B,C,D,E,F,G,H,I,J> const*){
+	#define X(NAME) try{\
+		return decode(in,(NAME*)nullptr);\
+	}catch(...){\
+	}
+	X(A) X(B) X(C) X(D)
+	X(E) X(F) X(G) X(H)
+	X(I)
+	#undef X
+	return decode(in,(J*)nullptr);
+}
+
 /*template<typename ...Ts>
 std::variant<Ts...> decode(JSON_object,std::variant<Ts...> const*){
 	TBA_PRINT(sizeof...(Ts));
@@ -264,6 +335,11 @@ std::variant<A,B,C,D,E,F,G,H> decode(std::nullptr_t x,std::variant<A,B,C,D, E,F,
 	X(E) X(F) X(G)
 	#undef X
 	return decode(x,(H*)nullptr);
+}
+
+template<typename ...Ts>
+std::variant<std::nullptr_t,Ts...> decode(std::nullptr_t,std::variant<std::nullptr_t,Ts...> const*){
+	return nullptr;
 }
 
 /*template<typename ...Ts>

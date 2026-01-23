@@ -51,6 +51,7 @@ std::ostream& operator<<(std::ostream& o,Year);
 Year& operator++(Year&);
 Year operator++(Year&,int);
 Year operator-(Year,int);
+Year operator+(Year,int);
 Year decode(JSON_value,const Year*);
 Year decode(std::string_view,Year const*);
 
@@ -88,7 +89,7 @@ Team_key decode2(std::string_view,Team_key const*);
 
 #define TBA_TEAM(X)\
 	X(Team_key,key)\
-	X(int,team_number)\
+	X(std::optional<int>,team_number)\
 	X(std::optional<std::string>,nickname)\
 	X(std::optional<std::string>,name)\
 	X(std::optional<std::string>,city)\
@@ -120,7 +121,7 @@ using Team_number=int;
 
 #define TBA_TEAM_SIMPLE(X)\
 	X(Team_key,key)\
-	X(Team_number,team_number)\
+	X(std::optional<Team_number>,team_number)\
 	X(std::optional<std::string>,nickname)\
 	X(std::optional<std::string>,name)\
 	X(std::optional<std::string>,city)\
@@ -859,7 +860,61 @@ TBA_MAKE_INST(Match_Score_Breakdown_2022_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2022
 
 TBA_MAKE_INST(Match_Score_Breakdown_2022,TBA_MATCH_SCORE_BREAKDOWN_2022)
 
+#define TBA_IGNORE(X)
+
+TBA_MAKE_INST(Ignore,TBA_IGNORE)
+
+//enum class Pole{NONE,CONE,CUBE};
+
+#define TBA_MATCH_SCORE_BREAKDOWN_2023_ALLIANCE(X)\
+	X(bool,activationBonusAchieved)\
+	X(int,adjustPoints)\
+	X(std::string,autoBridgeState)\
+	X(std::string,autoChargeStationRobot1)\
+	X(std::string,autoChargeStationRobot2)\
+	X(std::string,autoChargeStationRobot3)\
+	X(bool,autoDocked)\
+	X(Ignore,autoCommunity)\
+	X(int,autoGamePieceCount)\
+	X(int,autoGamePiecePoints)\
+	X(int,autoMobilityPoints)\
+	X(std::string,mobilityRobot1)\
+	X(std::string,mobilityRobot2)\
+	X(std::string,mobilityRobot3)\
+	X(int,autoPoints)\
+	X(int,coopGamePieceCount)\
+	X(int,coopertitionCriteriaMet)\
+	X(std::string,endGameBridgeState)\
+	X(int,endGameChargeStationPoints)\
+	X(std::string,endGameChargeStationRobot1)\
+	X(std::string,endGameChargeStationRobot2)\
+	X(std::string,endGameChargeStationRobot3)\
+	X(int,endGameParkPoints)\
+	X(int,extraGamePieceCount)\
+	X(int,foulCount)\
+	X(int,foulPoints)\
+	X(int,techFoulCount)\
+	X(int,linkPoints)\
+	X(Ignore,links)\
+	X(bool,sustainabilityBonusAchieved)\
+	X(Ignore,teleopCommunity)\
+	X(int,teleopGamePieceCount)\
+	X(int,teleopGamePiecePoints)\
+	X(int,totalChargeStationPoints)\
+	X(int,teleopPoints)\
+	X(int,rp)\
+	X(int,totalPoints)
+
+TBA_MAKE_INST(Match_Score_Breakdown_2023_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2023_ALLIANCE)
+
+#define TBA_MATCH_SCORE_BREAKDOWN_2023(X)\
+	X(Match_Score_Breakdown_2023_Alliance,blue)\
+	X(Match_Score_Breakdown_2023_Alliance,red)
+
+TBA_MAKE_INST(Match_Score_Breakdown_2023,TBA_MATCH_SCORE_BREAKDOWN_2023)
+
 using Match_Score_Breakdown=std::variant<
+	Match_Score_Breakdown_2023,
 	Match_Score_Breakdown_2022,
 	Match_Score_Breakdown_2020,
 	Match_Score_Breakdown_2017,
@@ -1456,6 +1511,44 @@ TBA_MAKE_INST(Event_Insights_2023_Detail,TBA_EVENT_INSIGHTS_2023_DETAIL)
 
 TBA_MAKE_INST(Event_Insights_2023,TBA_EVENT_INSIGHTS_2023)
 
+#define TBA_EVENT_INSIGHTS_2024_DETAIL(X)\
+	X(double,average_score)\
+	X(double,average_win_margin)\
+	X(IID,coopertition_count)\
+	X(IID,ensemble_rp_count)\
+	X(IID,four_rp_count)\
+	X(High_score,high_score)\
+	X(IID,melody_rp_count)\
+	X(IID,six_rp_count)\
+
+TBA_MAKE_INST(Event_Insights_2024_Detail,TBA_EVENT_INSIGHTS_2024_DETAIL)
+
+#define TBA_EVENT_INSIGHTS_2024(X)\
+	X(Event_Insights_2024_Detail,playoff)\
+	X(Event_Insights_2024_Detail,qual)
+
+TBA_MAKE_INST(Event_Insights_2024,TBA_EVENT_INSIGHTS_2024)
+
+#define TBA_EVENT_INSIGHTS_2025_DETAIL(X)\
+	X(IID,auto_rp_count)\
+	X(double,average_score)\
+	X(double,average_win_margin)\
+	X(double,average_winning_score)\
+	X(IID,barge_rp_count)\
+	X(IID,coopertition_count)\
+	X(IID,coral_rp_count)\
+	X(High_score,high_score)\
+	X(IID,nine_rp_count)\
+	X(IID,six_rp_count)\
+
+TBA_MAKE_INST(Event_Insights_2025_Detail,TBA_EVENT_INSIGHTS_2025_DETAIL)
+
+#define TBA_EVENT_INSIGHTS_2025(X)\
+	X(Event_Insights_2025_Detail,playoff)\
+	X(Event_Insights_2025_Detail,qual)
+
+TBA_MAKE_INST(Event_Insights_2025,TBA_EVENT_INSIGHTS_2025)
+
 using Event_insights=std::variant<
 	std::nullptr_t,
 	Event_Insights_2017,
@@ -1464,7 +1557,9 @@ using Event_insights=std::variant<
 	Event_Insights_2019,
 	Event_Insights_2020,
 	Event_Insights_2022,
-	Event_Insights_2023
+	Event_Insights_2023,
+	Event_Insights_2024,
+	Event_Insights_2025
 >;
 
 //These come back as null rather than empty lists for events that don't have these calculated yet.

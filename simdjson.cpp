@@ -47,6 +47,11 @@ int decode(JSON_value a,int const*){
 			throw Decode_error{"int",as_string(a),"wrong type, got null"};
 		case simdjson::dom::element_type::ARRAY:
 			throw Decode_error{"array",as_string(a),"wrong type, got array"};
+		case simdjson::dom::element_type::DOUBLE:
+			//could see if it's a whole number and coerce it to be an int.
+			throw Decode_error{"double",as_string(a),"wrong type, got double"};
+		case simdjson::dom::element_type::BOOL:
+			throw Decode_error{"bool",as_string(a),"wrong type, got bool"};
 		default:
 			TBA_PRINT(a.type())
 			TBA_NYI

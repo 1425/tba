@@ -322,6 +322,54 @@ auto to_set(std::vector<T> a){
 	return std::set<T>{a.begin(),a.end()};
 }
 
+template<typename Func,typename T>
+auto group(Func f,std::vector<T> const& t){
+	using K=decltype(f(t[0]));
+	std::map<K,std::vector<T>> r;
+	for(auto a:t){
+		r[f(a)]|=a;
+	}
+	return r;
+}
+
+template<typename T>
+std::vector<T> flatten(std::vector<std::vector<T>> const& a){
+	std::vector<T> r;
+	for(auto const& x:a){
+		r|=x;
+	}
+	return r;
+}
+
+Year year(Match_key const& a){
+	return Year(stoi(a.get()));
+}
+
+Year year(Event_key const& a){
+	return Year(stoi(a.get()));
+}
+
+#define GROUP(A,B) group([&](auto x){ return (A)(x); },B)
+
+template<typename Func,typename K,typename V>
+auto map_values(Func f,std::map<K,V> const& a){
+	using V2=decltype(f(a.begin()->second));
+	std::map<K,V2> r;
+	for(auto [k,v]:a){
+		r[k]=f(v);
+	}
+	return r;
+}
+
+template<typename K,typename V>
+std::vector<V> values(std::map<K,V> const& a){
+	std::vector<V> r;
+	for(auto [k,v]:a){
+		r|=v;
+	}
+	return r;
+}
+
 int main1(int argc,char **argv){
 	auto aa=parse_args(argc,argv);
 	std::string tba_key;
@@ -384,8 +432,7 @@ int main1(int argc,char **argv){
 		return 0;
 	}
 
-	//auto years=range(Year{1992},Year{2023});//could get this via the API.
-	auto years=range(Year{2026},Year{2027});//could get this via the API.
+	auto years=range(Year{1992},Year{2027});//could get this via the API.
 
 	std::vector<Event_key> event_key_list;
 
@@ -408,7 +455,13 @@ int main1(int argc,char **argv){
 	};
 	using namespace std;
 
-	for(auto event_key:take(10,select(event_key_list))){
+	auto events_to_check=[&](){
+		auto g=GROUP(year,event_key_list);
+		auto m=map_values(select,g);
+		return flatten(values(m));
+	}();
+
+	for(auto event_key:events_to_check){
 		null_stream<<event(f,event_key)<<"\n";
 		null_stream<<event_simple(f,event_key)<<"\n";
 		null_stream<<event_alliances(f,event_key)<<"\n";
@@ -432,11 +485,18 @@ int main1(int argc,char **argv){
 		null_stream<<event_awards(f,event_key)<<"\n";
 	}
 
-	for(auto match_key:select(reversed(match_keys))){
+	TBA_PRINT(match_keys.size());
+	auto matches_to_check=[&](){
+		auto g=GROUP(year,match_keys);
+		auto m=map_values(select,g);
+		return flatten(values(m));
+	}();
+
+	for(auto match_key:matches_to_check){
 		try{
 			null_stream<<match(f,match_key)<<"\n";
 		}catch(Decode_error){
-			cout<<"match(...)\n";
+			std::cout<<"match(...)\n";
 		}
 		try{
 			null_stream<<match_simple(f,match_key)<<"\n";

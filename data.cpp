@@ -32,7 +32,6 @@ std::strong_ordering operator<=>(std::optional<std::nullptr_t> const& a,std::opt
 
 template<typename T>
 T decode(std::nullptr_t,const T *x){
-	assert(0);
 	throw Decode_error(
 		typeid(*x).name(),
 		"null",
@@ -52,6 +51,7 @@ T decode(std::nullptr_t,const T *x){
 		ITEMS(DECODE_B1)\
 		for(auto p:in){\
 			std::string_view k=p.key;\
+			(void)k;\
 			try{\
 				ITEMS(DECODE_B2)\
 			}catch(Decode_error e){\
@@ -64,6 +64,7 @@ T decode(std::nullptr_t,const T *x){
 
 #define MAKE_INST(NAME,ITEMS)\
 	std::ostream& operator<<(std::ostream& o,NAME const& a){\
+		(void)a;\
 		o<<""#NAME<<"(";\
 		ITEMS(PRINT_ITEM)\
 		return o<<")";\
@@ -287,6 +288,10 @@ Year operator++(Year& a,int){
 
 Year operator-(Year a,int b){
 	return Year{a.get()-b};
+}
+
+Year operator+(Year a,int b){
+	return Year{a.get()+b};
 }
 
 Year decode(JSON_value in,const Year*){
@@ -643,6 +648,14 @@ MAKE_INST(Event_Insights_2023_Detail,TBA_EVENT_INSIGHTS_2023_DETAIL)
 
 MAKE_INST(Event_Insights_2023,TBA_EVENT_INSIGHTS_2023)
 
+MAKE_INST(Event_Insights_2024_Detail,TBA_EVENT_INSIGHTS_2024_DETAIL)
+
+MAKE_INST(Event_Insights_2024,TBA_EVENT_INSIGHTS_2024)
+
+MAKE_INST(Event_Insights_2025_Detail,TBA_EVENT_INSIGHTS_2025_DETAIL)
+
+MAKE_INST(Event_Insights_2025,TBA_EVENT_INSIGHTS_2025)
+
 MAKE_INST(Average_rocket_count,TBA_AVERAGE_ROCKET_COUNT)
 
 MAKE_INST(Event_OPRs,TBA_EVENT_OPRS)
@@ -721,9 +734,15 @@ MAKE_INST(Match_Score_Breakdown_2022_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2022_ALL
 
 MAKE_INST(Match_Score_Breakdown_2022,TBA_MATCH_SCORE_BREAKDOWN_2022)
 
+MAKE_INST(Match_Score_Breakdown_2023_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2023_ALLIANCE)
+
+MAKE_INST(Match_Score_Breakdown_2023,TBA_MATCH_SCORE_BREAKDOWN_2023)
+
 MAKE_INST(Elimination_Alliance_status,TBA_ELIMINATION_ALLIANCE_STATUS)
 
 MAKE_INST(Elimination_Alliance,TBA_ELIMINATION_ALLIANCE)
+
+MAKE_INST(Ignore,TBA_IGNORE)
 
 MAKE_INST(Year_info,TBA_YEAR_INFO)
 MAKE_INST(Event_points,TBA_EVENT_POINTS)
