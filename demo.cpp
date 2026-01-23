@@ -13,6 +13,8 @@
 #include "util.h"
 #include "simdjson.h"
 
+#define PRINT TBA_PRINT
+
 namespace tba{
 
 template<typename T>
@@ -138,7 +140,7 @@ void print_r(int indent,std::vector<T> const& a){
 	}
 }
 
-void print_r(int,int)TBA_NYI
+//void print_r(int,int)TBA_NYI
 
 void print_r(int indent,Event_OPRs const& e){
 	do_indent(indent);
@@ -172,6 +174,16 @@ PRINT_R(Event,TBA_EVENT)
 PRINT_R(Dcmp_history,TBA_DCMP_HISTORY)
 PRINT_R(District_data,TBA_DISTRICT_DATA)
 PRINT_R(District_insights,TBA_DISTRICT_INSIGHTS)
+PRINT_R(Match,TBA_MATCH)
+PRINT_R(Match_Score_Breakdown_2015_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2015_ALLIANCE)
+PRINT_R(Match_Score_Breakdown_2015,TBA_MATCH_SCORE_BREAKDOWN_2015)
+PRINT_R(Match_Score_Breakdown_2016_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2016_ALLIANCE)
+PRINT_R(Match_Score_Breakdown_2016,TBA_MATCH_SCORE_BREAKDOWN_2016)
+
+template<typename...Ts>
+void print_r(int indent,std::variant<Ts...> const& a){
+	return std::visit([&](auto const& x){ return print_r(indent,x); },a);
+}
 
 template<typename T>
 void print_r(T t){
@@ -345,8 +357,12 @@ Year year(Match_key const& a){
 	return Year(stoi(a.get()));
 }
 
-Year year(Event_key const& a){
-	return Year(stoi(a.get()));
+std::optional<Year> year(Event_key const& a){
+	try{
+		return Year(stoi(a.get()));
+	}catch(...){
+		return std::nullopt;
+	}
 }
 
 #define GROUP(A,B) group([&](auto x){ return (A)(x); },B)
@@ -368,6 +384,50 @@ std::vector<V> values(std::map<K,V> const& a){
 		r|=v;
 	}
 	return r;
+}
+
+std::ostream& operator<<(std::ostream& o,simdjson::dom::key_value_pair const& a){
+	o<<"("<<a.key<<","<<a.value<<")";
+	return o;
+}
+
+template<typename T,typename... Ts>
+bool operator==(T const& a,std::variant<Ts...> const& b){
+	return std::holds_alternative<T>(b) && a==std::get<T>(b);
+}
+
+int demo(Cached_fetcher& f){
+	//Match_key match_key("2016orwil_qm12");
+	//Match_key match_key("2022pncmp_qm43");
+	//Match_key match_key("2024pncmp_qm43");
+	Match_key match_key("2025pncmp_qm43");
+	//auto m=match(f,match_key);
+	//print_r(m);
+	auto json=f.fetch("https://www.thebluealliance.com/api/v3/match/"+as_string(match_key)).second;
+	//PRINT(json);
+	simdjson::dom::parser parser;
+	simdjson::padded_string str(json);
+	auto doc=parser.parse(str);
+	auto a=doc.get_object();
+	JSON_value found;
+	for(auto p:a){
+		//PRINT(p);
+		//PRINT(p.key);
+		//PRINT(p.value);
+		if(p.key=="score_breakdown"){
+			found=p.value;
+		}
+	}
+
+	PRINT(found);
+
+	auto d=decode(found,(Match_Score_Breakdown_2025*)0);
+	//print_r(d);
+	auto d2=decode(found,(Match_Score_Breakdown*)0);
+	assert(d==d2);
+	print_r(d2);
+
+	return 0;
 }
 
 int main1(int argc,char **argv){
@@ -397,6 +457,8 @@ int main1(int argc,char **argv){
 	}
 
 	Cached_fetcher f{Fetcher{Nonempty_string{tba_key}},Cache{}};
+
+	//return demo(f);
 
 	//auto s=status(f);
 	//TBA_PRINT(s);
@@ -449,7 +511,7 @@ int main1(int argc,char **argv){
 
 	auto select=[&](auto a){
 		if(quick){
-			return take_last(10,a);
+			return take_last(3,a);
 		}
 		return a;
 	};

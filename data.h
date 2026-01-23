@@ -883,14 +883,14 @@ TBA_MAKE_INST(Ignore,TBA_IGNORE)
 	X(std::string,mobilityRobot3)\
 	X(int,autoPoints)\
 	X(int,coopGamePieceCount)\
-	X(int,coopertitionCriteriaMet)\
+	X(bool,coopertitionCriteriaMet)\
 	X(std::string,endGameBridgeState)\
 	X(int,endGameChargeStationPoints)\
 	X(std::string,endGameChargeStationRobot1)\
 	X(std::string,endGameChargeStationRobot2)\
 	X(std::string,endGameChargeStationRobot3)\
 	X(int,endGameParkPoints)\
-	X(int,extraGamePieceCount)\
+	X(std::optional<int>,extraGamePieceCount)\
 	X(int,foulCount)\
 	X(int,foulPoints)\
 	X(int,techFoulCount)\
@@ -913,7 +913,110 @@ TBA_MAKE_INST(Match_Score_Breakdown_2023_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2023
 
 TBA_MAKE_INST(Match_Score_Breakdown_2023,TBA_MATCH_SCORE_BREAKDOWN_2023)
 
+#define TBA_MATCH_SCORE_BREAKDOWN_2024_ALLIANCE(X)\
+	X(int,adjustPoints)\
+	X(int,autoAmpNoteCount)\
+	X(int,autoAmpNotePoints)\
+	X(int,autoLeavePoints)\
+	X(std::string,autoLineRobot1)\
+	X(std::string,autoLineRobot2)\
+	X(std::string,autoLineRobot3)\
+	X(int,autoPoints)\
+	X(int,autoSpeakerNoteCount)\
+	X(int,autoSpeakerNotePoints)\
+	X(int,autoTotalNotePoints)\
+	X(bool,coopNotePlayed)\
+	X(bool,coopertitionCriteriaMet)\
+	X(int,endGameHarmonyPoints)\
+	X(int,endGameOnStagePoints)\
+	X(int,endGameParkPoints)\
+	X(std::string,endGameRobot1)\
+	X(std::string,endGameRobot2)\
+	X(std::string,endGameRobot3)\
+	X(int,endGameSpotLightBonusPoints)\
+	X(int,endGameTotalStagePoints)\
+	X(bool,ensembleBonusAchieved)\
+	X(int,ensembleBonusOnStageRobotsThreshold)\
+	X(int,ensembleBonusStagePointsThreshold)\
+	X(int,foulCount)\
+	X(int,foulPoints)\
+	X(bool,g206Penalty)\
+	X(bool,g408Penalty)\
+	X(bool,g424Penalty)\
+	X(bool,melodyBonusAchieved)\
+	X(int,melodyBonusThreshold)\
+	X(int,melodyBonusThresholdCoop)\
+	X(int,melodyBonusThresholdNonCoop)\
+	X(bool,micCenterStage)\
+	X(bool,micStageLeft)\
+	X(bool,micStageRight)\
+	X(int,rp)\
+	X(int,techFoulCount)\
+	X(int,teleopAmpNoteCount)\
+	X(int,teleopAmpNotePoints)\
+	X(int,teleopPoints)\
+	X(int,teleopSpeakerNoteAmplifiedCount)\
+	X(int,teleopSpeakerNoteAmplifiedPoints)\
+	X(int,teleopTotalNotePoints)\
+	X(int,totalPoints)\
+	X(bool,trapCenterStage)\
+	X(bool,trapStageLeft)\
+	X(bool,trapStageRight)
+
+TBA_MAKE_INST(Match_Score_Breakdown_2024_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2024_ALLIANCE)
+
+#define TBA_MATCH_SCORE_BREAKDOWN_2024(X)\
+	X(Match_Score_Breakdown_2024_Alliance,blue)\
+	X(Match_Score_Breakdown_2024_Alliance,red)
+
+TBA_MAKE_INST(Match_Score_Breakdown_2024,TBA_MATCH_SCORE_BREAKDOWN_2024)
+
+#define TBA_MATCH_SCORE_BREAKDOWN_2025_ALLIANCE(X)\
+	X(int,adjustPoints)\
+	X(int,algaePoints)\
+	X(bool,autoBonusAchieved)\
+	X(int,autoCoralCount)\
+	X(int,autoCoralPoints)\
+	X(std::string,autoLineRobot1)\
+	X(std::string,autoLineRobot2)\
+	X(std::string,autoLineRobot3)\
+	X(int,autoMobilityPoints)\
+	X(int,autoPoints)\
+	X(Ignore,autoReef)\
+	X(bool,bargeBonusAchieved)\
+	X(bool,coopertitionCriteriaMet)\
+	X(bool,coralBonusAchieved)\
+	X(int,endGameBargePoints)\
+	X(std::string,endGameRobot1)\
+	X(std::string,endGameRobot2)\
+	X(std::string,endGameRobot3)\
+	X(int,foulCount)\
+	X(int,foulPoints)\
+	X(bool,g206Penalty)\
+	X(bool,g410Penalty)\
+	X(bool,g418Penalty)\
+	X(bool,g428Penalty)\
+	X(int,netAlgaeCount)\
+	X(int,rp)\
+	X(int,techFoulCount)\
+	X(int,teleopCoralCount)\
+	X(int,teleopCoralPoints)\
+	X(int,teleopPoints)\
+	X(Ignore,teleopReef)\
+	X(int,totalPoints)\
+	X(int,wallAlgaeCount)\
+
+TBA_MAKE_INST(Match_Score_Breakdown_2025_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2025_ALLIANCE)
+
+#define TBA_MATCH_SCORE_BREAKDOWN_2025(X)\
+	X(Match_Score_Breakdown_2025_Alliance,blue)\
+	X(Match_Score_Breakdown_2025_Alliance,red)
+
+TBA_MAKE_INST(Match_Score_Breakdown_2025,TBA_MATCH_SCORE_BREAKDOWN_2025)
+
 using Match_Score_Breakdown=std::variant<
+	Match_Score_Breakdown_2025,
+	Match_Score_Breakdown_2024,
 	Match_Score_Breakdown_2023,
 	Match_Score_Breakdown_2022,
 	Match_Score_Breakdown_2020,

@@ -43,7 +43,12 @@ T decode(std::nullptr_t,const T *x){
 	if(VAR_##B){ \
 		return *VAR_##B;\
 	}\
-	return decode(nullptr,(A*)0);\
+	try{\
+		return decode(nullptr,(A*)0);\
+	}catch(Decode_error a){\
+		a.path.push_back(""#B);\
+		throw a;\
+	}\
 }(),
 
 #define DECODE_B(NAME,ITEMS) \
@@ -738,11 +743,29 @@ MAKE_INST(Match_Score_Breakdown_2023_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2023_ALL
 
 MAKE_INST(Match_Score_Breakdown_2023,TBA_MATCH_SCORE_BREAKDOWN_2023)
 
+MAKE_INST(Match_Score_Breakdown_2024_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2024_ALLIANCE)
+
+MAKE_INST(Match_Score_Breakdown_2024,TBA_MATCH_SCORE_BREAKDOWN_2024)
+
+MAKE_INST(Match_Score_Breakdown_2025_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2025_ALLIANCE)
+
+MAKE_INST(Match_Score_Breakdown_2025,TBA_MATCH_SCORE_BREAKDOWN_2025)
+
 MAKE_INST(Elimination_Alliance_status,TBA_ELIMINATION_ALLIANCE_STATUS)
 
 MAKE_INST(Elimination_Alliance,TBA_ELIMINATION_ALLIANCE)
 
-MAKE_INST(Ignore,TBA_IGNORE)
+Ignore decode(JSON_value,Ignore const*){
+	return Ignore();
+}
+
+Ignore decode(nullptr_t,Ignore const*){
+	return Ignore();
+}
+
+std::ostream& operator<<(std::ostream& o,Ignore const&){
+	return o<<"Ignore";
+}
 
 MAKE_INST(Year_info,TBA_YEAR_INFO)
 MAKE_INST(Event_points,TBA_EVENT_POINTS)

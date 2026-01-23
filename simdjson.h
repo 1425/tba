@@ -4,6 +4,7 @@
 #include<simdjson.h>
 #include<map>
 #include<variant>
+#include "util.h"
 
 namespace tba{
 
@@ -91,6 +92,13 @@ template<
 	typename I
 >
 std::variant<A,B,C,D,E,F,G,H,I> decode(JSON_object in,std::variant<A,B,C,D,E,F,G,H,I> const*);
+
+template<
+	typename A,typename B,typename C,typename D,
+	typename E,typename F,typename G,typename H,
+	typename I,typename J
+>
+std::variant<A,B,C,D,E,F,G,H,I,J> decode(JSON_object in,std::variant<A,B,C,D,E,F,G,H,I,J> const*);
 
 template<typename A,typename B,typename C,typename D,typename E,typename F,typename G>
 std::variant<A,B,C,D,E,F,G> decode(JSON_value in,std::variant<A,B,C,D,E,F,G> const* x){
@@ -240,6 +248,23 @@ std::variant<A,B,C,D,E,F,G,H,I,J> decode(JSON_object in,std::variant<A,B,C,D,E,F
 	return decode(in,(J*)nullptr);
 }
 
+template<
+	typename A,typename B,typename C,typename D,
+	typename E,typename F,typename G,typename H,
+	typename I,typename J,typename K
+>
+std::variant<A,B,C,D,E,F,G,H,I,J,K> decode(JSON_object in,std::variant<A,B,C,D,E,F,G,H,I,J,K> const*){
+	#define X(NAME) try{\
+		return decode(in,(NAME*)nullptr);\
+	}catch(...){\
+	}
+	X(A) X(B) X(C) X(D)
+	X(E) X(F) X(G) X(H)
+	X(I) X(J)
+	#undef X
+	return decode(in,(K*)nullptr);
+}
+
 /*template<typename ...Ts>
 std::variant<Ts...> decode(JSON_object,std::variant<Ts...> const*){
 	TBA_PRINT(sizeof...(Ts));
@@ -308,8 +333,19 @@ std::tuple<Ts...> decode(JSON_value,std::tuple<Ts...> const*){
 }
 
 template<typename T,size_t N>
-std::array<T,N> decode(JSON_value,std::array<T,N> const*){
-	assert(0);
+std::array<T,N> decode(JSON_value in,std::array<T,N> const*){
+	if(in.type()!=simdjson::dom::element_type::ARRAY){
+		std::stringstream ss;
+		throw Decode_error{"array",as_string(in),"expected array type"};
+	}
+	auto a=in.get_array();
+	assert(a.size()==N);
+	std::array<T,N> r;
+	size_t i=0;
+	for(auto elem:a){
+		r[i++]=decode(elem,(T*)0);
+	}
+	return r;
 }
 
 template<typename T>
@@ -407,6 +443,14 @@ std::vector<T> decode(JSON_value in,std::vector<T> const*){
 		throw Decode_error("std::vector<T>",ss.str(),"not an array");
 	}
 	return decode(in.get_array(),(std::vector<T> const*)nullptr);
+}
+
+template<typename...Ts>
+std::variant<Ts...> decode(JSON_value in,std::variant<Ts...> const* x){
+	if(in.is_object()){
+		return decode(in.get_object(),x);
+	}
+	TBA_NYI
 }
 
 }

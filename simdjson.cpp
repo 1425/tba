@@ -85,8 +85,11 @@ bool decode(JSON_value a,bool const*){
 	switch(a.type()){
 		case simdjson::dom::element_type::BOOL:
 			return a.get_bool();
+		case simdjson::dom::element_type::INT64:
+			throw Decode_error("int",as_string(a),"expected bool, got int");
 		default:
 			TBA_PRINT(a.type());
+			TBA_PRINT(a);
 			TBA_NYI
 	}
 }
