@@ -15,6 +15,9 @@ namespace tba{
 template<typename A,typename B,typename C,typename D,typename E,typename F,typename G>
 std::ostream& operator<<(std::ostream& o,std::tuple<A,B,C,D,E,F,G> const& a);
 
+template<typename T,size_t N>
+std::ostream& operator<<(std::ostream&,std::array<T,N> const&);
+
 template<typename T>
 std::ostream& operator<<(std::ostream& o,std::optional<T> const& a);
 

@@ -1014,7 +1014,40 @@ TBA_MAKE_INST(Match_Score_Breakdown_2025_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2025
 
 TBA_MAKE_INST(Match_Score_Breakdown_2025,TBA_MATCH_SCORE_BREAKDOWN_2025)
 
+#define TBA_MATCH_SCORE_BREAKDOWN_2026_ALLIANCE(X)\
+	X(int,adjustPoints)\
+	X(int,autoTowerPoints)\
+	X(std::string,autoTowerRobot1)\
+	X(std::string,autoTowerRobot2)\
+	X(std::string,autoTowerRobot3)\
+	X(int,endGameTowerPoints)\
+	X(std::string,endGameTowerRobot1)\
+	X(std::string,endGameTowerRobot2)\
+	X(std::string,endGameTowerRobot3)\
+	X(bool,energizedAchieved)\
+	X(int,foulPoints)\
+	X(bool,g206Penalty)\
+	X(Ignore,hubScore)\
+	X(int,majorFoulCount)\
+	X(int,minorFoulCount)\
+	X(int,rp)\
+	X(bool,superchargedAchieved)\
+	X(int,totalAutoPoints)\
+	X(int,totalPoints)\
+	X(int,totalTeleopPoints)\
+	X(int,totalTowerPoints)\
+	X(bool,traversalAchieved)
+
+TBA_MAKE_INST(Match_Score_Breakdown_2026_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2026_ALLIANCE)
+
+#define TBA_MATCH_SCORE_BREAKDOWN_2026(X)\
+	X(Match_Score_Breakdown_2026_Alliance,blue)\
+	X(Match_Score_Breakdown_2026_Alliance,red)
+
+TBA_MAKE_INST(Match_Score_Breakdown_2026,TBA_MATCH_SCORE_BREAKDOWN_2026)
+
 using Match_Score_Breakdown=std::variant<
+	Match_Score_Breakdown_2026,
 	Match_Score_Breakdown_2025,
 	Match_Score_Breakdown_2024,
 	Match_Score_Breakdown_2023,
