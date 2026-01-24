@@ -4,7 +4,6 @@
 #include<simdjson.h>
 #include<map>
 #include<variant>
-#include "util.h"
 
 namespace tba{
 
@@ -450,7 +449,7 @@ std::variant<Ts...> decode(JSON_value in,std::variant<Ts...> const* x){
 	if(in.is_object()){
 		return decode(in.get_object(),x);
 	}
-	TBA_NYI
+	assert(0);
 }
 
 }
