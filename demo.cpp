@@ -430,6 +430,26 @@ int demo(Cached_fetcher& f){
 	return 0;
 }
 
+void test_unicode(Cached_fetcher &f){
+	struct Verbose{
+		Cached_fetcher &cf;
+
+		auto fetch(URL url){
+			PRINT(url);
+			return cf.fetch(url);
+		}
+	};
+	Verbose v(f);
+
+	//examples 8302 in PNW
+	auto x=event_teams(v,Event_key("2026wabon"));
+	//print_r(x);
+	for(auto a:x){
+		cout<<a.team_number<<"\t"<<a.nickname<<"\n";
+	}
+	exit(0);
+}
+
 int main1(int argc,char **argv){
 	auto aa=parse_args(argc,argv);
 	std::string tba_key;
@@ -458,6 +478,7 @@ int main1(int argc,char **argv){
 
 	Cached_fetcher f{Fetcher{Nonempty_string{tba_key}},Cache{}};
 
+	//test_unicode(f);
 	//return demo(f);
 
 	//auto s=status(f);

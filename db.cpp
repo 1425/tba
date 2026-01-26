@@ -108,39 +108,48 @@ Cache::Cache(const char *filename):db(filename),policy(Cache_policy::any()){
 Cache::Cache():Cache("cache.db"){
 }
 
-void escape(std::ostream& o,std::string const& s){
-	for(size_t i=0;i<s.size();i++){
-		if(s[i]=='\''){
-			//TBA_PRINT(s.substr(i,10));
-			//TBA_NYI
-			//ignore
-		}else if(s[i]=='\\'){
-			if(s[i+1]=='"'){
-				o<<s[i];
-				o<<s[i+1];
-				i++;
-			}else{
-				if(s[i+1]=='\'' || s[i+1]=='"'){
-					TBA_PRINT(s.substr(i,10));
-					TBA_NYI
-				}else{
-					//ignore
-				}
-			}
-		}else{
-			o<<s[i];
-		}
-	}
-}
-			
 void Cache::add(URL url,std::pair<Date,Data> p){
 	auto date=p.first;
 	auto body=p.second;
-	std::ostringstream ss;
-	ss<<"INSERT INTO cache VALUES (\'"<<url<<"\',\'"<<date<<"\',\'";
-	escape(ss,body);
-	ss<<"\')";
-	db.query(ss.str());
+
+	const char* sql = "INSERT INTO cache (url, date, body) VALUES (?, ?, ?)";
+	sqlite3_stmt *stmt;
+
+	{
+		int r = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+		if (r != SQLITE_OK) {
+			std::stringstream ss;
+			ss<< "Failed to prepare statement: " << sqlite3_errstr(r);
+			throw ss.str();
+		}
+	}
+
+	//Note the 1-based index
+	auto bind=[&](int index,std::string const& s){
+		int r=sqlite3_bind_text(stmt,index,s.c_str(),s.size(),SQLITE_STATIC);
+		if(r!=SQLITE_OK){
+			throw "sqlite3 failed";
+		}
+	};
+	bind(1,url);
+	bind(2,date);
+	bind(3,body);
+
+	{
+		int r=sqlite3_step(stmt);
+		if (r!=SQLITE_DONE){
+			std::stringstream ss;
+			ss<<"Execution failed: "<<sqlite3_errstr(r);
+			throw ss.str();
+		}
+	}
+
+	{
+		auto r=sqlite3_finalize(stmt);
+		if(r!=SQLITE_OK){
+			throw "sqlite3 error";
+		}
+	}
 }
 
 struct Mutex_lock{
