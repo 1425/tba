@@ -401,34 +401,19 @@ std::array<char,LEN> take(std::string const& s){
 	return r;
 }
 
-Date::Date(std::string s1):s(s1){
-	auto check=[*this](bool b){
-		if(b) return;
-		throw std::invalid_argument{"Date:"+s};
-	};
-	check(s.size()==10);
+Date decode(JSON_value in,Date const*){
+	auto s=decode(in,(std::string*)nullptr);
 
-	{
-		auto cs=take<4>(s);
-		std::for_each(begin(cs),end(cs),[&](auto c){ check(isdigit(c)); });
+	std::chrono::year_month_day ymd;
+	std::istringstream ss(s);
+    
+	ss >> std::chrono::parse("%Y-%m-%d", ymd);
+
+	if (ss.fail()) {
+		throw Decode_error("Date",s,"Invalid date");
 	}
 
-	check(s[4]=='-');
-	check(isdigit(s[5]));
-	check(isdigit(s[6]));
-	check(s[7]=='-');
-	check(isdigit(s[8]));
-	check(isdigit(s[9]));
-}
-
-std::string Date::str()const{ return s; }
-
-std::ostream& operator<<(std::ostream& o,Date const& a){
-	return o<<a.str();
-}
-
-Date decode(JSON_value in,const Date*){
-	return Date{decode(in,(std::string*)nullptr)};
+	return ymd;
 }
 
 MAKE_INST(Event_Simple,TBA_EVENT_SIMPLE)

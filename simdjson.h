@@ -4,6 +4,7 @@
 #include<simdjson.h>
 #include<map>
 #include<variant>
+#include<chrono>
 
 namespace tba{
 
@@ -48,6 +49,7 @@ unsigned decode(JSON_value,unsigned const*);
 long decode(JSON_value,long const*);
 double decode(JSON_value,double const*);
 std::string decode(JSON_value,std::string const*);
+std::chrono::year_month_day decode(JSON_value,std::chrono::year_month_day const*);
 
 std::nullptr_t decode(JSON_object,std::nullptr_t const*);
 std::nullptr_t decode(JSON_value,std::nullptr_t const*);

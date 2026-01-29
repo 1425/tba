@@ -6,6 +6,7 @@
 #include<map>
 #include<variant>
 #include<array>
+#include<chrono>
 #include "simdjson.h"
 
 #define TBA_SINGLE_ARG(A,B) A,B
@@ -262,19 +263,9 @@ std::ostream& operator<<(std::ostream&,Playoff_type);
 
 Playoff_type decode(JSON_value,const Playoff_type*);
 
-class Date{
-	//yyyy-mm-dd format
-	std::string s;
-
-	public:
-	explicit Date(std::string);
-	std::string str()const;
-
-	auto operator<=>(Date const&)const=default;
-};
-
-std::ostream& operator<<(std::ostream&,Date const&);
+using Date=std::chrono::year_month_day;
 Date decode(JSON_value,const Date*);
+
 
 #define TBA_EVENT(X)\
 	X(Event_key,key)\
