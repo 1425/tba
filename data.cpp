@@ -263,6 +263,18 @@ int Year::get()const{
 	return i;
 }
 
+bool Year::operator==(Year const& a)const{
+	return i==a.i;
+}
+
+bool Year::operator==(int a)const{
+	return i==a;
+}
+
+bool Year::operator>=(int a)const{
+	return i>=a;
+}
+
 std::ostream& operator<<(std::ostream& o,Year a){
 	return o<<a.get();
 }

@@ -46,6 +46,10 @@ class Year{
 
 	auto operator<=>(Year const&)const=default;
 	friend Year& operator++(Year&);
+
+	bool operator==(Year const&)const;
+	bool operator==(int)const;
+	bool operator>=(int)const;
 };
 
 std::ostream& operator<<(std::ostream& o,Year);
@@ -786,6 +790,8 @@ TBA_MAKE_INST(Match_Score_Breakdown_2020,TBA_MATCH_SCORE_BREAKDOWN_2020)
 enum class Yes_no{
 	Yes,No //not all-caps to preserve being as documented in API
 };
+
+std::ostream& operator<<(std::ostream&,Yes_no);
 
 #define TBA_ENDGAME_2022_OPTIONS(X)\
 	X(Traversal)\
