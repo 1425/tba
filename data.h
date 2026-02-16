@@ -1233,8 +1233,8 @@ TBA_MAKE_INST(Sort_order,TBA_SORT_ORDER)
 TBA_MAKE_INST(Team_Event_Status_rank,TBA_TEAM_EVENT_STATUS_RANK)
 
 #define TBA_TEAM_EVENT_STATUS_ALLIANCE_BACKUP(X)\
-	X(std::string,out)\
-	X(std::string,in)
+	X(Team_key,out)\
+	X(Team_key,in)
 
 TBA_MAKE_INST(Team_Event_Status_alliance_backup,TBA_TEAM_EVENT_STATUS_ALLIANCE_BACKUP)
 
