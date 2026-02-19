@@ -760,7 +760,7 @@ Ignore decode(JSON_value,Ignore const*){
 	return Ignore();
 }
 
-Ignore decode(nullptr_t,Ignore const*){
+Ignore decode(std::nullptr_t,Ignore const*){
 	return Ignore();
 }
 

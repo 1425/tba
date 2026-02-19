@@ -430,6 +430,7 @@ std::optional<T> decode(JSON_value in,std::optional<T> const*){
 template<typename T>
 std::vector<T> decode(JSON_array a,std::vector<T> const*){
 	std::vector<T> r;
+	r.reserve(a.size());
 	for(auto elem:a){
 		r.push_back(decode(elem,(T*)nullptr));
 	}
