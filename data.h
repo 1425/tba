@@ -29,6 +29,10 @@ using URL=std::string;
 	NAME decode(tba::JSON_object,const NAME*);\
 	NAME decode(tba::JSON_array,const NAME*);\
 	NAME decode(std::nullptr_t,NAME const*);\
+	std::optional<NAME> maybe_decode(tba::JSON_value,const NAME*);\
+	std::optional<NAME> maybe_decode(tba::JSON_object,const NAME*);\
+	std::optional<NAME> maybe_decode(tba::JSON_array,const NAME*);\
+	std::optional<NAME> maybe_decode(std::nullptr_t,NAME const*);\
 
 using Page=unsigned;
 
@@ -59,6 +63,7 @@ Year operator-(Year,int);
 Year operator+(Year,int);
 Year decode(JSON_value,const Year*);
 Year decode(std::string_view,Year const*);
+std::optional<Year> maybe_decode(JSON_value,Year const*);
 
 #define TBA_API_STATUS_APP_VERSION(X)\
 	X(int,min_app_version)\
@@ -91,6 +96,7 @@ class Team_key{
 std::ostream& operator<<(std::ostream&,Team_key const&);
 Team_key decode(JSON_value,Team_key const*);
 Team_key decode2(std::string_view,Team_key const*);
+std::optional<Team_key> maybe_decode(JSON_value,Team_key const*);
 
 #define TBA_TEAM(X)\
 	X(Team_key,key)\
@@ -150,6 +156,7 @@ class District_key{
 std::ostream& operator<<(std::ostream&,District_key const&);
 bool operator==(District_key const&,std::string const&);
 District_key decode(JSON_value,const District_key*);
+std::optional<District_key> maybe_decode(JSON_value,District_key const*);
 
 using District_abbreviation=std::string;
 
@@ -174,6 +181,7 @@ class Event_key{
 bool operator==(Event_key const&,const char *);
 std::ostream& operator<<(std::ostream&,Event_key const&);
 Event_key decode(JSON_value,Event_key const*);
+std::optional<Event_key> maybe_decode(JSON_value,Event_key const*);
 
 #define TBA_EVENT_POINTS(X)\
 	X(Event_key,event_key)\
@@ -212,6 +220,7 @@ enum class Webcast_type{
 
 std::ostream& operator<<(std::ostream&,Webcast_type);
 Webcast_type decode(JSON_value,const Webcast_type*);
+std::optional<Webcast_type> maybe_decode(JSON_value,Webcast_type const*);
 
 #define TBA_WEBCAST(X)\
 	X(Webcast_type,type)\
@@ -242,6 +251,7 @@ enum class Event_type{
 
 std::ostream& operator<<(std::ostream&,Event_type);
 Event_type decode(JSON_value,const Event_type *);
+std::optional<Event_type> maybe_decode(JSON_value,Event_type const*);
 
 #define TBA_PLAYOFF_TYPES(X)\
 	X(0,BRACKET_8_TEAM,"Elimination Bracket (8 Alliances)")\
@@ -349,6 +359,7 @@ enum class Media_type{
 
 std::ostream& operator<<(std::ostream&,Media_type);
 Media_type decode(JSON_value,const Media_type*);
+std::optional<Media_type> maybe_decode(JSON_value,Media_type const*);
 
 #define TBA_MEDIA_DETAILS(X)\
 	X(std::optional<int64_t>,author_id)\
@@ -394,6 +405,7 @@ class M_score{
 
 std::ostream& operator<<(std::ostream&,M_score const&);
 M_score decode(JSON_value,const M_score*);
+std::optional<M_score> maybe_decode(JSON_value,M_score const*);
 
 #define TBA_MATCH_ALLIANCE(X)\
 	X(M_score,score)\
@@ -413,6 +425,7 @@ enum class Winning_alliance{red,blue,NONE};
 std::ostream& operator<<(std::ostream&,Winning_alliance);
 
 Winning_alliance decode(JSON_value,const Winning_alliance *);
+std::optional<Winning_alliance> maybe_decode(JSON_value,Winning_alliance const*);
 
 #define TBA_PLAYOFF_LEVELS(X) X(qm) X(ef) X(qf) X(sf) X(f)
 
@@ -424,6 +437,7 @@ enum class Playoff_level{
 
 std::ostream& operator<<(std::ostream&,Playoff_level);
 Playoff_level decode(JSON_value,const Playoff_level*);
+std::optional<Playoff_level> maybe_decode(JSON_value,Playoff_level const*);
 
 using Competition_level=Playoff_level;//this is probably going to have to change.
 
@@ -495,12 +509,17 @@ TBA_MAKE_INST(Match_Score_Breakdown_2015,TBA_MATCH_SCORE_BREAKDOWN_2015)
 	enum class NAME{ OPTIONS(TBA_STR_OPT_INST) };\
 	std::ostream& operator<<(std::ostream&,NAME);\
 	NAME decode(JSON_value,const NAME *);\
+	std::optional<NAME> maybe_decode(JSON_value,NAME const*);\
 
 #define TBA_AUTO_2016_TYPES(X) X(Crossed) X(Reached) X(None)
 
 #define NAME Auto_2016
 TBA_STR_OPTIONS(TBA_AUTO_2016_TYPES)
 #undef NAME
+
+/*	X(int,autoBoulderPoints)\
+	X(int,breachPoints)\
+	X(int,tba_rpEarned)\*/
 
 #define TBA_MATCH_SCORE_BREAKDOWN_2016_ALLIANCE(X)\
 	X(int,autoPoints)\
@@ -539,7 +558,7 @@ TBA_STR_OPTIONS(TBA_AUTO_2016_TYPES)
 	X(int,position2crossings)\
 	X(int,position3crossings)\
 	X(int,position4crossings)\
-	X(int,position5crossings)
+	X(int,position5crossings)\
 
 TBA_MAKE_INST(Match_Score_Breakdown_2016_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2016_ALLIANCE)
 
@@ -670,6 +689,7 @@ struct Match_Score_Breakdown_2014_Alliance{
 
 std::ostream& operator<<(std::ostream&,Match_Score_Breakdown_2014_Alliance const&);
 Match_Score_Breakdown_2014_Alliance decode(JSON_value,const Match_Score_Breakdown_2014_Alliance*);
+std::optional<Match_Score_Breakdown_2014_Alliance> maybe_decode(JSON_value,Match_Score_Breakdown_2014_Alliance const*);
 
 #define TBA_MATCH_SCORE_BREAKDOWN_2014(X)\
 	X(Match_Score_Breakdown_2014_Alliance,blue)\
@@ -689,6 +709,7 @@ enum class Init_line{
 
 std::ostream& operator<<(std::ostream&,Init_line);
 Init_line decode(JSON_value,Init_line const*);
+std::optional<Init_line> maybe_decode(JSON_value,Init_line const*);
 
 #define TBA_ENDGAME_OPTIONS(X)\
 	X(Park)\
@@ -703,6 +724,7 @@ enum class Endgame{
 
 std::ostream& operator<<(std::ostream&,Endgame);
 Endgame decode(JSON_value,Endgame const*);
+std::optional<Endgame> maybe_decode(JSON_value,Endgame const*);
 
 #define TBA_TARGET_COLOR_OPTIONS(X)\
 	X(Unknown)\
@@ -719,6 +741,7 @@ enum class Target_color{
 
 std::ostream& operator<<(std::ostream&,Target_color);
 Target_color decode(JSON_value,Target_color const*);
+std::optional<Target_color> maybe_decode(JSON_value,Target_color const*);
 
 #define TBA_RUNG_LEVEL_OPTIONS(X)\
 	X(NotLevel)\
@@ -732,6 +755,7 @@ enum class Rung_level{
 
 std::ostream& operator<<(std::ostream&,Rung_level);
 Rung_level decode(JSON_value,Rung_level const*);
+std::optional<Rung_level> maybe_decode(JSON_value,Rung_level const*);
 
 #define TBA_MATCH_SCORE_BREAKDOWN_2020_ALLIANCE(X)\
 	X(Init_line,initLineRobot1)\
@@ -779,7 +803,7 @@ struct Match_Score_Breakdown_2020_Alliance{
 
 std::ostream& operator<<(std::ostream&,Match_Score_Breakdown_2020_Alliance const&);
 Match_Score_Breakdown_2020_Alliance decode(JSON_value,const Match_Score_Breakdown_2020_Alliance*);
-
+std::optional<Match_Score_Breakdown_2020_Alliance> maybe_decode(JSON_value,Match_Score_Breakdown_2020_Alliance const*);
 
 #define TBA_MATCH_SCORE_BREAKDOWN_2020(X)\
 	X(Match_Score_Breakdown_2020_Alliance,blue)\
@@ -792,6 +816,8 @@ enum class Yes_no{
 };
 
 std::ostream& operator<<(std::ostream&,Yes_no);
+Yes_no decode(JSON_value,Yes_no const*);
+std::optional<Yes_no> maybe_decode(JSON_value,Yes_no const*);
 
 #define TBA_ENDGAME_2022_OPTIONS(X)\
 	X(Traversal)\
@@ -807,6 +833,8 @@ enum class Endgame_2022{
 };
 
 std::ostream& operator<<(std::ostream&,Endgame_2022);
+Endgame_2022 decode(JSON_value,Endgame_2022 const*);
+std::optional<Endgame_2022> maybe_decode(JSON_value,Endgame_2022 const*);
 
 #define TBA_MATCH_SCORE_BREAKDOWN_2022_ALLIANCE(X)\
 	X(Yes_no,taxiRobot1)\
@@ -1190,6 +1218,7 @@ enum class Award_type{
 
 std::ostream& operator<<(std::ostream&,Award_type);
 Award_type decode(JSON_value,const Award_type *);
+std::optional<Award_type> maybe_decode(JSON_value,Award_type const*);
 
 #define TBA_AWARD(X)\
 	X(std::string,name)\
@@ -1253,6 +1282,7 @@ class Pick_order{
 
 std::ostream& operator<<(std::ostream&,Pick_order);
 Pick_order decode(JSON_value,const Pick_order *);
+std::optional<Pick_order> maybe_decode(JSON_value,Pick_order const*);
 
 #define TBA_TEAM_EVENT_STATUS_ALLIANCE(X)\
 	X(std::string,name)\
@@ -1273,6 +1303,7 @@ enum class Playoff_status{
 std::ostream& operator<<(std::ostream&,Playoff_status);
 
 Playoff_status decode(JSON_value,const Playoff_status*);
+std::optional<Playoff_status> maybe_decode(JSON_value,Playoff_status const*);
 
 #define TBA_TEAM_EVENT_STATUS_PLAYOFF(X)\
 	X(Playoff_level,level)\
@@ -1335,6 +1366,7 @@ class Match_key{
 std::ostream& operator<<(std::ostream&,Match_key const&);
 Match_key decode(JSON_value,Match_key const*);
 Match_key decode2(std::string_view,Match_key const*);
+std::optional<Match_key> maybe_decode(JSON_value,Match_key const*);
 
 #define TBA_HIGH_SCORE(X)\
 	X(int,high_score)\
@@ -1349,6 +1381,7 @@ struct High_score{
 
 std::ostream& operator<<(std::ostream&,High_score const&);
 High_score decode(JSON_value,const High_score*);
+std::optional<High_score> maybe_decode(JSON_value,High_score const*);
 
 using D3=std::array<double,3>;
 using I3=std::array<int,3>;
@@ -1768,6 +1801,7 @@ enum class Alliance_color{RED,BLUE};
 std::ostream& operator<<(std::ostream&,Alliance_color);
 
 Alliance_color decode(JSON_value,const Alliance_color *);
+std::optional<Alliance_color> maybe_decode(JSON_value,Alliance_color const*);
 
 #define TBA_ALLIANCE_PREDICTION(X)\
 	X(std::optional<double>,gears)\

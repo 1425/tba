@@ -48,12 +48,50 @@ bool decode(JSON_value,bool const*);
 unsigned decode(JSON_value,unsigned const*);
 long decode(JSON_value,long const*);
 double decode(JSON_value,double const*);
+double decode(std::nullptr_t,double const*);
+std::string decode(std::nullptr_t,std::string const*);
+unsigned decode(std::nullptr_t,unsigned const*);
 std::string decode(JSON_value,std::string const*);
 std::chrono::year_month_day decode(JSON_value,std::chrono::year_month_day const*);
 
 std::nullptr_t decode(JSON_object,std::nullptr_t const*);
 std::nullptr_t decode(JSON_value,std::nullptr_t const*);
 std::nullptr_t decode(std::nullptr_t,std::nullptr_t const*);
+
+std::optional<bool> maybe_decode(JSON_value,bool const*);
+std::optional<int> maybe_decode(JSON_value,int const*);
+std::optional<unsigned> maybe_decode(JSON_value,unsigned const*);
+std::optional<double> maybe_decode(JSON_value,double const*);
+std::optional<std::string> maybe_decode(JSON_value,std::string const*);
+std::optional<std::nullptr_t> maybe_decode(JSON_object,std::nullptr_t const*);
+std::optional<std::nullptr_t> maybe_decode(JSON_value,std::nullptr_t const*);
+std::optional<std::nullptr_t> maybe_decode(std::nullptr_t,std::nullptr_t const*);
+std::optional<int> maybe_decode(std::nullptr_t,int const*);
+std::optional<bool> maybe_decode(std::nullptr_t,bool const*);
+
+template<typename T>
+std::optional<std::optional<T>> maybe_decode(JSON_value in,std::optional<T> const*);
+
+template<typename T>
+std::optional<std::vector<T>> maybe_decode(std::nullptr_t,std::vector<T> const*);
+
+template<typename T>
+std::optional<std::vector<T>> maybe_decode(JSON_value in,std::vector<T> const*);
+
+template<typename K,typename V>
+std::optional<std::map<K,V>> maybe_decode(JSON_value,std::map<K,V> const*);
+
+template<typename...Ts>
+std::optional<std::tuple<Ts...>> maybe_decode(JSON_value,std::tuple<Ts...> const*);
+
+template<typename T,size_t N>
+std::optional<std::array<T,N>> maybe_decode(JSON_value,std::array<T,N> const*);
+
+template<typename...Ts>
+std::tuple<Ts...> decode(std::nullptr_t,std::tuple<Ts...> const*);
+
+template<typename T,size_t N>
+std::array<T,N> decode(std::nullptr_t,std::array<T,N> const*);
 
 template<typename K,typename V>
 std::map<K,V> decode(JSON_object,std::map<K,V> const*);
@@ -154,6 +192,18 @@ std::pair<A,B> decode(JSON_value in,std::pair<A,B> const*){
 	);
 }
 
+#define TBA_DECODE_VARIANT1(NAME) try{\
+		return decode(in,(NAME*)nullptr);\
+	}catch(...){\
+	}
+
+#define TBA_DECODE_VARIANT(NAME) try{\
+		auto x=maybe_decode(in,(NAME*)nullptr);\
+		if(x) return *x;\
+	}catch(...){\
+		assert(0);\
+	}
+
 template<
 	typename A,
 	typename B,
@@ -163,10 +213,7 @@ template<
 	typename F
 >
 std::variant<A,B,C,D,E,F> decode(JSON_value in,std::variant<A,B,C,D,E,F> const*){
-	#define X(NAME) try{\
-		return decode(in,(NAME*)nullptr);\
-	}catch(...){\
-	}
+	#define X TBA_DECODE_VARIANT
 	X(A) X(B) X(C) X(D) X(E) 
 	#undef X
 	return decode(in,(F*)nullptr);
@@ -182,10 +229,7 @@ template<
 	typename G
 >
 std::variant<A,B,C,D,E,F,G> decode(JSON_object in,std::variant<A,B,C,D,E,F,G> const*){
-	#define X(NAME) try{\
-		return decode(in,(NAME*)nullptr);\
-	}catch(...){\
-	}
+	#define X TBA_DECODE_VARIANT
 	X(A) X(B) X(C) X(D) X(E) X(F) 
 	#undef X
 	return decode(in,(G*)nullptr);
@@ -202,10 +246,7 @@ template<
 	typename H
 >
 std::variant<A,B,C,D,E,F,G,H> decode(JSON_object in,std::variant<A,B,C,D,E,F,G,H> const*){
-	#define X(NAME) try{\
-		return decode(in,(NAME*)nullptr);\
-	}catch(...){\
-	}
+	#define X TBA_DECODE_VARIANT
 	X(A) X(B) X(C) X(D) X(E) X(F) X(G)
 	#undef X
 	return decode(in,(H*)nullptr);
@@ -223,10 +264,7 @@ template<
 	typename I
 >
 std::variant<A,B,C,D,E,F,G,H,I> decode(JSON_object in,std::variant<A,B,C,D,E,F,G,H,I> const*){
-	#define X(NAME) try{\
-		return decode(in,(NAME*)nullptr);\
-	}catch(...){\
-	}
+	#define X TBA_DECODE_VARIANT
 	X(A) X(B) X(C) X(D) X(E) X(F) X(G) X(H)
 	#undef X
 	return decode(in,(I*)nullptr);
@@ -238,10 +276,7 @@ template<
 	typename I,typename J
 >
 std::variant<A,B,C,D,E,F,G,H,I,J> decode(JSON_object in,std::variant<A,B,C,D,E,F,G,H,I,J> const*){
-	#define X(NAME) try{\
-		return decode(in,(NAME*)nullptr);\
-	}catch(...){\
-	}
+	#define X TBA_DECODE_VARIANT
 	X(A) X(B) X(C) X(D)
 	X(E) X(F) X(G) X(H)
 	X(I)
@@ -255,10 +290,11 @@ template<
 	typename I,typename J,typename K
 >
 std::variant<A,B,C,D,E,F,G,H,I,J,K> decode(JSON_object in,std::variant<A,B,C,D,E,F,G,H,I,J,K> const*){
-	#define X(NAME) try{\
+	/*#define X(NAME) try{\
 		return decode(in,(NAME*)nullptr);\
 	}catch(...){\
-	}
+	}*/
+	#define X TBA_DECODE_VARIANT
 	X(A) X(B) X(C) X(D)
 	X(E) X(F) X(G) X(H)
 	X(I) X(J)
@@ -453,6 +489,79 @@ std::variant<Ts...> decode(JSON_value in,std::variant<Ts...> const* x){
 		return decode(in.get_object(),x);
 	}
 	assert(0);
+}
+
+template<typename T>
+std::optional<std::optional<T>> maybe_decode(JSON_value in,std::optional<T> const* x){
+	try{
+		return decode(in,x);
+	}catch(...){
+		return std::nullopt;
+	}
+}
+
+template<typename T>
+std::optional<std::optional<T>> maybe_decode(std::nullptr_t in,std::optional<T> const* x){
+	try{
+		return decode(in,x);
+	}catch(...){
+		return std::nullopt;
+	}
+}
+
+template<typename...Ts>
+std::optional<std::tuple<Ts...>> maybe_decode(JSON_value in,std::tuple<Ts...> const* x){
+	try{
+		return decode(in,x);
+	}catch(...){
+		return std::nullopt;
+	}
+}
+
+template<typename...Ts>
+std::tuple<Ts...> decode(std::nullptr_t,std::tuple<Ts...> const*){
+	throw Decode_error("null","null","expected tuple");
+}
+
+template<typename T,size_t N>
+std::array<T,N> decode(std::nullptr_t,std::array<T,N> const*){
+	throw Decode_error("null","null","expected array");
+}
+
+template<typename T>
+std::optional<std::vector<T>> maybe_decode(std::nullptr_t in,std::vector<T> const* x){
+	try{
+		return decode(in,x);
+	}catch(...){
+		return std::nullopt;
+	}
+}
+
+template<typename T>
+std::optional<std::vector<T>> maybe_decode(JSON_value in,std::vector<T> const* x){
+	try{
+		return decode(in,x);
+	}catch(...){
+		return std::nullopt;
+	}
+}
+
+template<typename K,typename V>
+std::optional<std::map<K,V>> maybe_decode(JSON_value in,std::map<K,V> const* x){
+	try{
+		return decode(in,x);
+	}catch(...){
+		return std::nullopt;
+	}
+}
+
+template<typename T,size_t N>
+std::optional<std::array<T,N>> maybe_decode(JSON_value in,std::array<T,N> const* x){
+	try{
+		return decode(in,x);
+	}catch(...){
+		return std::nullopt;
+	}
 }
 
 }

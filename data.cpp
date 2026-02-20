@@ -1,8 +1,65 @@
 #include "data.h"
+#include<set>
 #include "util.h"
 #include "simdjson.h"
 
 namespace tba{
+
+template<typename T>
+std::ostream& operator<<(std::ostream& o,std::set<T> const& a){
+	o<<"{";
+	for(auto const& x:a){
+		o<<x<<" ";
+	}
+	return o<<"}";
+}
+
+//obviously, this is the slow way to do this, but should be sufficient to see that the other pieces are working.
+#define DECODE_FAIL(NAME) \
+	std::optional<NAME> maybe_decode(JSON_value in,NAME const*){\
+		try{\
+			return decode(in,(NAME*)nullptr);\
+		}catch(...){\
+			return std::nullopt;\
+		}\
+	}
+
+DECODE_FAIL(Webcast_type)
+DECODE_FAIL(Event_key)
+DECODE_FAIL(Media_type)
+DECODE_FAIL(unsigned)
+DECODE_FAIL(Pick_order)
+DECODE_FAIL(double)
+DECODE_FAIL(High_score)
+DECODE_FAIL(Endgame)
+DECODE_FAIL(Init_line)
+DECODE_FAIL(Target_color)
+DECODE_FAIL(Rung_level)
+//DECODE_FAIL(Yes_no)
+DECODE_FAIL(Event_type)
+DECODE_FAIL(Playoff_status)
+//DECODE_FAIL(Endgame_2022)
+DECODE_FAIL(Ignore)
+DECODE_FAIL(Award_type)
+DECODE_FAIL(Match_key)
+//DECODE_FAIL(Auto_2016)
+DECODE_FAIL(Winning_alliance)
+DECODE_FAIL(Playoff_level)
+DECODE_FAIL(Alliance_color)
+DECODE_FAIL(M_score)
+//DECODE_FAIL(Match_Score_Breakdown_2014_Alliance)
+DECODE_FAIL(District_key)
+DECODE_FAIL(Year)
+DECODE_FAIL(Team_key)
+
+template<typename T>
+std::optional<T> maybe_decode(std::nullptr_t a,T const* x){
+	try{
+		return decode(a,x);
+	}catch(...){
+		return std::nullopt;
+	}
+}
 
 std::strong_ordering operator<=>(std::optional<std::nullptr_t> const& a,std::optional<std::nullptr_t> const& b){
 	if(a){
@@ -67,6 +124,57 @@ T decode(std::nullptr_t,const T *x){
 		return NAME{ITEMS(DECODE_B3)};\
 	}
 
+#define MAYBE_DECODE_NULL(A,B)\
+	if(!VAR_##B){\
+		VAR_##B=maybe_decode(nullptr,(A*)0);\
+		if(!VAR_##B) return std::nullopt;\
+	}
+
+#define MAYBE_DECODE_LAST(A,B) [&](){\
+		assert(VAR_##B);\
+		return *VAR_##B;\
+	}(),
+
+#define MAYBE_DECODE_INNER(A,B) \
+	if(k==""#B){\
+		VAR_##B=maybe_decode(p.value,(A*)nullptr); \
+		if(!VAR_##B) return std::nullopt;\
+		any=1;\
+	}
+
+#define MAYBE_DECODE(NAME,ITEMS)\
+	std::optional<NAME> maybe_decode(JSON_object in,NAME const*){\
+		try{\
+			ITEMS(DECODE_B1)\
+			for(auto p:in){\
+				bool any=0;\
+				std::string_view k=p.key;\
+				(void)k;\
+				ITEMS(MAYBE_DECODE_INNER)\
+				if(!any){\
+				}\
+			}\
+			ITEMS(MAYBE_DECODE_NULL)\
+			return NAME{ITEMS(MAYBE_DECODE_LAST)};\
+		}catch(...){\
+			assert(0);\
+		}\
+	}\
+	std::optional<NAME> maybe_decode(JSON_value in,NAME const* x){\
+		if(in.type()!=simdjson::dom::element_type::OBJECT){\
+			return std::nullopt;\
+		}\
+		return maybe_decode(in.get_object(),x);\
+	}\
+	std::optional<NAME> maybe_decode(std::nullptr_t in,NAME const* x){\
+		try{\
+			return decode(in,x);\
+		}catch(...){\
+			return std::nullopt;\
+		}\
+	}
+
+
 #define MAKE_INST(NAME,ITEMS)\
 	std::ostream& operator<<(std::ostream& o,NAME const& a){\
 		(void)a;\
@@ -87,8 +195,8 @@ T decode(std::nullptr_t,const T *x){
 	}\
 	NAME decode(std::nullptr_t,NAME const*){\
 		throw Decode_error{""#NAME,"null","exprected object"};\
-	}
-
+	}\
+	MAYBE_DECODE(NAME,ITEMS)
 
 #define DECODE(A,B) [&](){ \
 	if(!in.IsObject()){\
@@ -699,6 +807,11 @@ MAKE_INST(Match_Score_Breakdown_2015,TBA_MATCH_SCORE_BREAKDOWN_2015)
 		auto s=decode(in,(std::string*)nullptr);\
 		OPTIONS(STR_OPT_DEC)\
 		throw std::invalid_argument{STR(NAME)+std::string{":"}+s};\
+	}\
+	std::optional<NAME> maybe_decode(JSON_value in,NAME const*){\
+		auto s=maybe_decode(in,(std::string*)nullptr);\
+		OPTIONS(STR_OPT_DEC)\
+		return std::nullopt;\
 	}
 
 #define AUTO_2016_TYPES(X) X(Crossed) X(Reached) X(None)
@@ -764,6 +877,10 @@ Ignore decode(std::nullptr_t,Ignore const*){
 	return Ignore();
 }
 
+std::optional<Ignore> maybe_decode(std::nullptr_t,Ignore const*){
+	return Ignore();
+}
+
 std::ostream& operator<<(std::ostream& o,Ignore const&){
 	return o<<"Ignore";
 }
@@ -785,6 +902,60 @@ Match_Score_Breakdown_2014_Alliance decode(JSON_value in,const Match_Score_Break
 	}
 	return Match_Score_Breakdown_2014_Alliance{
 		#define X(A,B,C) DECODE2(A,C)
+		TBA_MATCH_SCORE_BREAKDOWN_2014_ALLIANCE(X)
+		#undef X
+	};
+}
+
+std::optional<Match_Score_Breakdown_2014_Alliance> maybe_decode(
+	JSON_value in,Match_Score_Breakdown_2014_Alliance const*
+){
+	if(!in.is_object()){
+		return std::nullopt;
+	}
+	#define X(A,B,C) std::optional<A> VAR_##B;
+	TBA_MATCH_SCORE_BREAKDOWN_2014_ALLIANCE(X)
+	#undef X
+	for(auto [k,v]:in.get_object()){
+		bool any=0;
+
+		#define X(A,B,C) if(k==""#C){\
+			VAR_##B=maybe_decode(v,(A*)nullptr);\
+			if(!VAR_##B) return std::nullopt;\
+			any=1;\
+		}
+		TBA_MATCH_SCORE_BREAKDOWN_2014_ALLIANCE(X)
+		#undef X
+
+		/*if(!any){
+			std::cout<<"Did not find: "<<k<<"\n";
+			std::set<std::string> keys;
+			for(auto [k,v]:in.get_object()){
+				keys.insert(std::string(k));
+			}
+			if(keys.count("autoBoulderPoints")){
+				//2016; ignore
+			}else if(keys.count("container_count_level6")){
+				//2015; ignore
+			}else{
+				std::cout<<keys<<"\n";
+			}
+			return std::nullopt;
+		}*/
+		(void)any;
+	}
+
+	#define X(A,B,C) if(!VAR_##B){\
+		VAR_##B=maybe_decode(nullptr,(A*)nullptr);\
+		if(!VAR_##B){\
+			return std::nullopt;\
+		}\
+	}
+	TBA_MATCH_SCORE_BREAKDOWN_2014_ALLIANCE(X)
+	#undef X
+
+	return Match_Score_Breakdown_2014_Alliance{
+		#define X(A,B,C) *VAR_##B,
 		TBA_MATCH_SCORE_BREAKDOWN_2014_ALLIANCE(X)
 		#undef X
 	};
