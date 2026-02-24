@@ -82,13 +82,13 @@ TBA_MAKE_INST(API_Status_App_Version,TBA_API_STATUS_APP_VERSION)
 TBA_MAKE_INST(API_Status,TBA_API_STATUS)
 
 class Team_key{
-	std::string s;
+	std::array<char,9> buf;
 
 	public:
-	explicit Team_key(std::string);
+	explicit Team_key(std::string const&);
 	explicit Team_key(int);
 
-	std::string const& str()const;
+	std::string str()const;
 
 	auto operator<=>(Team_key const&)const=default;
 };
@@ -308,7 +308,7 @@ Date decode(JSON_value,const Date*);
 	X(std::optional<std::string>,first_event_id)\
 	X(std::optional<Webcast>,webcast)\
 	X(std::vector<Event_key>,division_keys)\
-	X(std::optional<std::string>,parent_event_key)\
+	X(std::optional<Event_key>,parent_event_key)\
 	X(std::optional<Playoff_type>,playoff_type)\
 	X(std::optional<std::string>,playoff_type_string)	
 	

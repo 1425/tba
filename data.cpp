@@ -316,29 +316,27 @@ District_key decode(JSON_value in,const District_key *){
 	return District_key{decode(in,(std::string*)nullptr)};
 }
 
-Team_key::Team_key(std::string s1):s(s1){
-	auto check=[&](bool b){
-		if(b) return;
-		std::ostringstream ss;
-		ss<<"Invalid Team_key: \""<<s<<"\"";
-		throw std::invalid_argument{ss.str()};
-	};
-	check(s.size()>=3);
-	check(s[0]=='f');
-	check(s[1]=='r');
-	check(s[2]=='c');
+Team_key::Team_key(std::string const& s){
+	assert(s.size()<buf.size());
+	assert(s.size()>3);
+	assert(s[0]=='f');
+	assert(s[1]=='r');
+	assert(s[2]=='c');
 
-	//note: can be stuff like frc1111b
-	//can also be just "frc", oddly.
+	bzero(&buf[0],buf.size());
+	memcpy(&buf[0],s.c_str(),s.size());
 }
 
 Team_key::Team_key(int x){
 	std::stringstream ss;
 	ss<<"frc"<<x;
-	s=ss.str();
+	*this=Team_key(ss.str());
 }
 
-std::string const& Team_key::str()const{ return s; }
+std::string Team_key::str()const{
+	return std::string(&(buf[0]));
+	//return s;
+}
 
 std::ostream& operator<<(std::ostream& o,Team_key const& a){
 	//return o<<"Team_key("<<a.str()<<")";
