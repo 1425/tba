@@ -298,7 +298,7 @@ std::ostream& operator<<(std::ostream& o,Match_key const& a){
 	return o<<a.get();
 }
 
-District_key::District_key(std::string s1):s(std::move(s1)){
+District_key::District_key(std::string const& s){
 	Year{atoi(s.c_str())};//check that starts with a year
 	//then a 2-3 letter code.
 	if( !(s.size()>=6 && s.size()<=7) ){
@@ -308,6 +308,11 @@ District_key::District_key(std::string s1):s(std::move(s1)){
 			return ss.str();
 		}()};
 	}
+
+	assert(s.size()<buf.size());
+
+	bzero(&buf[0],buf.size());
+	memcpy(&buf[0],s.c_str(),s.size());
 }
 
 District_key::District_key(const char *s){
@@ -317,8 +322,21 @@ District_key::District_key(const char *s){
 	*this=District_key(std::string(s));
 }
 
-std::string const& District_key::get()const{
-	return s;
+std::string District_key::get()const{
+	return std::string(&buf[0]);
+}
+
+std::strong_ordering District_key::operator<=>(District_key const& a)const{
+	static_assert(buf.size()==8);
+	
+	auto x=*(uint64_t*)&buf[0];
+	auto y=*(uint64_t*)&a.buf[0];
+
+	return x<=>y;
+}
+
+bool District_key::operator==(District_key const& a)const{
+	return (*this<=>a)==std::strong_ordering::equal;
 }
 
 std::ostream& operator<<(std::ostream& o,District_key const& a){
@@ -344,6 +362,24 @@ Team_key::Team_key(std::string const& s){
 	//later char is set to 0.
 	bzero(&buf[0],buf.size());
 	memcpy(&buf[0],s.c_str()+3,s.size()-3);
+}
+
+Team_key::Team_key(std::string_view s){
+	assert(s.size()>3);
+	assert(s[0]=='f');
+	assert(s[1]=='r');
+	assert(s[2]=='c');
+	assert(s.size()-3<buf.size());
+
+	//making sure that the string is not just null terminated, but any 
+	//later char is set to 0.
+	bzero(&buf[0],buf.size());
+	memcpy(&buf[0],s.data()+3,s.size()-3);
+}
+
+Team_key::Team_key(const char *s){
+	assert(s);
+	*this=Team_key(std::string_view(s));
 }
 
 Team_key::Team_key(int x){
@@ -376,6 +412,9 @@ std::ostream& operator<<(std::ostream& o,Team_key const& a){
 }
 
 Team_key decode(JSON_value in,const Team_key*){
+	if(in.type()==simdjson::dom::element_type::STRING){
+		return Team_key{in.get_string()};
+	}
 	return Team_key{decode(in,(std::string*)0)};
 }
 

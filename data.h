@@ -87,6 +87,8 @@ class Team_key{
 
 	public:
 	explicit Team_key(std::string const&);
+	explicit Team_key(std::string_view);
+	explicit Team_key(const char*);
 	explicit Team_key(int);
 
 	std::string str()const;
@@ -145,15 +147,16 @@ using Team_number=int;
 TBA_MAKE_INST(Team_Simple,TBA_TEAM_SIMPLE)
 
 class District_key{
-	std::string s;
+	std::array<char,8> buf;
 
 	public:
-	explicit District_key(std::string);
+	explicit District_key(std::string const&);
 	explicit District_key(const char *);
 
-	std::string const& get()const;
+	std::string get()const;
 
-	auto operator<=>(District_key const&)const=default;
+	std::strong_ordering operator<=>(District_key const&)const;
+	bool operator==(District_key const&)const;
 };
 
 std::ostream& operator<<(std::ostream&,District_key const&);
@@ -413,7 +416,7 @@ std::optional<M_score> maybe_decode(JSON_value,M_score const*);
 
 #define TBA_MATCH_ALLIANCE(X)\
 	X(M_score,score)\
-	X(vector_fixed<TBA_SINGLE_ARG(Team_key,3)>,team_keys)\
+	X(vector_fixed<TBA_SINGLE_ARG(Team_key,4)>,team_keys)\
 	X(vector_fixed<TBA_SINGLE_ARG(Team_key,3)>,surrogate_team_keys)
 
 TBA_MAKE_INST(Match_Alliance,TBA_MATCH_ALLIANCE)
