@@ -10,6 +10,10 @@
 #define TBA_NYI { std::cout<<"NYI "<<__FILE__<<":"<<__LINE__<<"\n"; exit(1); }
 #define TBA_PRINT(X) { std::cout<<""#X<<":"<<(X)<<"\n"; }
 
+#define RM_CONST(X) typename std::remove_cv<X>::type
+#define RM_REF(X) typename std::remove_reference<X>::type
+#define ELEM(X) RM_CONST(RM_REF(decltype(*std::begin(X))))
+
 namespace tba{
 
 template<typename A,typename B,typename C,typename D,typename E,typename F,typename G>

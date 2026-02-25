@@ -46,6 +46,15 @@ std::string decode(JSON_value in,std::string const*){
 	}
 }
 
+std::optional<std::string> maybe_decode(JSON_value in,std::string const*){
+	if(in.type()!=simdjson::dom::element_type::STRING){
+		return std::nullopt;
+	}
+	std::string_view s=in.get_string();
+	return std::string(s.begin(),s.end());
+}
+
+
 int decode(JSON_value a,int const*){
 	switch(a.type()){
 		case simdjson::dom::element_type::INT64:
@@ -106,6 +115,15 @@ long decode(JSON_value a,long const*){
 	}
 }
 
+std::optional<long> maybe_decode(JSON_value a,long const*){
+	switch(a.type()){
+		case simdjson::dom::element_type::INT64:
+			return a.get_int64();
+		default:
+			return std::nullopt;
+	}
+}
+
 bool decode(JSON_value a,bool const*){
 	switch(a.type()){
 		case simdjson::dom::element_type::BOOL:
@@ -120,14 +138,6 @@ bool decode(JSON_value a,bool const*){
 }
 
 std::optional<bool> maybe_decode(JSON_value in,bool const* x){
-	try{
-		return decode(in,x);
-	}catch(...){
-		return std::nullopt;
-	}
-}
-
-std::optional<std::string> maybe_decode(JSON_value in,std::string const* x){
 	try{
 		return decode(in,x);
 	}catch(...){
@@ -154,6 +164,10 @@ double decode(JSON_value a,double const*){
 }
 
 std::nullptr_t decode(JSON_value,std::nullptr_t const*){
+	TBA_NYI
+}
+
+std::optional<std::nullptr_t> maybe_decode(JSON_value,std::nullptr_t const*){
 	TBA_NYI
 }
 

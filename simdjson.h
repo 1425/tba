@@ -5,6 +5,7 @@
 #include<map>
 #include<variant>
 #include<chrono>
+#include "vector_fixed.h"
 
 namespace tba{
 
@@ -53,6 +54,7 @@ std::string decode(std::nullptr_t,std::string const*);
 unsigned decode(std::nullptr_t,unsigned const*);
 std::string decode(JSON_value,std::string const*);
 std::chrono::year_month_day decode(JSON_value,std::chrono::year_month_day const*);
+std::optional<std::chrono::year_month_day> maybe_decode(JSON_value,std::chrono::year_month_day const*);
 
 std::nullptr_t decode(JSON_object,std::nullptr_t const*);
 std::nullptr_t decode(JSON_value,std::nullptr_t const*);
@@ -61,6 +63,7 @@ std::nullptr_t decode(std::nullptr_t,std::nullptr_t const*);
 std::optional<bool> maybe_decode(JSON_value,bool const*);
 std::optional<int> maybe_decode(JSON_value,int const*);
 std::optional<unsigned> maybe_decode(JSON_value,unsigned const*);
+std::optional<long> maybe_decode(JSON_value,long const*);
 std::optional<double> maybe_decode(JSON_value,double const*);
 std::optional<std::string> maybe_decode(JSON_value,std::string const*);
 std::optional<std::nullptr_t> maybe_decode(JSON_object,std::nullptr_t const*);
@@ -74,6 +77,12 @@ std::optional<std::optional<T>> maybe_decode(JSON_value in,std::optional<T> cons
 
 template<typename T>
 std::optional<std::vector<T>> maybe_decode(std::nullptr_t,std::vector<T> const*);
+
+template<typename T,size_t N>
+std::optional<vector_fixed<T,N>> maybe_decode(std::nullptr_t,vector_fixed<T,N> const*);
+
+template<typename T,size_t N>
+std::optional<vector_fixed<T,N>> maybe_decode(JSON_value in,vector_fixed<T,N> const*);
 
 template<typename T>
 std::optional<std::vector<T>> maybe_decode(JSON_value in,std::vector<T> const*);
@@ -95,6 +104,16 @@ std::array<T,N> decode(std::nullptr_t,std::array<T,N> const*);
 
 template<typename K,typename V>
 std::map<K,V> decode(JSON_object,std::map<K,V> const*);
+
+template<typename A,typename B>
+std::optional<std::variant<A,B>> maybe_decode(JSON_value,std::variant<A,B> const*);
+
+template<
+	typename A,typename B,typename C,typename D,
+	typename E,typename F,typename G,typename H,
+	typename I,typename J
+>
+std::optional<std::variant<A,B,C,D, E,F,G,H, I,J>> maybe_decode(JSON_value,std::variant<A,B,C,D, E,F,G,H, I,J> const*);
 
 template<
 	typename A,
@@ -321,14 +340,15 @@ std::variant<Ts...> decode(JSON_value,std::variant<Ts...> const*){
 
 template<typename A,typename B>
 std::variant<A,B> decode(JSON_value in,std::variant<A,B> const*){
-	try{
-		return decode(in,(A*)0);
-	}catch(...){}
+	TBA_DECODE_VARIANT(A)
 	return decode(in,(B*)0);
 }
 
 template<typename T>
 std::vector<T> decode(JSON_value in,std::vector<T> const*);
+
+template<typename T,size_t N>
+vector_fixed<T,N> decode(JSON_value in,vector_fixed<T,N> const*);
 
 template<typename A,typename B,typename C>
 auto decode(JSON_value in,std::tuple<A,B,C> const*){
@@ -473,6 +493,29 @@ std::vector<T> decode(JSON_array a,std::vector<T> const*){
 	return r;
 }
 
+template<typename T,size_t N>
+vector_fixed<T,N> decode(JSON_array a,vector_fixed<T,N> const*){
+	vector_fixed<T,N> r;
+	if(a.size()>N){
+		std::cout<<"fixed("<<N<<"): found:"<<a.size()<<"\n";
+		assert(0);
+	}
+	for(auto elem:a){
+		r.push_back(decode(elem,(T*)nullptr));
+	}
+	return r;
+}
+
+template<typename T,size_t N>
+vector_fixed<T,N> decode(JSON_value in,vector_fixed<T,N> const*){
+	if(in.type()!=simdjson::dom::element_type::ARRAY){
+		std::stringstream ss;
+		ss<<in;
+		throw Decode_error("vector_fixed<T,N>",ss.str(),"not an array");
+	}
+	return decode(in.get_array(),(vector_fixed<T,N> const*)nullptr);
+}
+
 template<typename T>
 std::vector<T> decode(JSON_value in,std::vector<T> const*){
 	if(in.type()!=simdjson::dom::element_type::ARRAY){
@@ -492,12 +535,13 @@ std::variant<Ts...> decode(JSON_value in,std::variant<Ts...> const* x){
 }
 
 template<typename T>
-std::optional<std::optional<T>> maybe_decode(JSON_value in,std::optional<T> const* x){
-	try{
+std::optional<std::optional<T>> maybe_decode(JSON_value in,std::optional<T> const*){
+	/*try{
 		return decode(in,x);
 	}catch(...){
 		return std::nullopt;
-	}
+	}*/
+	return maybe_decode(in,(T*)nullptr);
 }
 
 template<typename T>
@@ -537,8 +581,26 @@ std::optional<std::vector<T>> maybe_decode(std::nullptr_t in,std::vector<T> cons
 	}
 }
 
+template<typename T,size_t N>
+std::optional<vector_fixed<T,N>> maybe_decode(std::nullptr_t in,vector_fixed<T,N> const* x){
+	try{
+		return decode(in,x);
+	}catch(...){
+		return std::nullopt;
+	}
+}
+
 template<typename T>
 std::optional<std::vector<T>> maybe_decode(JSON_value in,std::vector<T> const* x){
+	try{
+		return decode(in,x);
+	}catch(...){
+		return std::nullopt;
+	}
+}
+
+template<typename T,size_t N>
+std::optional<vector_fixed<T,N>> maybe_decode(JSON_value in,vector_fixed<T,N> const* x){
 	try{
 		return decode(in,x);
 	}catch(...){
@@ -562,6 +624,27 @@ std::optional<std::array<T,N>> maybe_decode(JSON_value in,std::array<T,N> const*
 	}catch(...){
 		return std::nullopt;
 	}
+}
+
+template<typename A,typename B>
+std::optional<std::variant<A,B>> maybe_decode(JSON_value in,std::variant<A,B> const*){
+	auto a=maybe_decode(in,(A*)nullptr);
+	if(a) return a;
+	return maybe_decode(in,(B*)nullptr);
+}
+
+template<
+	typename A,typename B,typename C,typename D,
+	typename E,typename F,typename G,typename H,
+	typename I,typename J
+>
+std::optional<std::variant<A,B,C,D,E,F,G,H,I,J>> maybe_decode(JSON_value in,std::variant<A,B,C,D,E,F,G,H,I,J> const*){
+	#define X(TYPE) { auto x=maybe_decode(in,(TYPE*)nullptr); if(x) return x; }
+	X(A) X(B) X(C) X(D)
+	X(E) X(F) X(G) X(H)
+	X(I)
+	#undef X
+	return maybe_decode(in,(J*)nullptr);
 }
 
 }

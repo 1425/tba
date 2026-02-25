@@ -181,15 +181,15 @@ std::optional<std::pair<Date,Data>> Cache::fetch(URL url){
 		return {};
 	}
 	if(r.size()==1){
-		auto x=r[0];
+		auto &x=r[0];
 		assert(x.size()==2);
-		auto date=x[0].second;
-		auto body=x[1].second;
+		auto &date=x[0].second;
+		auto &body=x[1].second;
 		//cout<<"date:"<<date<<"\n";
 		//cout<<"body:"<<body<<"\n";
 		assert(date);
 		assert(body);
-		return make_pair(*date,*body);
+		return make_pair(std::move(*date),std::move(*body));
 	}
 	assert(0);TBA_NYI
 }

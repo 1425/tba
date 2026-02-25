@@ -22,6 +22,9 @@ std::ostream& operator<<(std::ostream& o,std::set<T> const& a){
 		}catch(...){\
 			return std::nullopt;\
 		}\
+	}\
+	std::optional<NAME> maybe_decode(std::nullptr_t,NAME const*){\
+		return std::nullopt;\
 	}
 
 DECODE_FAIL(Webcast_type)
@@ -39,7 +42,6 @@ DECODE_FAIL(Rung_level)
 DECODE_FAIL(Event_type)
 DECODE_FAIL(Playoff_status)
 //DECODE_FAIL(Endgame_2022)
-DECODE_FAIL(Ignore)
 DECODE_FAIL(Award_type)
 DECODE_FAIL(Match_key)
 //DECODE_FAIL(Auto_2016)
@@ -52,14 +54,29 @@ DECODE_FAIL(District_key)
 DECODE_FAIL(Year)
 DECODE_FAIL(Team_key)
 
-template<typename T>
+#define NO_NULL(NAME) \
+	std::optional<NAME> maybe_decode(std::nullptr_t,NAME const*){\
+		return std::nullopt;\
+	}\
+
+NO_NULL(std::string)
+
+template<typename K,typename V>
+NO_NULL(std::map<TBA_SINGLE_ARG(K,V)>)
+
+NO_NULL(IID)
+NO_NULL(ISS)
+NO_NULL(D8)
+NO_NULL(D6)
+
+/*template<typename T>
 std::optional<T> maybe_decode(std::nullptr_t a,T const* x){
 	try{
 		return decode(a,x);
 	}catch(...){
 		return std::nullopt;
 	}
-}
+}*/
 
 std::strong_ordering operator<=>(std::optional<std::nullptr_t> const& a,std::optional<std::nullptr_t> const& b){
 	if(a){
@@ -317,14 +334,16 @@ District_key decode(JSON_value in,const District_key *){
 }
 
 Team_key::Team_key(std::string const& s){
-	assert(s.size()<buf.size());
 	assert(s.size()>3);
 	assert(s[0]=='f');
 	assert(s[1]=='r');
 	assert(s[2]=='c');
+	assert(s.size()-3<buf.size());
 
+	//making sure that the string is not just null terminated, but any 
+	//later char is set to 0.
 	bzero(&buf[0],buf.size());
-	memcpy(&buf[0],s.c_str(),s.size());
+	memcpy(&buf[0],s.c_str()+3,s.size()-3);
 }
 
 Team_key::Team_key(int x){
@@ -334,8 +353,21 @@ Team_key::Team_key(int x){
 }
 
 std::string Team_key::str()const{
-	return std::string(&(buf[0]));
+	return "frc"+std::string(&(buf[0]));
 	//return s;
+}
+
+std::strong_ordering Team_key::operator<=>(Team_key const& a)const{
+	static_assert(buf.size()==8);
+
+	auto x=*(uint64_t*)(&buf[0]);
+	auto y=*(uint64_t*)(&a.buf[0]);
+
+	return x<=>y;
+}
+
+bool Team_key::operator==(Team_key const& a)const{
+	return (*this<=>a)==std::strong_ordering::equal;
 }
 
 std::ostream& operator<<(std::ostream& o,Team_key const& a){
@@ -510,6 +542,16 @@ Playoff_type decode(JSON_value in,const Playoff_type*){
 	throw std::invalid_argument(ss.str());
 }
 
+std::optional<Playoff_type> maybe_decode(JSON_value in,Playoff_type const*){
+	auto i1=maybe_decode(in,(int*)nullptr);
+	if(!i1) return std::nullopt;
+	auto i=*i1;
+	#define X(A,B,C) if(i==A) return Playoff_type::B;
+	TBA_PLAYOFF_TYPES(X)
+	#undef X
+	return std::nullopt;
+}
+
 MAKE_INST(Event,TBA_EVENT)
 
 template<size_t LEN>
@@ -533,6 +575,24 @@ Date decode(JSON_value in,Date const*){
 
 	return ymd;
 }
+
+std::optional<Date> maybe_decode(JSON_value in,Date const*){
+	auto s=maybe_decode(in,(std::string*)nullptr);
+	if(!s) return std::nullopt;
+
+	std::chrono::year_month_day ymd;
+	std::istringstream ss(*s);
+    
+	ss >> std::chrono::parse("%Y-%m-%d", ymd);
+
+	if (ss.fail()) {
+		//throw Decode_error("Date",s,"Invalid date");
+		return std::nullopt;
+	}
+
+	return ymd;
+}
+
 
 MAKE_INST(Event_Simple,TBA_EVENT_SIMPLE)
 
@@ -785,6 +845,15 @@ Coopertition decode(JSON_value in,const Coopertition*){
 	throw std::invalid_argument{"Coopertition:"+s};
 }
 
+std::optional<Coopertition> maybe_decode(JSON_value in,Coopertition const*){
+	auto s=maybe_decode(in,(std::string*)nullptr);
+	if(!s) return std::nullopt;
+	#define X(A) if(s==""#A) return Coopertition::A;
+	TBA_COOPERTITION_TYPES(X)
+	#undef X
+	return std::nullopt;
+}
+
 MAKE_INST(Match_Score_Breakdown_2015,TBA_MATCH_SCORE_BREAKDOWN_2015)
 
 //#define EVENT_PREDICTTIONS(X)
@@ -810,7 +879,8 @@ MAKE_INST(Match_Score_Breakdown_2015,TBA_MATCH_SCORE_BREAKDOWN_2015)
 		auto s=maybe_decode(in,(std::string*)nullptr);\
 		OPTIONS(STR_OPT_DEC)\
 		return std::nullopt;\
-	}
+	}\
+	NO_NULL(NAME)
 
 #define AUTO_2016_TYPES(X) X(Crossed) X(Reached) X(None)
 #define NAME Auto_2016
@@ -879,6 +949,10 @@ std::optional<Ignore> maybe_decode(std::nullptr_t,Ignore const*){
 	return Ignore();
 }
 
+std::optional<Ignore> maybe_decode(JSON_value,Ignore const*){
+	return Ignore();
+}
+
 std::ostream& operator<<(std::ostream& o,Ignore const&){
 	return o<<"Ignore";
 }
@@ -903,6 +977,12 @@ Match_Score_Breakdown_2014_Alliance decode(JSON_value in,const Match_Score_Break
 		TBA_MATCH_SCORE_BREAKDOWN_2014_ALLIANCE(X)
 		#undef X
 	};
+}
+
+std::optional<Match_Score_Breakdown_2014_Alliance> maybe_decode(
+	std::nullptr_t,Match_Score_Breakdown_2014_Alliance const*
+){
+	return std::nullopt;
 }
 
 std::optional<Match_Score_Breakdown_2014_Alliance> maybe_decode(
@@ -1010,6 +1090,17 @@ Unknown decode(JSON_value in,const Unknown*){
 	std::ostringstream ss;
 	ss<<"Expected \"unknown\", but got:"<<in;
 	throw std::invalid_argument{ss.str()};
+}
+
+std::optional<Unknown> maybe_decode(JSON_value in,Unknown const*){
+	auto s=maybe_decode(in,(std::string*)nullptr);
+	if(!s){
+		return std::nullopt;
+	}
+	if(*s!="unknown"){
+		return std::nullopt;
+	}
+	return Unknown{};
 }
 
 std::ostream& operator<<(std::ostream& o,Init_line a){

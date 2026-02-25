@@ -8,6 +8,7 @@
 #include<array>
 #include<chrono>
 #include "simdjson.h"
+#include "vector_fixed.h"
 
 #define TBA_SINGLE_ARG(A,B) A,B
 
@@ -38,7 +39,7 @@ using Page=unsigned;
 
 class Year{
 	//An integer that is between 1992 and 2092.
-	int i;
+	short i;
 
 	bool valid()const;
 
@@ -82,7 +83,7 @@ TBA_MAKE_INST(API_Status_App_Version,TBA_API_STATUS_APP_VERSION)
 TBA_MAKE_INST(API_Status,TBA_API_STATUS)
 
 class Team_key{
-	std::array<char,9> buf;
+	std::array<char,8> buf;
 
 	public:
 	explicit Team_key(std::string const&);
@@ -90,7 +91,9 @@ class Team_key{
 
 	std::string str()const;
 
-	auto operator<=>(Team_key const&)const=default;
+	//auto operator<=>(Team_key const&)const=default;
+	std::strong_ordering operator<=>(Team_key const&)const;
+	bool operator==(Team_key const&)const;
 };
 
 std::ostream& operator<<(std::ostream&,Team_key const&);
@@ -199,7 +202,7 @@ TBA_MAKE_INST(Event_points,TBA_EVENT_POINTS)
 	X(int,rank)\
 	X(int,rookie_bonus)\
 	X(double,point_total)\
-	X(std::vector<Event_points>,event_points)
+	X(vector_fixed<TBA_SINGLE_ARG(Event_points,4)>,event_points)
 
 TBA_MAKE_INST(District_Ranking,TBA_DISTRICT_RANKING)
 
@@ -276,6 +279,7 @@ enum class Playoff_type{
 std::ostream& operator<<(std::ostream&,Playoff_type);
 
 Playoff_type decode(JSON_value,const Playoff_type*);
+std::optional<Playoff_type> maybe_decode(JSON_value,Playoff_type const*);
 
 using Date=std::chrono::year_month_day;
 Date decode(JSON_value,const Date*);
@@ -307,7 +311,7 @@ Date decode(JSON_value,const Date*);
 	X(std::optional<std::string>,website)\
 	X(std::optional<std::string>,first_event_id)\
 	X(std::optional<Webcast>,webcast)\
-	X(std::vector<Event_key>,division_keys)\
+	X(vector_fixed<TBA_SINGLE_ARG(Event_key,8)>,division_keys)\
 	X(std::optional<Event_key>,parent_event_key)\
 	X(std::optional<Playoff_type>,playoff_type)\
 	X(std::optional<std::string>,playoff_type_string)	
@@ -409,8 +413,8 @@ std::optional<M_score> maybe_decode(JSON_value,M_score const*);
 
 #define TBA_MATCH_ALLIANCE(X)\
 	X(M_score,score)\
-	X(std::vector<Team_key>,team_keys)\
-	X(std::vector<Team_key>,surrogate_team_keys)
+	X(vector_fixed<TBA_SINGLE_ARG(Team_key,3)>,team_keys)\
+	X(vector_fixed<TBA_SINGLE_ARG(Team_key,3)>,surrogate_team_keys)
 
 TBA_MAKE_INST(Match_Alliance,TBA_MATCH_ALLIANCE)
 
@@ -494,6 +498,7 @@ enum class Coopertition{
 
 std::ostream& operator<<(std::ostream&,Coopertition);
 Coopertition decode(JSON_value,const Coopertition*);
+std::optional<Coopertition> maybe_decode(JSON_value,Coopertition const*);
 
 #define TBA_MATCH_SCORE_BREAKDOWN_2015(X)\
 	X(Match_Score_Breakdown_2015_Alliance,blue)\
@@ -1220,11 +1225,14 @@ std::ostream& operator<<(std::ostream&,Award_type);
 Award_type decode(JSON_value,const Award_type *);
 std::optional<Award_type> maybe_decode(JSON_value,Award_type const*);
 
+//You can have so many award recipients because of Dean's list.
+//up to 15 known
+
 #define TBA_AWARD(X)\
 	X(std::string,name)\
 	X(Award_type,award_type)\
 	X(Event_key,event_key)\
-	X(std::vector<Award_Recipient>,recipient_list)\
+	X(vector_fixed<TBA_SINGLE_ARG(Award_Recipient,15)>,recipient_list)\
 	X(Year,year)
 
 TBA_MAKE_INST(Award,TBA_AWARD)
@@ -1753,6 +1761,7 @@ struct Unknown{
 
 std::ostream& operator<<(std::ostream&,Unknown);
 Unknown decode(JSON_value,const Unknown *);
+std::optional<Unknown> maybe_decode(JSON_value,Unknown const*);
 
 using M_Elimination_Alliance_status=std::variant<Unknown,Elimination_Alliance_status>;
 
@@ -1760,7 +1769,7 @@ using M_Elimination_Alliance_status=std::variant<Unknown,Elimination_Alliance_st
 	X(std::optional<std::string>,name)\
 	X(std::optional<Team_Event_Status_alliance_backup>,backup)\
 	X(std::vector<Team_key>,declines)\
-	X(std::vector<Team_key>,picks)\
+	X(vector_fixed<TBA_SINGLE_ARG(Team_key,5)>,picks)\
 	X(std::optional<M_Elimination_Alliance_status>,status)
 
 TBA_MAKE_INST(Elimination_Alliance,TBA_ELIMINATION_ALLIANCE)

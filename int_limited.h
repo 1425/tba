@@ -1,0 +1,240 @@
+#ifndef TBA_INT_LIMITED_H
+#define TBA_INT_LIMITED_H
+
+#include<cstddef>
+#include<cassert>
+#include<vector>
+#include<cstdlib>
+#include<cstdint>
+#include<ostream>
+#include<iostream>
+#include<numeric>
+
+namespace tba{
+
+template<long long MIN,long long MAX>
+auto get_int(){
+	if constexpr(MIN>=0 && MAX<=255){
+		return uint8_t(0);
+	}else if constexpr(MIN>=0 && MAX<=std::numeric_limits<uint16_t>::max()){
+		return uint16_t(0);
+	}else{
+		return (long long)0;
+	}
+}
+
+template<long long MIN,long long MAX>
+class Int_limited{
+	using Data=decltype(get_int<MIN,MAX>());
+	Data data;
+
+	constexpr void check()const{
+		assert(data>=MIN);
+		assert(data<=MAX);
+	}
+
+	public:
+	constexpr Int_limited():data(MIN){
+		static_assert(MIN<=MAX);
+	}
+
+	constexpr Int_limited(Data a):data(a){
+		assert(a>=MIN);
+		assert(a<=MAX);
+	}
+
+	Int_limited& operator=(auto const& a){
+		if(a<MIN || a>MAX){
+			std::cout<<"Int_limited<"<<MIN<<","<<MAX<<">"<<a<<"\n";
+		}
+		assert(a>=MIN);
+		assert(a<=MAX);
+		data=a;
+		check();
+		return *this;
+	}
+
+	auto get()const{
+		return data;
+	}
+
+	constexpr operator Data()const{
+		return data;
+	}
+
+	template<long long MIN2,long long MAX2>
+	Int_limited& operator+=(Int_limited<MIN2,MAX2> a){
+		data+=a.get();
+		check();
+		return *this;
+	}
+
+	Int_limited& operator+=(int a){
+		data+=a;
+		check();
+		return *this;
+	}
+
+	constexpr Int_limited operator++(int){
+		auto r=*this;
+		data++;
+		check();
+		return r;
+	}
+
+	Int_limited& operator++(){
+		data++;
+		check();
+		return *this;
+	}
+
+	auto operator<=>(Int_limited const&)const=default;
+
+	constexpr bool operator>(size_t a)const{
+		return data>(long long)a;
+	}
+
+	constexpr bool operator>(auto a)const{
+		return data>a;
+	}
+
+	constexpr bool operator<(auto a)const{
+		return data<(long long)a;
+	}
+
+	constexpr bool operator<=(auto a)const{
+		return data<=a;
+	}
+
+	constexpr bool operator==(auto a)const{
+		return data==a;
+	}
+
+	constexpr bool operator>=(auto a)const{
+		return data>=a;
+	}
+
+	template<long long MIN2,long long MAX2>
+	constexpr bool operator<(Int_limited<MIN2,MAX2> a)const{
+		return get()<a.get();
+	}
+
+	template<long long MIN2,long long MAX2>
+	constexpr bool operator<=(Int_limited<MIN2,MAX2> a)const{
+		return get()<=a.get();
+	}
+
+	template<long long MIN2,long long MAX2>
+	auto operator-(Int_limited<MIN2,MAX2> a)const{
+		long long v1=data;
+		long long v2=a.get();
+		Int_limited<MIN-MAX2,MAX-MIN2> r;
+		r=v1-v2;
+		return r;
+	}
+
+	template<long long MIN2,long long MAX2>
+	auto& operator-=(Int_limited<MIN2,MAX2> a){
+		long long v1=data;
+		long long v2=a.get();
+		auto result=v1-v2;
+		assert(result>=MIN && result<=MAX);
+		data=result;
+		return *this;
+	}
+
+	template<long long MIN2,long long MAX2>
+	auto operator+(Int_limited a)const{
+		Int_limited<MIN+MIN2,MAX+MAX2> r;
+		r=(long long)data+(long long)a.data;
+		return r;
+	}
+
+	auto operator+(auto x)const{
+		return data+x;
+	}
+};
+
+template<typename T,long long MIN,long long MAX>
+bool operator>(T a,Int_limited<MIN,MAX> b){
+	return a>b.get();
+}
+
+template<typename T,long long MIN,long long MAX>
+bool operator>=(T a,Int_limited<MIN,MAX> b){
+	return a>=b.get();
+}
+
+template<typename T,long long MIN,long long MAX>
+bool operator<(T a,Int_limited<MIN,MAX> b){
+	return a<b.get();
+}
+
+template<typename T,long long MIN,long long MAX>
+bool operator<=(T a,Int_limited<MIN,MAX> b){
+	return a<=b.get();
+}
+
+template<long long MIN,long long MAX>
+std::ostream& operator<<(std::ostream& o,Int_limited<MIN,MAX> a){
+	return o<<(long long)a.get();
+}
+
+template<long long MIN,long long MAX>
+bool operator<=(size_t a,Int_limited<MIN,MAX> const& b){
+	return a<=b.get();
+}
+
+#if 0
+template<long long MIN,long long MAX>
+constexpr auto options(Int_limited<MIN,MAX> const*){
+	using E=Int_limited<MIN,MAX>;
+	auto r=range_st<MIN,MAX+1>();
+	return MAP(E,r);
+	//return range_st<MIN,MAX+1>();
+	/*std::vector<E> r;
+	for(long long i=MIN;i<=MAX;i++){
+		r|=i;
+	}
+	return r;*/
+}
+#endif
+
+template<long long MIN,long long MAX>
+auto rand(Int_limited<MIN,MAX> const*){
+	return Int_limited<MIN,MAX>(MIN+std::rand()%(MAX-MIN+1));
+}
+
+template<long long MIN,long long MAX,size_t N>
+auto sum(std::array<Int_limited<MIN,MAX>,N> const& a){
+	//could put some logic in here to see that this doesn't overflow
+	using R=Int_limited<MIN*N,MAX*N>;
+	return std::accumulate(a.begin(),a.end(),R());
+}
+
+Int_limited<0,3> sum(std::tuple<bool,bool,bool> const&);
+
+template<long long MIN1,long long MAX1,long long MIN2,long long MAX2>
+auto max(Int_limited<MIN1,MAX1> a,Int_limited<MIN2,MAX2> b){
+	static constexpr auto MIN3=std::max(MIN1,MIN2);
+	static constexpr auto MAX3=std::max(MAX1,MAX2);
+	auto v=std::max((long long)a,(long long)b);
+	return Int_limited<MIN3,MAX3>(v);
+}
+
+template<long long MIN1,long long MAX1,long long MIN2,long long MAX2>
+auto min(Int_limited<MIN1,MAX1> a,Int_limited<MIN2,MAX2> b){
+	static constexpr auto MIN3=std::min(MIN1,MIN2);
+	static constexpr auto MAX3=std::max(MAX1,MAX2);
+	auto v=std::min((long long)a,(long long)b);
+	return Int_limited<MIN3,MAX3>(v);
+}
+
+template<long long MIN1,long long MAX1,long long MIN2,long long MAX2>
+Int_limited<MIN2,MAX2> coerce(Int_limited<MIN1,MAX1> a,Int_limited<MIN2,MAX2> const*){
+	return a.get();
+}
+
+}
+
+#endif
