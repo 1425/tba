@@ -211,11 +211,6 @@ std::ostream& operator<<(std::ostream& o,vector_fixed<T,N> const& a){
 	return o<<"]";
 }
 
-template<typename T,size_t N>
-auto to_set(vector_fixed<T,N> const& a){
-	return std::set<T>{a.begin(),a.end()};
-}
-
 /*template<typename T,size_t N>
 class set_limited;
 
