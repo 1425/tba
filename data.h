@@ -175,13 +175,15 @@ using District_abbreviation=std::string;
 TBA_MAKE_INST(District_List,TBA_DISTRICT_LIST)
 
 class Event_key{
-	std::string s;
+	std::array<char,12> buf;
 
 	public:
-	explicit Event_key(std::string);
-	std::string const& get()const;
+	explicit Event_key(std::string_view);
+	explicit Event_key(const char*);
+	std::string_view get()const;
 
-	auto operator<=>(Event_key const&)const=default;
+	std::strong_ordering operator<=>(Event_key const&)const;
+	bool operator==(Event_key const&)const;
 };
 
 bool operator==(Event_key const&,const char *);

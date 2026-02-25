@@ -500,16 +500,44 @@ MAKE_INST(Team_Robot,TBA_TEAM_ROBOT)
 
 MAKE_INST(Team_Simple,TBA_TEAM_SIMPLE)
 
-Event_key::Event_key(std::string s1):s(std::move(s1)){
-	if(s.size()<6) throw std::invalid_argument{"Event_key:"+s};
+Event_key::Event_key(std::string_view s){
+	if(s.size()<6) throw std::invalid_argument{std::string()+"Event_key:"+std::string(s)};
 	//starts with a year then has at least 2 more chars.
 	if(!s.starts_with("202121")){
-		Year{atoi(s.c_str())};
+		Year{atoi(s.data())};
 	}
+	if(s.size()>=buf.size()){
+		TBA_PRINT(s);
+		TBA_PRINT(s.size())
+		TBA_PRINT(buf.size())
+	}
+	assert(s.size()<buf.size());
+	bzero(&buf[0],buf.size());
+	memcpy(&buf[0],s.data(),s.size());
 }
 
-std::string const& Event_key::get()const{
-	return s;
+Event_key::Event_key(const char *s){
+	assert(s);
+	*this=Event_key(std::string_view(s));
+}
+
+std::strong_ordering Event_key::operator<=>(Event_key const& a)const{
+	static_assert(buf.size()==12);
+	auto f=[](auto const& x){ return *(uint64_t*)&x[0]; };
+	auto c=f(buf)<=>f(a.buf);
+	if(c!=std::strong_ordering::equal){
+		return c;
+	}
+	auto g=[](auto const& x){ return *(uint32_t*)&x[8]; };
+	return g(buf)<=>g(a.buf);
+}
+
+bool Event_key::operator==(Event_key const& a)const{
+	return (*this<=>a)==0;
+}
+
+std::string_view Event_key::get()const{
+	return std::string_view(&buf[0]);
 }
 
 bool operator==(Event_key const& a,const char *s){
@@ -522,7 +550,11 @@ std::ostream& operator<<(std::ostream& o,Event_key const& a){
 }
 
 Event_key decode(JSON_value in,const Event_key*){
-	return Event_key{decode(in,(std::string*)nullptr)};
+	//return Event_key{decode(in,(std::string*)nullptr)};
+	if(in.type()!=simdjson::dom::element_type::STRING){
+		throw "expected str";
+	}
+	return Event_key{in.get_string()};
 }
 
 MAKE_INST(District_List,TBA_DISTRICT_LIST)
@@ -915,7 +947,10 @@ MAKE_INST(Match_Score_Breakdown_2015,TBA_MATCH_SCORE_BREAKDOWN_2015)
 		throw std::invalid_argument{STR(NAME)+std::string{":"}+s};\
 	}\
 	std::optional<NAME> maybe_decode(JSON_value in,NAME const*){\
-		auto s=maybe_decode(in,(std::string*)nullptr);\
+		if(in.type()!=simdjson::dom::element_type::STRING){\
+			return std::nullopt;\
+		}\
+		std::string_view s=in.get_string();\
 		OPTIONS(STR_OPT_DEC)\
 		return std::nullopt;\
 	}\

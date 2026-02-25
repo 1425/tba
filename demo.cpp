@@ -359,7 +359,7 @@ Year year(Match_key const& a){
 
 std::optional<Year> year(Event_key const& a){
 	try{
-		return Year(stoi(a.get()));
+		return Year(stoi(string(a.get())));
 	}catch(...){
 		return std::nullopt;
 	}
