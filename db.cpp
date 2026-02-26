@@ -196,7 +196,7 @@ std::optional<std::pair<Date,Data>> Cache::fetch(URL url){
 
 std::pair<Date,Data> Cached_fetcher::fetch(URL url){
 	auto c=cache.fetch(url);
-	if(c) return *c;
+	if(c) return std::move(*c);
 	auto f=fetcher.fetch(url);
 	cache.add(url,f);
 	TBA_PRINT(url);

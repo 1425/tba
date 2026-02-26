@@ -1073,9 +1073,12 @@ std::string type_name(T* x){
 		assert(0); \
 	}\
 	NAME decode(JSON_value in,NAME const* x){\
-		auto s=decode(in,(std::string*)nullptr);\
+		if(in.type()!=simdjson::dom::element_type::STRING){\
+			throw Decode_error(type_name(x),as_string(in),"expected string");\
+		}\
+		std::string_view s=in.get_string();\
 		OPTIONS(STR_OPT_DEC)\
-		throw std::invalid_argument{type_name(x)+std::string{":"}+s};\
+		throw Decode_error{type_name(x),as_string(s),std::string("unrecognized str")};\
 	}\
 	std::optional<NAME> maybe_decode(JSON_value in,NAME const*){\
 		if(in.type()!=simdjson::dom::element_type::STRING){\
@@ -1090,6 +1093,71 @@ std::string type_name(T* x){
 #define NAME Auto_2016
 STR_OPTIONS(TBA_AUTO_2016_TYPES)
 #undef NAME
+
+#define NAME Endgame_2025
+STR_OPTIONS(TBA_ENDGAME_2025)
+#undef NAME
+
+#define NAME Endgame_2024
+STR_OPTIONS(TBA_ENDGAME_2024)
+#undef NAME
+
+#define NAME Bridge_state
+STR_OPTIONS(TBA_BRIDGE_STATE)
+#undef NAME
+
+#define NAME Auto_charge_station
+STR_OPTIONS(TBA_AUTO_CHARGE_STATION)
+#undef NAME
+
+#define NAME End_charge_station
+STR_OPTIONS(TBA_END_CHARGE_STATION)
+#undef NAME
+
+#define NAME Tower
+STR_OPTIONS(TBA_TOWER)
+#undef NAME
+
+#define NAME Touchpad
+STR_OPTIONS(TBA_TOUCHPAD)
+#undef NAME
+
+#define NAME Defense
+//STR_OPTIONS(TBA_DEFENSE)
+NAME decode(JSON_value in,NAME const*){
+	if(in.type()!=simdjson::dom::element_type::STRING){
+		throw Decode_error("Defense",as_string(in),"wrong type");
+	}
+	std::string_view s=in.get_string();
+	TBA_DEFENSE(STR_OPT_DEC)
+	if(s==""){
+		return Defense::NotSpecified;
+	}
+	throw Decode_error("Defense",s,"unrecognized");
+}
+
+std::optional<NAME> maybe_decode(JSON_value in,NAME const*){
+	if(in.type()!=simdjson::dom::element_type::STRING){
+		return std::nullopt;
+	}
+	std::string_view s=in.get_string();
+	TBA_DEFENSE(STR_OPT_DEC)
+	if(s==""){
+		return Defense::NotSpecified;
+	}
+	return std::nullopt;
+}
+
+NAME maybe_decode(std::nullptr_t,NAME const*){
+	return Defense::NotSpecified;
+}
+
+std::ostream& operator<<(std::ostream& o,Defense a){
+	TBA_DEFENSE(STR_OPT_F2)
+	assert(0);
+}
+#undef NAME
+
 
 MAKE_INST(Match_Score_Breakdown_2016_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2016_ALLIANCE)
 
@@ -1380,5 +1448,6 @@ MAKE_INST(Team_data,TBA_TEAM_DATA)
 MAKE_INST(District_data,TBA_DISTRICT_DATA)
 MAKE_INST(Year_data,TBA_YEAR_DATA)
 MAKE_INST(Advancement_status,TBA_ADVANCEMENT_STATUS)
+
 
 }
