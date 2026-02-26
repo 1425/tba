@@ -1,5 +1,6 @@
 #include "data.h"
 #include<set>
+#include<typeinfo>
 #include "util.h"
 #include "simdjson.h"
 
@@ -367,7 +368,7 @@ District_key decode(JSON_value in,const District_key *){
 }
 
 Team_key::Team_key(std::string const& s){
-	assert(s.size()>3);
+	assert(s.size()>=3);
 	assert(s[0]=='f');
 	assert(s[1]=='r');
 	assert(s[2]=='c');
@@ -380,7 +381,7 @@ Team_key::Team_key(std::string const& s){
 }
 
 Team_key::Team_key(std::string_view s){
-	assert(s.size()>3);
+	assert(s.size()>=3);
 	assert(s[0]=='f');
 	assert(s[1]=='r');
 	assert(s[2]=='c');
@@ -776,7 +777,6 @@ Playoff_level decode(JSON_value in,const Playoff_level*){
 	throw Decode_error{"Playoff_level",s,"unrecognized option"};
 }
 
-//MAKE_INST(Match,TBA_MATCH)
 INST_PRINT(Match,TBA_MATCH)
 
 Match_key decode(JSON_value,std::optional<Year> &,Match_key const*);
@@ -1062,15 +1062,20 @@ MAKE_INST(Match_Score_Breakdown_2015,TBA_MATCH_SCORE_BREAKDOWN_2015)
 #define STR_OPT_DEC(A) if(s==""#A) return NAME::A;
 #define STR(A) ""#A
 
+template<typename T>
+std::string type_name(T* x){
+	return typeid(x).name();
+}
+
 #define STR_OPTIONS(OPTIONS)\
 	std::ostream& operator<<(std::ostream& o,NAME a){\
 		OPTIONS(STR_OPT_F2)\
 		assert(0); \
 	}\
-	NAME decode(JSON_value in,NAME const*){\
+	NAME decode(JSON_value in,NAME const* x){\
 		auto s=decode(in,(std::string*)nullptr);\
 		OPTIONS(STR_OPT_DEC)\
-		throw std::invalid_argument{STR(NAME)+std::string{":"}+s};\
+		throw std::invalid_argument{type_name(x)+std::string{":"}+s};\
 	}\
 	std::optional<NAME> maybe_decode(JSON_value in,NAME const*){\
 		if(in.type()!=simdjson::dom::element_type::STRING){\
@@ -1082,9 +1087,8 @@ MAKE_INST(Match_Score_Breakdown_2015,TBA_MATCH_SCORE_BREAKDOWN_2015)
 	}\
 	NO_NULL(NAME)
 
-#define AUTO_2016_TYPES(X) X(Crossed) X(Reached) X(None)
 #define NAME Auto_2016
-STR_OPTIONS(AUTO_2016_TYPES)
+STR_OPTIONS(TBA_AUTO_2016_TYPES)
 #undef NAME
 
 MAKE_INST(Match_Score_Breakdown_2016_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2016_ALLIANCE)
