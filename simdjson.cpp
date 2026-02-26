@@ -3,6 +3,24 @@
 
 namespace tba{
 
+Decode_error::Decode_error(const char *a,const char *b,const char *c):
+	path({std::string(a)}),
+	value(b),
+	description(c)
+{}
+
+Decode_error::Decode_error(const char *a,std::string b,const char *c):
+	path({a}),
+	value(b),
+	description(c)
+{}
+
+Decode_error::Decode_error(const char *a,std::string_view b,const char *c):
+	path({a}),
+	value(b),
+	description(c)
+{}
+
 Decode_error::Decode_error(const char *s,const char *value1,std::string what):
 	path({s}),value(value1),description(what)
 {}
@@ -92,6 +110,28 @@ std::optional<int> maybe_decode(JSON_value a,int const*){
 	}
 }
 
+short decode(JSON_value a,short const*){
+	switch(a.type()){
+		case simdjson::dom::element_type::INT64:{
+			int64_t r=a.get_int64();
+			assert(r>=std::numeric_limits<short>::min());
+			assert(r<=std::numeric_limits<short>::max());
+			return r;
+		}
+		default:
+			TBA_PRINT(a.type())
+			TBA_NYI
+	}
+}
+
+std::optional<short> maybe_decode(JSON_value a,short const* x){
+	return decode(a,x);
+}
+
+std::optional<short> maybe_decode(nullptr_t,short const*){
+	return std::nullopt;
+}
+
 unsigned decode(JSON_value a,unsigned const*){
 	switch(a.type()){
 		case simdjson::dom::element_type::INT64:{
@@ -110,8 +150,7 @@ long decode(JSON_value a,long const*){
 		case simdjson::dom::element_type::INT64:
 			return a.get_int64();
 		default:
-			TBA_PRINT(a.type());
-			TBA_NYI
+			throw Decode_error("long",as_string(a),"expected integer input");
 	}
 }
 

@@ -450,6 +450,32 @@ void test_unicode(Cached_fetcher &f){
 	exit(0);
 }
 
+auto sorted(auto a){
+	std::sort(a.begin(),a.end());
+	return a;
+}
+
+int score_breakdown_test(Cached_fetcher &f){
+	(void)f;
+	std::vector<std::pair<long unsigned,std::string>> v;
+	#define X(TYPE,ITEMS) v.push_back(std::make_pair(sizeof(TYPE),""#TYPE));
+	X(Match_Score_Breakdown_2015_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2015_ALLIANCE)
+	X(Match_Score_Breakdown_2016_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2016_ALLIANCE)
+	X(Match_Score_Breakdown_2017_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2017_ALLIANCE)
+	//X(Match_Score_Breakdown_2018_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2015_ALLIANCE)
+	//X(Match_Score_Breakdown_2019_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2015_ALLIANCE)
+	X(Match_Score_Breakdown_2020_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2020_ALLIANCE)
+	//X(Match_Score_Breakdown_2021_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2015_ALLIANCE)
+	X(Match_Score_Breakdown_2022_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2022_ALLIANCE)
+	X(Match_Score_Breakdown_2023_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2023_ALLIANCE)
+	X(Match_Score_Breakdown_2024_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2024_ALLIANCE)
+	X(Match_Score_Breakdown_2025_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2025_ALLIANCE)
+	X(Match_Score_Breakdown_2026_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2026_ALLIANCE)
+	#undef X
+	print_lines(sorted(v));
+	return 0;
+}
+
 int main1(int argc,char **argv){
 	auto aa=parse_args(argc,argv);
 	std::string tba_key;
@@ -477,6 +503,8 @@ int main1(int argc,char **argv){
 	}
 
 	Cached_fetcher f{Fetcher{Nonempty_string{tba_key}},Cache{}};
+
+	//return score_breakdown_test(f);
 
 	//test_unicode(f);
 	//return demo(f);
@@ -624,7 +652,7 @@ int main1(int argc,char **argv){
 
 	auto add_to_queue=[&](std::function<int(void)> f){
 		q.push(async(f));
-		while(q.size()>1000){
+		while(q.size()>0){
 			q.front().get();
 			q.pop();
 		}

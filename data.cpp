@@ -113,6 +113,15 @@ T decode(std::nullptr_t,const T *x){
 	);
 }
 
+/*
+ * How to do a faster decode (?)
+ * 1) make a list of all the elements and whether or not they can be null
+ * 2) sort them alphabetically
+ * 3) iterate over the items, which appear to always be in alphabetical order
+ * although the parser says it shows them in whatever order they appear in the input
+ * and so that seems to just be an artifact of upstream
+ * */
+
 #define DECODE_B3(A,B) [&](){\
 	if(VAR_##B){ \
 		return *VAR_##B;\
@@ -191,14 +200,16 @@ T decode(std::nullptr_t,const T *x){
 		}\
 	}
 
-
-#define MAKE_INST(NAME,ITEMS)\
+#define INST_PRINT(NAME,ITEMS)\
 	std::ostream& operator<<(std::ostream& o,NAME const& a){\
 		(void)a;\
 		o<<""#NAME<<"(";\
 		ITEMS(PRINT_ITEM)\
 		return o<<")";\
 	}\
+
+#define MAKE_INST(NAME,ITEMS)\
+	INST_PRINT(NAME,ITEMS)\
 	DECODE_B(NAME,ITEMS)\
 	NAME decode(JSON_array,const NAME*){\
 		std::cout<<"hello2\n";\
@@ -285,6 +296,10 @@ Match_key::Match_key(std::string s1):s(std::move(s1)){
 }
 
 std::string const& Match_key::get()const{ return s; }
+
+Year Match_key::year()const{
+	return Year(atoi(s.c_str()));
+}
 
 Match_key decode(JSON_value in,const Match_key*){
 	return Match_key{decode(in,(std::string*)nullptr)};
@@ -675,7 +690,10 @@ std::ostream& operator<<(std::ostream& o,Media_type a){
 }
 
 Media_type decode(JSON_value in,const Media_type*){
-	auto s=decode(in,(std::string*)nullptr);
+	if(in.type()!=simdjson::dom::element_type::STRING){
+		throw Decode_error{"Media_type",as_string(in),"expected string"};
+	}
+	std::string_view s=in.get_string();
 	#define X(A,B) if(s==""#B) return Media_type::A;
 	TBA_MEDIA_TYPES(X)
 	#undef X
@@ -727,7 +745,10 @@ std::ostream& operator<<(std::ostream& o,Winning_alliance a){
 }
 
 Winning_alliance decode(JSON_value in,const Winning_alliance *){
-	auto s=decode(in,(std::string*)nullptr);
+	if(in.type()!=simdjson::dom::element_type::STRING){
+		throw Decode_error{"Winning_alliance",as_string(in.type()),"expected string"};
+	}
+	std::string_view s=in.get_string();
 	if(s=="red") return Winning_alliance::red;
 	if(s=="blue") return Winning_alliance::blue;
 	if(s=="") return Winning_alliance::NONE;
@@ -745,14 +766,114 @@ std::ostream& operator<<(std::ostream& o,Playoff_level a){
 }
 
 Playoff_level decode(JSON_value in,const Playoff_level*){
-	auto s=decode(in,(std::string*)nullptr);
+	if(in.type()!=simdjson::dom::element_type::STRING){
+		throw Decode_error{"Playoff_level",as_string(in.type()),"expected string"};
+	}
+	std::string_view s=in.get_string();
 	#define X(A) if(s==""#A) return Playoff_level::A;
 	PLAYOFF_LEVELS(X)
 	#undef X
 	throw Decode_error{"Playoff_level",s,"unrecognized option"};
 }
 
-MAKE_INST(Match,TBA_MATCH)
+//MAKE_INST(Match,TBA_MATCH)
+INST_PRINT(Match,TBA_MATCH)
+
+Match_key decode(JSON_value,std::optional<Year> &,Match_key const*);
+Match_Score_Breakdown decode(JSON_value,std::optional<Year>&,Match_Score_Breakdown const*);
+
+template<typename T>
+std::optional<T> decode(JSON_value a,std::optional<Year> &year,std::optional<T> const*);
+
+template<typename T>
+T decode(JSON_value a,std::optional<Year> &,T const* x){
+	return decode(a,x);
+}
+
+template<typename T>
+std::optional<T> decode(JSON_value a,std::optional<Year> &year,std::optional<T> const*){
+	if(a.is_null()){
+		return std::nullopt;
+	}
+	try{
+		return decode(a,year,(T*)0);
+	}catch(Decode_error e){
+		e.path|=std::string("t-year");
+		throw e;
+	}
+}
+
+Match_key decode(JSON_value a,std::optional<Year> &year,Match_key const* x){
+	auto r=decode(a,x);
+	assert(!year);
+	year=r.year();
+	return r;
+}
+
+Match_Score_Breakdown decode(JSON_value in,std::optional<Year>& year,Match_Score_Breakdown const*){
+	assert(year);
+
+	switch(year->get()){
+		//case 2014: return decode(in,(Match_Score_Breakdown_2014*)0);
+		#define X(YEAR) case YEAR: return decode(in,(Match_Score_Breakdown_##YEAR*)0);
+		X(2014)
+	   	X(2015)
+		X(2016)
+		X(2017)
+		//X(2018)
+		//X(2019)
+		X(2020)
+		//X(2021)
+		X(2022)
+		X(2023)
+		X(2024)
+		X(2025)
+		X(2026)
+		#undef X
+		case 2018:
+		case 2019:
+		case 2021:
+			return Ignore();
+		default:
+			TBA_PRINT(year);
+			TBA_NYI
+	}
+}
+
+#define DECODE_Y(A,B)\
+	try{\
+		if(k==""#B) VAR_##B=decode(p.value,year,(A*)nullptr);\
+	}catch(Decode_error e){\
+		e.path.push_back(""#B);\
+		throw e;\
+	}\
+
+Match decode(JSON_object in,Match const*){
+	std::optional<Year> year;
+
+	TBA_MATCH(DECODE_B1)
+
+	for(auto p:in){
+		std::string_view k=p.key;
+		try{
+			TBA_MATCH(DECODE_Y)
+		}catch(Decode_error e){
+			e.path.push_back("Match");
+			throw e;
+		}
+	}
+	return Match{TBA_MATCH(DECODE_B3)};
+}
+
+Match decode(JSON_value in,Match const* x){
+	if(in.type()!=simdjson::dom::element_type::OBJECT){
+		throw Decode_error("Match",as_string(in),"expected obj");
+	}
+	return decode(in.get_object(),x);
+}
+
+Match decode(JSON_array,Match const*)TBA_NYI
+Match decode(std::nullptr_t,Match const*)TBA_NYI
 
 MAKE_INST(Match_Simple,TBA_MATCH_SIMPLE)
 
@@ -909,16 +1030,21 @@ std::ostream& operator<<(std::ostream& o,Coopertition a){
 }
 
 Coopertition decode(JSON_value in,const Coopertition*){
-	auto s=decode(in,(std::string*)nullptr);
+	if(in.type()!=simdjson::dom::element_type::STRING){
+		throw Decode_error("Coopertiton",as_string(in),"expected string");
+	}
+	std::string_view s=in.get_string();
 	#define X(A) if(s==""#A) return Coopertition::A;
 	TBA_COOPERTITION_TYPES(X)
 	#undef X
-	throw std::invalid_argument{"Coopertition:"+s};
+	throw Decode_error("Coopertition",s,"unexpected string");
 }
 
 std::optional<Coopertition> maybe_decode(JSON_value in,Coopertition const*){
-	auto s=maybe_decode(in,(std::string*)nullptr);
-	if(!s) return std::nullopt;
+	if(in.type()!=simdjson::dom::element_type::STRING){
+		return std::nullopt;
+	}
+	std::string_view s=in.get_string();
 	#define X(A) if(s==""#A) return Coopertition::A;
 	TBA_COOPERTITION_TYPES(X)
 	#undef X
@@ -1011,7 +1137,12 @@ MAKE_INST(Elimination_Alliance_status,TBA_ELIMINATION_ALLIANCE_STATUS)
 
 MAKE_INST(Elimination_Alliance,TBA_ELIMINATION_ALLIANCE)
 
+
 Ignore decode(JSON_value,Ignore const*){
+	return Ignore();
+}
+
+Ignore decode(JSON_object,Ignore const*){
 	return Ignore();
 }
 
@@ -1167,11 +1298,11 @@ Unknown decode(JSON_value in,const Unknown*){
 }
 
 std::optional<Unknown> maybe_decode(JSON_value in,Unknown const*){
-	auto s=maybe_decode(in,(std::string*)nullptr);
-	if(!s){
+	if(in.type()!=simdjson::dom::element_type::STRING){
 		return std::nullopt;
 	}
-	if(*s!="unknown"){
+	std::string_view s=in.get_string();
+	if(s!="unknown"){
 		return std::nullopt;
 	}
 	return Unknown{};

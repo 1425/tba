@@ -20,9 +20,12 @@ struct Decode_error{
 	std::string value;
 	std::string description;
 
+	Decode_error(const char*,const char*,const char*);
 	Decode_error(const char *,const char *,std::string);
+	Decode_error(const char*,std::string,const char*);
 	Decode_error(const char *,std::string,std::string);
 	Decode_error(std::string,std::string,std::string);
+	Decode_error(const char*,std::string_view,const char*);
 };
 std::ostream& operator<<(std::ostream&,Decode_error const&);
 
@@ -46,6 +49,7 @@ int decode(JSON_value,int const*);
 int decode(JSON_object,int const*);
 
 bool decode(JSON_value,bool const*);
+short decode(JSON_value,short const*);
 unsigned decode(JSON_value,unsigned const*);
 long decode(JSON_value,long const*);
 double decode(JSON_value,double const*);
@@ -61,6 +65,7 @@ std::nullptr_t decode(JSON_value,std::nullptr_t const*);
 std::nullptr_t decode(std::nullptr_t,std::nullptr_t const*);
 
 std::optional<bool> maybe_decode(JSON_value,bool const*);
+std::optional<short> maybe_decode(JSON_value,short const*);
 std::optional<int> maybe_decode(JSON_value,int const*);
 std::optional<unsigned> maybe_decode(JSON_value,unsigned const*);
 std::optional<long> maybe_decode(JSON_value,long const*);
@@ -71,6 +76,7 @@ std::optional<std::nullptr_t> maybe_decode(JSON_value,std::nullptr_t const*);
 std::optional<std::nullptr_t> maybe_decode(std::nullptr_t,std::nullptr_t const*);
 std::optional<int> maybe_decode(std::nullptr_t,int const*);
 std::optional<bool> maybe_decode(std::nullptr_t,bool const*);
+std::optional<short> maybe_decode(std::nullptr_t,short const*);
 
 template<typename T>
 std::optional<std::optional<T>> maybe_decode(JSON_value in,std::optional<T> const*);

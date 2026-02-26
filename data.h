@@ -191,6 +191,22 @@ std::ostream& operator<<(std::ostream&,Event_key const&);
 Event_key decode(JSON_value,Event_key const*);
 std::optional<Event_key> maybe_decode(JSON_value,Event_key const*);
 
+class Match_key{
+	std::string s;
+
+	public:
+	explicit Match_key(std::string);
+	std::string const& get()const;
+	Year year()const;
+
+	auto operator<=>(Match_key const&)const=default;
+};
+
+std::ostream& operator<<(std::ostream&,Match_key const&);
+Match_key decode(JSON_value,Match_key const*);
+Match_key decode2(std::string_view,Match_key const*);
+std::optional<Match_key> maybe_decode(JSON_value,Match_key const*);
+
 #define TBA_EVENT_POINTS(X)\
 	X(Event_key,event_key)\
 	X(bool,district_cmp)\
@@ -532,43 +548,43 @@ TBA_STR_OPTIONS(TBA_AUTO_2016_TYPES)
 	X(int,tba_rpEarned)\*/
 
 #define TBA_MATCH_SCORE_BREAKDOWN_2016_ALLIANCE(X)\
-	X(int,autoPoints)\
-	X(int,teleopPoints)\
-	X(std::optional<int>,breechPoints)\
-	X(int,foulPoints)\
-	X(int,capturePoints)\
-	X(std::optional<int>,adjustPoints)\
-	X(int,totalPoints)\
-	X(Auto_2016,robot1Auto)\
-	X(Auto_2016,robot2Auto)\
-	X(Auto_2016,robot3Auto)\
-	X(int,autoReachPoints)\
-	X(int,autoCrossingPoints)\
-	X(int,autoBouldersLow)\
-	X(int,autoBouldersHigh)\
-	X(int,teleopCrossingPoints)\
-	X(int,teleopBouldersLow)\
-	X(int,teleopBouldersHigh)\
-	X(int,teleopBoulderPoints)\
+	X(short,autoPoints)\
+	X(std::optional<short>,teleopPoints)\
+	X(std::optional<short>,breechPoints)\
+	X(short,foulPoints)\
+	X(short,capturePoints)\
+	X(std::optional<short>,adjustPoints)\
+	X(short,totalPoints)\
+	X(std::optional<Auto_2016>,robot1Auto)\
+	X(std::optional<Auto_2016>,robot2Auto)\
+	X(std::optional<Auto_2016>,robot3Auto)\
+	X(short,autoReachPoints)\
+	X(short,autoCrossingPoints)\
+	X(std::optional<short>,autoBouldersLow)\
+	X(std::optional<short>,autoBouldersHigh)\
+	X(short,teleopCrossingPoints)\
+	X(short,teleopBouldersLow)\
+	X(short,teleopBouldersHigh)\
+	X(short,teleopBoulderPoints)\
 	X(bool,teleopDefensesBreached)\
-	X(int,teleopChallengePoints)\
-	X(int,teleopScalePoints)\
+	X(short,teleopChallengePoints)\
+	X(short,teleopScalePoints)\
 	X(bool,teleopTowerCaptured)\
-	X(std::string,towerFaceA)\
-	X(std::string,towerFaceB)\
-	X(std::string,towerFaceC)\
-	X(int,towerEndStrength)\
-	X(int,techFoulCount)\
-	X(int,foulCount)\
+	X(std::optional<std::string>,towerFaceA)\
+	X(std::optional<std::string>,towerFaceB)\
+	X(std::optional<std::string>,towerFaceC)\
+	X(std::optional<short>,towerEndStrength)\
+	X(std::optional<short>,techFoulCount)\
+	X(std::optional<short>,foulCount)\
 	X(std::string,position2)\
 	X(std::string,position3)\
 	X(std::string,position4)\
 	X(std::string,position5)\
-	X(int,position1crossings)\
-	X(int,position2crossings)\
-	X(int,position3crossings)\
-	X(int,position4crossings)\
-	X(int,position5crossings)\
+	X(short,position1crossings)\
+	X(short,position2crossings)\
+	X(short,position3crossings)\
+	X(short,position4crossings)\
+	X(short,position5crossings)\
 
 TBA_MAKE_INST(Match_Score_Breakdown_2016_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2016_ALLIANCE)
 
@@ -882,7 +898,7 @@ std::optional<Endgame_2022> maybe_decode(JSON_value,Endgame_2022 const*);
 	X(bool,hangarBonusRankingPoint)\
 	X(int,foulCount)\
 	X(int,techFoulCount)\
-	X(int,adjustPoints)\
+	X(std::optional<int>,adjustPoints)\
 	X(int,foulPoints)\
 	X(int,rp)\
 	X(int,totalPoints)
@@ -903,12 +919,12 @@ TBA_MAKE_INST(Ignore,TBA_IGNORE)
 
 #define TBA_MATCH_SCORE_BREAKDOWN_2023_ALLIANCE(X)\
 	X(bool,activationBonusAchieved)\
-	X(int,adjustPoints)\
+	X(std::optional<short>,adjustPoints)\
 	X(std::string,autoBridgeState)\
 	X(std::string,autoChargeStationRobot1)\
 	X(std::string,autoChargeStationRobot2)\
 	X(std::string,autoChargeStationRobot3)\
-	X(bool,autoDocked)\
+	X(std::optional<bool>,autoDocked)\
 	X(Ignore,autoCommunity)\
 	X(int,autoGamePieceCount)\
 	X(int,autoGamePiecePoints)\
@@ -916,29 +932,29 @@ TBA_MAKE_INST(Ignore,TBA_IGNORE)
 	X(std::string,mobilityRobot1)\
 	X(std::string,mobilityRobot2)\
 	X(std::string,mobilityRobot3)\
-	X(int,autoPoints)\
-	X(int,coopGamePieceCount)\
-	X(bool,coopertitionCriteriaMet)\
+	X(short,autoPoints)\
+	X(std::optional<short>,coopGamePieceCount)\
+	X(std::optional<bool>,coopertitionCriteriaMet)\
 	X(std::string,endGameBridgeState)\
-	X(int,endGameChargeStationPoints)\
+	X(std::optional<short>,endGameChargeStationPoints)\
 	X(std::string,endGameChargeStationRobot1)\
 	X(std::string,endGameChargeStationRobot2)\
 	X(std::string,endGameChargeStationRobot3)\
-	X(int,endGameParkPoints)\
+	X(std::optional<short>,endGameParkPoints)\
 	X(std::optional<int>,extraGamePieceCount)\
-	X(int,foulCount)\
-	X(int,foulPoints)\
-	X(int,techFoulCount)\
-	X(int,linkPoints)\
+	X(short,foulCount)\
+	X(short,foulPoints)\
+	X(short,techFoulCount)\
+	X(short,linkPoints)\
 	X(Ignore,links)\
 	X(bool,sustainabilityBonusAchieved)\
 	X(Ignore,teleopCommunity)\
-	X(int,teleopGamePieceCount)\
-	X(int,teleopGamePiecePoints)\
-	X(int,totalChargeStationPoints)\
-	X(int,teleopPoints)\
-	X(int,rp)\
-	X(int,totalPoints)
+	X(short,teleopGamePieceCount)\
+	X(short,teleopGamePiecePoints)\
+	X(std::optional<short>,totalChargeStationPoints)\
+	X(short,teleopPoints)\
+	X(short,rp)\
+	X(short,totalPoints)
 
 TBA_MAKE_INST(Match_Score_Breakdown_2023_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2023_ALLIANCE)
 
@@ -949,7 +965,7 @@ TBA_MAKE_INST(Match_Score_Breakdown_2023_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2023
 TBA_MAKE_INST(Match_Score_Breakdown_2023,TBA_MATCH_SCORE_BREAKDOWN_2023)
 
 #define TBA_MATCH_SCORE_BREAKDOWN_2024_ALLIANCE(X)\
-	X(int,adjustPoints)\
+	X(std::optional<int>,adjustPoints)\
 	X(int,autoAmpNoteCount)\
 	X(int,autoAmpNotePoints)\
 	X(int,autoLeavePoints)\
@@ -960,8 +976,8 @@ TBA_MAKE_INST(Match_Score_Breakdown_2023,TBA_MATCH_SCORE_BREAKDOWN_2023)
 	X(int,autoSpeakerNoteCount)\
 	X(int,autoSpeakerNotePoints)\
 	X(int,autoTotalNotePoints)\
-	X(bool,coopNotePlayed)\
-	X(bool,coopertitionCriteriaMet)\
+	X(std::optional<bool>,coopNotePlayed)\
+	X(std::optional<bool>,coopertitionCriteriaMet)\
 	X(int,endGameHarmonyPoints)\
 	X(int,endGameOnStagePoints)\
 	X(int,endGameParkPoints)\
@@ -971,17 +987,17 @@ TBA_MAKE_INST(Match_Score_Breakdown_2023,TBA_MATCH_SCORE_BREAKDOWN_2023)
 	X(int,endGameSpotLightBonusPoints)\
 	X(int,endGameTotalStagePoints)\
 	X(bool,ensembleBonusAchieved)\
-	X(int,ensembleBonusOnStageRobotsThreshold)\
-	X(int,ensembleBonusStagePointsThreshold)\
+	X(std::optional<int>,ensembleBonusOnStageRobotsThreshold)\
+	X(std::optional<int>,ensembleBonusStagePointsThreshold)\
 	X(int,foulCount)\
 	X(int,foulPoints)\
-	X(bool,g206Penalty)\
-	X(bool,g408Penalty)\
+	X(std::optional<bool>,g206Penalty)\
+	X(std::optional<bool>,g408Penalty)\
 	X(bool,g424Penalty)\
 	X(bool,melodyBonusAchieved)\
-	X(int,melodyBonusThreshold)\
-	X(int,melodyBonusThresholdCoop)\
-	X(int,melodyBonusThresholdNonCoop)\
+	X(std::optional<int>,melodyBonusThreshold)\
+	X(std::optional<int>,melodyBonusThresholdCoop)\
+	X(std::optional<int>,melodyBonusThresholdNonCoop)\
 	X(bool,micCenterStage)\
 	X(bool,micStageLeft)\
 	X(bool,micStageRight)\
@@ -1007,7 +1023,7 @@ TBA_MAKE_INST(Match_Score_Breakdown_2024_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2024
 TBA_MAKE_INST(Match_Score_Breakdown_2024,TBA_MATCH_SCORE_BREAKDOWN_2024)
 
 #define TBA_MATCH_SCORE_BREAKDOWN_2025_ALLIANCE(X)\
-	X(int,adjustPoints)\
+	X(std::optional<int>,adjustPoints)\
 	X(int,algaePoints)\
 	X(bool,autoBonusAchieved)\
 	X(int,autoCoralCount)\
@@ -1019,7 +1035,7 @@ TBA_MAKE_INST(Match_Score_Breakdown_2024,TBA_MATCH_SCORE_BREAKDOWN_2024)
 	X(int,autoPoints)\
 	X(Ignore,autoReef)\
 	X(bool,bargeBonusAchieved)\
-	X(bool,coopertitionCriteriaMet)\
+	X(std::optional<bool>,coopertitionCriteriaMet)\
 	X(bool,coralBonusAchieved)\
 	X(int,endGameBargePoints)\
 	X(std::string,endGameRobot1)\
@@ -1091,11 +1107,12 @@ using Match_Score_Breakdown=std::variant<
 	Match_Score_Breakdown_2017,
 	Match_Score_Breakdown_2014,
 	Match_Score_Breakdown_2016,
-	Match_Score_Breakdown_2015
+	Match_Score_Breakdown_2015,
+	Ignore
 >;
 
 #define TBA_MATCH(X)\
-	X(std::string,key)\
+	X(Match_key,key)\
 	X(Competition_level,comp_level)\
 	X(int,set_number)\
 	X(int,match_number)\
@@ -1114,7 +1131,7 @@ using Match_Score_Breakdown=std::variant<
 TBA_MAKE_INST(Match,TBA_MATCH)
 
 #define TBA_MATCH_SIMPLE(X)\
-	X(std::string,key)\
+	X(Match_key,key)\
 	X(Competition_level,comp_level)\
 	X(int,set_number)\
 	X(int,match_number)\
@@ -1365,21 +1382,6 @@ TBA_MAKE_INST(Tiebreaker,TBA_TIEBREAKER)
 	X(std::map<TBA_SINGLE_ARG(Team_key,Tiebreaker)>,tiebreakers)
 
 TBA_MAKE_INST(Event_District_Points,TBA_EVENT_DISTRICT_POINTS)
-
-class Match_key{
-	std::string s;
-
-	public:
-	explicit Match_key(std::string);
-	std::string const& get()const;
-
-	auto operator<=>(Match_key const&)const=default;
-};
-
-std::ostream& operator<<(std::ostream&,Match_key const&);
-Match_key decode(JSON_value,Match_key const*);
-Match_key decode2(std::string_view,Match_key const*);
-std::optional<Match_key> maybe_decode(JSON_value,Match_key const*);
 
 #define TBA_HIGH_SCORE(X)\
 	X(int,high_score)\
