@@ -98,12 +98,14 @@ std::strong_ordering operator<=>(std::optional<std::nullptr_t> const& a,std::opt
 #define DECODE_B1(A,B) std::optional<A> VAR_##B;
 
 #define DECODE_B2(A,B) \
-	try{\
-		if(k==""#B) VAR_##B=decode(p.value,(A*)nullptr);\
-	}catch(Decode_error e){\
-		e.path.push_back(""#B);\
-		throw e;\
-	}\
+	else if(k==""#B){\
+		try{\
+			VAR_##B=decode(p.value,(A*)nullptr);\
+		}catch(Decode_error e){\
+			e.path.push_back(""#B);\
+			throw e;\
+		}\
+	}
 
 template<typename T>
 T decode(std::nullptr_t,const T *x){
@@ -142,7 +144,7 @@ T decode(std::nullptr_t,const T *x){
 			std::string_view k=p.key;\
 			(void)k;\
 			try{\
-				ITEMS(DECODE_B2)\
+				if(0){} ITEMS(DECODE_B2)\
 			}catch(Decode_error e){\
 				e.path.push_back(""#NAME);\
 				throw e;\

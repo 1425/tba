@@ -26,6 +26,7 @@ Sqlite::operator sqlite3 *()const{ return db; }
 
 std::vector<Row> Sqlite::query(std::string const& s){
 	std::vector<Row> r;
+	r.reserve(1);
 	char *err_msg;
 	int rc=sqlite3_exec(db,s.c_str(),callback2,&r,&err_msg);
 	if(rc!=SQLITE_OK){
@@ -40,10 +41,11 @@ std::vector<Row> Sqlite::query(std::string const& s){
 static int callback2(void *data,int argc,char **argv,char **azColname){
 	std::vector<Row> &r=*(std::vector<Row>*)data;
 	Row row;
+	row.reserve(argc);
 	for(int i=0;i<argc;i++){
 		row.push_back(std::make_pair(azColname[i],argv[i]));
 	}
-	r.push_back(row);
+	r.push_back(std::move(row));
 	return 0;
 }
 

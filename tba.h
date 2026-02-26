@@ -9,7 +9,7 @@ namespace tba{
 
 template<typename Fetch,typename T>
 auto run(Fetch& fetcher,std::string const& url,const T*){
-	auto json=fetcher.fetch(url.c_str()).second;
+	auto const& json=fetcher.fetch(url.c_str()).second;
 	simdjson::dom::parser parser;
 	simdjson::padded_string str(json);
 	auto doc=parser.parse(str);
