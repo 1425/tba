@@ -1146,16 +1146,24 @@ TBA_MAKE_INST(Match_Score_Breakdown_2025_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2025
 
 TBA_MAKE_INST(Match_Score_Breakdown_2025,TBA_MATCH_SCORE_BREAKDOWN_2025)
 
+#define TBA_TOWERROBOT_2026(X)\
+	X(Level1)\
+	X(Level2)\
+	X(Level3)\
+	X(None)
+
+TBA_MAKE_ENUM(TowerRobot_2026,TBA_TOWERROBOT_2026)
+
 #define TBA_MATCH_SCORE_BREAKDOWN_2026_ALLIANCE(X)\
 	X(int,adjustPoints)\
 	X(int,autoTowerPoints)\
-	X(std::string,autoTowerRobot1)\
-	X(std::string,autoTowerRobot2)\
-	X(std::string,autoTowerRobot3)\
+	X(TowerRobot_2026,autoTowerRobot1)\
+	X(TowerRobot_2026,autoTowerRobot2)\
+	X(TowerRobot_2026,autoTowerRobot3)\
 	X(int,endGameTowerPoints)\
-	X(std::string,endGameTowerRobot1)\
-	X(std::string,endGameTowerRobot2)\
-	X(std::string,endGameTowerRobot3)\
+	X(TowerRobot_2026,endGameTowerRobot1)\
+	X(TowerRobot_2026,endGameTowerRobot2)\
+	X(TowerRobot_2026,endGameTowerRobot3)\
 	X(bool,energizedAchieved)\
 	X(int,foulPoints)\
 	X(bool,g206Penalty)\

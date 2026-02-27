@@ -345,7 +345,9 @@ std::string District_key::get()const{
 }
 
 std::strong_ordering District_key::operator<=>(District_key const& a)const{
-	static_assert(buf.size()==8);
+	//This is not understood by clang++ 20.1.8 or g++ 15
+	//so leave it out.
+	//static_assert(buf.size()==8);
 	
 	auto x=*(uint64_t*)&buf[0];
 	auto y=*(uint64_t*)&a.buf[0];
@@ -412,7 +414,8 @@ std::string Team_key::str()const{
 }
 
 std::strong_ordering Team_key::operator<=>(Team_key const& a)const{
-	static_assert(buf.size()==8);
+	//Not allowed by some older compilers, so leave this out.
+	//static_assert(buf.size()==8);
 
 	auto x=*(uint64_t*)(&buf[0]);
 	auto y=*(uint64_t*)(&a.buf[0]);
@@ -540,7 +543,9 @@ Event_key::Event_key(const char *s){
 }
 
 std::strong_ordering Event_key::operator<=>(Event_key const& a)const{
-	static_assert(buf.size()==12);
+	//Not understood by some older compilers, so leave this out.
+	//static_assert(buf.size()==12);
+	
 	auto f=[](auto const& x){ return *(uint64_t*)&x[0]; };
 	auto c=f(buf)<=>f(a.buf);
 	if(c!=std::strong_ordering::equal){
@@ -1122,6 +1127,10 @@ STR_OPTIONS(TBA_TOWER)
 
 #define NAME Touchpad
 STR_OPTIONS(TBA_TOUCHPAD)
+#undef NAME
+
+#define NAME TowerRobot_2026
+STR_OPTIONS(TBA_TOWERROBOT_2026)
 #undef NAME
 
 #define NAME Defense

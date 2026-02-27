@@ -128,7 +128,7 @@ std::optional<short> maybe_decode(JSON_value a,short const* x){
 	return decode(a,x);
 }
 
-std::optional<short> maybe_decode(nullptr_t,short const*){
+std::optional<short> maybe_decode(std::nullptr_t,short const*){
 	return std::nullopt;
 }
 
