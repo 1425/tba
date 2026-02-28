@@ -18,7 +18,9 @@ class Sqlite{
 	public:
 	explicit Sqlite(const char *filename);
 	Sqlite(Sqlite const&)=delete;
+	Sqlite(Sqlite&&);
 	Sqlite& operator=(Sqlite const&)=delete;
+	Sqlite& operator=(Sqlite&&);
 	~Sqlite();
 
 	operator sqlite3 *()const;
@@ -78,6 +80,7 @@ class Cache{
 	explicit Cache(const char *filename);
 
 	void add(URL,std::pair<HTTP_Date,Data>);
+	void update(URL,std::pair<HTTP_Date,Data>);
 	std::optional<std::pair<HTTP_Date,Data>> fetch(URL url);
 };
 

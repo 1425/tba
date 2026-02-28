@@ -110,6 +110,47 @@ Cache::Cache(const char *filename):db(filename),policy(Cache_policy::any()){
 Cache::Cache():Cache("cache.db"){
 }
 
+void Cache::update(URL url,std::pair<Date,Data> p){
+	const char *sql="UPDATE cache SET date=?, body=? WHERE url=?";
+	sqlite3_stmt *stmt;
+
+	{
+		int r=sqlite3_prepare_v2(db,sql,-1,&stmt,NULL);
+		if(r!=SQLITE_OK){
+			std::stringstream ss;
+			ss<<"sqlite3: Failed to prepate statement: "<<sqlite3_errstr(r);
+			throw ss.str();
+		}
+	}
+
+	auto bind=[&](int index,std::string const& s){
+		int r=sqlite3_bind_text(stmt,index,s.c_str(),s.size(),SQLITE_STATIC);
+		if(r!=SQLITE_OK){
+			throw "sqlite3_bind_text";
+		}
+	};
+
+	bind(1,p.first);
+	bind(2,p.second);
+	bind(3,url);
+
+	{
+		int r=sqlite3_step(stmt);
+		if(r!=SQLITE_DONE){
+			std::stringstream ss;
+			ss<<"sqlite3: Execution failed: "<<sqlite3_errstr(r);
+			throw ss.str();
+		}
+	}
+
+	{
+		auto r=sqlite3_finalize(stmt);
+		if(r!=SQLITE_OK){
+			throw "sqlite3_finalize";
+		}
+	}
+}
+
 void Cache::add(URL url,std::pair<Date,Data> p){
 	auto date=p.first;
 	auto body=p.second;
@@ -141,7 +182,7 @@ void Cache::add(URL url,std::pair<Date,Data> p){
 		int r=sqlite3_step(stmt);
 		if (r!=SQLITE_DONE){
 			std::stringstream ss;
-			ss<<"Execution failed: "<<sqlite3_errstr(r);
+			ss<<"sqlite3: Execution failed: "<<sqlite3_errstr(r);
 			throw ss.str();
 		}
 	}
