@@ -1337,13 +1337,13 @@ Award_type decode(JSON_value,const Award_type *);
 std::optional<Award_type> maybe_decode(JSON_value,Award_type const*);
 
 //You can have so many award recipients because of Dean's list.
-//up to 15 known
+//up to 25 known
 
 #define TBA_AWARD(X)\
 	X(std::string,name)\
 	X(Award_type,award_type)\
 	X(Event_key,event_key)\
-	X(vector_fixed<TBA_SINGLE_ARG(Award_Recipient,15)>,recipient_list)\
+	X(vector_fixed<TBA_SINGLE_ARG(Award_Recipient,25)>,recipient_list)\
 	X(Year,year)
 
 TBA_MAKE_INST(Award,TBA_AWARD)
