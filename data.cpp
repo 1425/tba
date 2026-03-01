@@ -674,7 +674,7 @@ std::optional<Date> maybe_decode(JSON_value in,Date const*){
 	auto s=maybe_decode(in,(std::string*)nullptr);
 	if(!s) return std::nullopt;
 
-	std::chrono::year_month_day ymd;
+	std::chrono::year_month_day ymd{};
 	std::istringstream ss(*s);
     
 	ss >> std::chrono::parse("%Y-%m-%d", ymd);
