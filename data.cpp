@@ -372,11 +372,16 @@ District_key decode(JSON_value in,const District_key *){
 }
 
 Team_key::Team_key(std::string const& s){
-	assert(s.size()>=3);
-	assert(s[0]=='f');
-	assert(s[1]=='r');
-	assert(s[2]=='c');
-	assert(s.size()-3<buf.size());
+	auto ok=(
+		s.size()>=3 &&
+		s[0]=='f' &&
+		s[1]=='r' &&
+		s[2]=='c' &&
+		s.size()-3<buf.size()
+	);
+	if(!ok){
+		throw std::invalid_argument("Team_key");
+	}
 
 	//making sure that the string is not just null terminated, but any 
 	//later char is set to 0.
