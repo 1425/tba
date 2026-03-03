@@ -109,7 +109,7 @@ TBA_MAKE_INST(API_Status_App_Version,TBA_API_STATUS_APP_VERSION)
 TBA_MAKE_INST(API_Status,TBA_API_STATUS)
 
 class Team_key{
-	std::array<char,8> buf;
+	alignas(8) std::array<char,8> buf;
 
 	public:
 	explicit Team_key(std::string const&);
@@ -173,7 +173,7 @@ using Team_number=int;
 TBA_MAKE_INST(Team_Simple,TBA_TEAM_SIMPLE)
 
 class District_key{
-	std::array<char,8> buf;
+	alignas(8) std::array<char,8> buf;
 
 	public:
 	explicit District_key(std::string const&);
@@ -201,7 +201,7 @@ using District_abbreviation=std::string;
 TBA_MAKE_INST(District_List,TBA_DISTRICT_LIST)
 
 class Event_key{
-	std::array<char,12> buf;
+	alignas(8) std::array<char,12> buf;
 
 	public:
 	explicit Event_key(std::string_view);
