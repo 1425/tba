@@ -99,8 +99,8 @@ std::optional<Year> maybe_decode(JSON_value,Year const*);
 TBA_MAKE_INST(API_Status_App_Version,TBA_API_STATUS_APP_VERSION)
 
 #define TBA_API_STATUS(X) \
-	X(int,current_season)\
-	X(int,max_season)\
+	X(Year,current_season)\
+	X(Year,max_season)\
 	X(bool,is_datafeed_down)\
 	X(std::vector<std::string>,down_events)\
 	X(API_Status_App_Version,ios)\
@@ -183,6 +183,8 @@ class District_key{
 
 	std::strong_ordering operator<=>(District_key const&)const;
 	bool operator==(District_key const&)const;
+
+	static std::optional<District_key> parse(std::string const&);
 };
 
 std::ostream& operator<<(std::ostream&,District_key const&);

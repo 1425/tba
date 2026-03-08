@@ -340,6 +340,15 @@ District_key::District_key(const char *s){
 	*this=District_key(std::string(s));
 }
 
+std::optional<District_key> District_key::parse(std::string const& s){
+	//obviously not an efficient way to do this.
+	try{
+		return District_key(s);
+	}catch(...){
+		return std::nullopt;
+	}
+}
+
 std::string District_key::get()const{
 	return std::string(&buf[0]);
 }
