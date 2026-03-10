@@ -6,6 +6,13 @@
 
 namespace tba{
 
+template<size_t LEN>
+std::array<char,LEN> take(std::string const& s){
+	std::array<char,LEN> r;
+	std::copy_n(s.begin(),LEN,std::begin(r));
+	return r;
+}
+
 template<typename T>
 std::ostream& operator<<(std::ostream& o,std::set<T> const& a){
 	o<<"{";
@@ -471,6 +478,10 @@ bool Year::valid()const{
 	return i>=1992 && i<2092;
 }
 
+Year rand(Year const*){
+	return Year(1992+::rand()%100);
+}
+
 int Year::get()const{
 	return i;
 }
@@ -662,17 +673,8 @@ std::optional<Playoff_type> maybe_decode(JSON_value in,Playoff_type const*){
 
 MAKE_INST(Event,TBA_EVENT)
 
-template<size_t LEN>
-std::array<char,LEN> take(std::string const& s){
-	std::array<char,LEN> r;
-	std::copy_n(s.begin(),LEN,std::begin(r));
-	return r;
-}
-
-Date decode(JSON_value in,Date const*){
-	auto s=decode(in,(std::string*)nullptr);
-
-	std::chrono::year_month_day ymd;
+Date decode(std::string const& s,Date const*){
+	std::chrono::year_month_day ymd{};
 	std::istringstream ss(s);
     
 	ss >> std::chrono::parse("%Y-%m-%d", ymd);
@@ -682,6 +684,11 @@ Date decode(JSON_value in,Date const*){
 	}
 
 	return ymd;
+}
+
+Date decode(JSON_value in,Date const* x){
+	auto s=decode(in,(std::string*)nullptr);
+	return decode(s,x);
 }
 
 std::optional<Date> maybe_decode(JSON_value in,Date const*){

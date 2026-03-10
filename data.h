@@ -91,6 +91,7 @@ Year operator+(Year,int);
 Year decode(JSON_value,const Year*);
 Year decode(std::string_view,Year const*);
 std::optional<Year> maybe_decode(JSON_value,Year const*);
+Year rand(Year const*);
 
 #define TBA_API_STATUS_APP_VERSION(X)\
 	X(int,min_app_version)\
@@ -332,7 +333,7 @@ std::optional<Playoff_type> maybe_decode(JSON_value,Playoff_type const*);
 
 using Date=std::chrono::year_month_day;
 Date decode(JSON_value,const Date*);
-
+Date decode(std::string const&,Date const*);
 
 #define TBA_EVENT(X)\
 	X(Event_key,key)\
