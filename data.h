@@ -81,6 +81,7 @@ class Year{
 	bool operator==(Year const&)const;
 	bool operator==(int)const;
 	bool operator>=(int)const;
+	bool operator<(int)const;
 };
 
 std::ostream& operator<<(std::ostream& o,Year);

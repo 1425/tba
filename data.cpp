@@ -396,7 +396,7 @@ Team_key::Team_key(std::string const& s){
 		s.size()-3<buf.size()
 	);
 	if(!ok){
-		throw std::invalid_argument("Team_key");
+		throw std::invalid_argument("Team_key: "+s);
 	}
 
 	//making sure that the string is not just null terminated, but any 
@@ -496,6 +496,10 @@ bool Year::operator==(int a)const{
 
 bool Year::operator>=(int a)const{
 	return i>=a;
+}
+
+bool Year::operator<(int a)const{
+	return i<a;
 }
 
 std::ostream& operator<<(std::ostream& o,Year a){
