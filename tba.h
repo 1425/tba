@@ -4,6 +4,7 @@
 #include<string>
 #include "data.h"
 #include "simdjson.h"
+#include "event_insights.h"
 
 namespace tba{
 

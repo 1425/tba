@@ -22,26 +22,15 @@ std::ostream& operator<<(std::ostream& o,std::set<T> const& a){
 	return o<<"}";
 }
 
+#define DECODE_FAIL TBA_DECODE_FAIL
 //obviously, this is the slow way to do this, but should be sufficient to see that the other pieces are working.
-#define DECODE_FAIL(NAME) \
-	std::optional<NAME> maybe_decode(JSON_value in,NAME const*){\
-		try{\
-			return decode(in,(NAME*)nullptr);\
-		}catch(...){\
-			return std::nullopt;\
-		}\
-	}\
-	std::optional<NAME> maybe_decode(std::nullptr_t,NAME const*){\
-		return std::nullopt;\
-	}
-
 DECODE_FAIL(Webcast_type)
 DECODE_FAIL(Event_key)
 DECODE_FAIL(Media_type)
 DECODE_FAIL(unsigned)
 DECODE_FAIL(Pick_order)
 DECODE_FAIL(double)
-DECODE_FAIL(High_score)
+//DECODE_FAIL(High_score)
 DECODE_FAIL(Endgame)
 DECODE_FAIL(Init_line)
 DECODE_FAIL(Target_color)
@@ -72,10 +61,10 @@ NO_NULL(std::string)
 template<typename K,typename V>
 NO_NULL(std::map<TBA_SINGLE_ARG(K,V)>)
 
-NO_NULL(IID)
-NO_NULL(ISS)
-NO_NULL(D8)
-NO_NULL(D6)
+//NO_NULL(IID)
+//NO_NULL(ISS)
+//NO_NULL(D8)
+//NO_NULL(D6)
 
 /*template<typename T>
 std::optional<T> maybe_decode(std::nullptr_t a,T const* x){
@@ -100,28 +89,6 @@ std::strong_ordering operator<=>(std::optional<std::nullptr_t> const& a,std::opt
 }
 
 #define INST(A,B) A B;
-#define PRINT_ITEM(A,B) o<<""#B<<":"<<a.B<<" ";
-
-#define DECODE_B1(A,B) std::optional<A> VAR_##B;
-
-#define DECODE_B2(A,B) \
-	else if(k==""#B){\
-		try{\
-			VAR_##B=decode(p.value,(A*)nullptr);\
-		}catch(Decode_error e){\
-			e.path.push_back(""#B);\
-			throw e;\
-		}\
-	}
-
-template<typename T>
-T decode(std::nullptr_t,const T *x){
-	throw Decode_error(
-		typeid(*x).name(),
-		"null",
-		"wrong type"
-	);
-}
 
 /*
  * How to do a faster decode (?)
@@ -131,110 +98,6 @@ T decode(std::nullptr_t,const T *x){
  * although the parser says it shows them in whatever order they appear in the input
  * and so that seems to just be an artifact of upstream
  * */
-
-#define DECODE_B3(A,B) [&](){\
-	if(VAR_##B){ \
-		return *VAR_##B;\
-	}\
-	try{\
-		return decode(nullptr,(A*)0);\
-	}catch(Decode_error a){\
-		a.path.push_back(""#B);\
-		throw a;\
-	}\
-}(),
-
-#define DECODE_B(NAME,ITEMS) \
-	NAME decode(JSON_object in,const NAME*){\
-		ITEMS(DECODE_B1)\
-		for(auto p:in){\
-			std::string_view k=p.key;\
-			(void)k;\
-			try{\
-				if(0){} ITEMS(DECODE_B2)\
-			}catch(Decode_error e){\
-				e.path.push_back(""#NAME);\
-				throw e;\
-			}\
-		}\
-		return NAME{ITEMS(DECODE_B3)};\
-	}
-
-#define MAYBE_DECODE_NULL(A,B)\
-	if(!VAR_##B){\
-		VAR_##B=maybe_decode(nullptr,(A*)0);\
-		if(!VAR_##B) return std::nullopt;\
-	}
-
-#define MAYBE_DECODE_LAST(A,B) [&](){\
-		assert(VAR_##B);\
-		return *VAR_##B;\
-	}(),
-
-#define MAYBE_DECODE_INNER(A,B) \
-	if(k==""#B){\
-		VAR_##B=maybe_decode(p.value,(A*)nullptr); \
-		if(!VAR_##B) return std::nullopt;\
-		any=1;\
-	}
-
-#define MAYBE_DECODE(NAME,ITEMS)\
-	std::optional<NAME> maybe_decode(JSON_object in,NAME const*){\
-		try{\
-			ITEMS(DECODE_B1)\
-			for(auto p:in){\
-				bool any=0;\
-				std::string_view k=p.key;\
-				(void)k;\
-				ITEMS(MAYBE_DECODE_INNER)\
-				if(!any){\
-				}\
-			}\
-			ITEMS(MAYBE_DECODE_NULL)\
-			return NAME{ITEMS(MAYBE_DECODE_LAST)};\
-		}catch(...){\
-			assert(0);\
-		}\
-	}\
-	std::optional<NAME> maybe_decode(JSON_value in,NAME const* x){\
-		if(in.type()!=simdjson::dom::element_type::OBJECT){\
-			return std::nullopt;\
-		}\
-		return maybe_decode(in.get_object(),x);\
-	}\
-	std::optional<NAME> maybe_decode(std::nullptr_t in,NAME const* x){\
-		try{\
-			return decode(in,x);\
-		}catch(...){\
-			return std::nullopt;\
-		}\
-	}
-
-#define INST_PRINT(NAME,ITEMS)\
-	std::ostream& operator<<(std::ostream& o,NAME const& a){\
-		(void)a;\
-		o<<""#NAME<<"(";\
-		ITEMS(PRINT_ITEM)\
-		return o<<")";\
-	}\
-
-#define MAKE_INST(NAME,ITEMS)\
-	INST_PRINT(NAME,ITEMS)\
-	DECODE_B(NAME,ITEMS)\
-	NAME decode(JSON_array,const NAME*){\
-		std::cout<<"hello2\n";\
-		TBA_NYI\
-	}\
-	NAME decode(JSON_value in,NAME const* x){\
-		if(in.type()!=simdjson::dom::element_type::OBJECT){\
-			throw Decode_error{""#NAME,as_string(in),"expected object"};\
-		}\
-		return decode(in.get_object(),x);\
-	}\
-	NAME decode(std::nullptr_t,NAME const*){\
-		throw Decode_error{""#NAME,"null","exprected object"};\
-	}\
-	MAYBE_DECODE(NAME,ITEMS)
 
 #define DECODE(A,B) [&](){ \
 	if(!in.IsObject()){\
@@ -272,6 +135,8 @@ T decode(std::nullptr_t,const T *x){
 		throw e;\
 	}\
 }(),
+
+#define MAKE_INST TBA_MAKE_IMPL
 
 MAKE_INST(API_Status_App_Version,TBA_API_STATUS_APP_VERSION)
 
@@ -484,7 +349,7 @@ Playoff_level decode(JSON_value in,const Playoff_level*){
 	throw Decode_error{"Playoff_level",s,"unrecognized option"};
 }
 
-INST_PRINT(Match,TBA_MATCH)
+TBA_INST_PRINT(Match,TBA_MATCH)
 
 Match_key decode(JSON_value,std::optional<Year> &,Match_key const*);
 Match_Score_Breakdown decode(JSON_value,std::optional<Year>&,Match_Score_Breakdown const*);
@@ -558,7 +423,7 @@ Match_Score_Breakdown decode(JSON_value in,std::optional<Year>& year,Match_Score
 Match decode(JSON_object in,Match const*){
 	std::optional<Year> year;
 
-	TBA_MATCH(DECODE_B1)
+	TBA_MATCH(TBA_DECODE_B1)
 
 	for(auto p:in){
 		std::string_view k=p.key;
@@ -569,7 +434,7 @@ Match decode(JSON_object in,Match const*){
 			throw e;
 		}
 	}
-	return Match{TBA_MATCH(DECODE_B3)};
+	return Match{TBA_MATCH(TBA_DECODE_B3)};
 }
 
 Match decode(JSON_value in,Match const* x){
@@ -663,67 +528,6 @@ MAKE_INST(Points,TBA_POINTS)
 MAKE_INST(Tiebreaker,TBA_TIEBREAKER)
 
 MAKE_INST(Event_District_Points,TBA_EVENT_DISTRICT_POINTS)
-
-std::ostream& operator<<(std::ostream& o,High_score const& a){
-	o<<"High_score(";
-	TBA_HIGH_SCORE(PRINT_ITEM)
-	return o<<")";
-}
-
-High_score decode(JSON_value in,const High_score*){
-	auto check=[&](bool b){
-		if(b) return;
-		std::ostringstream ss;
-		ss<<"High_score:"<<in;
-		throw std::invalid_argument{ss.str()};
-	};
-	check(in.is_array());
-	auto a=in.get_array();
-	check(a.size()==3);
-	return High_score{
-		decode(a.at(0),(int*)nullptr),
-		decode(a.at(1),(Match_key*)nullptr),
-		decode(a.at(2),(std::string*)nullptr),
-	};
-}
-
-MAKE_INST(Event_Insights_2016_Detail,TBA_EVENT_INSIGHTS_2016_DETAIL)
-
-MAKE_INST(Event_Insights_2016,TBA_EVENT_INSIGHTS_2016)
-
-MAKE_INST(Event_Insights_2017_Detail,TBA_EVENT_INSIGHTS_2017_DETAIL)
-
-MAKE_INST(Event_Insights_2017,TBA_EVENT_INSIGHTS_2017)
-
-MAKE_INST(Event_Insights_2018_Detail,TBA_EVENT_INSIGHTS_2018_DETAIL)
-
-MAKE_INST(Event_Insights_2018,TBA_EVENT_INSIGHTS_2018)
-
-MAKE_INST(Event_Insights_2019_Detail,TBA_EVENT_INSIGHTS_2019_DETAIL)
-
-MAKE_INST(Event_Insights_2019,TBA_EVENT_INSIGHTS_2019)
-
-MAKE_INST(Event_Insights_2020_Detail,TBA_EVENT_INSIGHTS_2020_DETAIL)
-
-MAKE_INST(Event_Insights_2020,TBA_EVENT_INSIGHTS_2020)
-
-MAKE_INST(Event_Insights_2022_Detail,TBA_EVENT_INSIGHTS_2022_DETAIL)
-
-MAKE_INST(Event_Insights_2022,TBA_EVENT_INSIGHTS_2022)
-
-MAKE_INST(Event_Insights_2023_Detail,TBA_EVENT_INSIGHTS_2023_DETAIL)
-
-MAKE_INST(Event_Insights_2023,TBA_EVENT_INSIGHTS_2023)
-
-MAKE_INST(Event_Insights_2024_Detail,TBA_EVENT_INSIGHTS_2024_DETAIL)
-
-MAKE_INST(Event_Insights_2024,TBA_EVENT_INSIGHTS_2024)
-
-MAKE_INST(Event_Insights_2025_Detail,TBA_EVENT_INSIGHTS_2025_DETAIL)
-
-MAKE_INST(Event_Insights_2025,TBA_EVENT_INSIGHTS_2025)
-
-MAKE_INST(Average_rocket_count,TBA_AVERAGE_ROCKET_COUNT)
 
 MAKE_INST(Event_OPRs,TBA_EVENT_OPRS)
 
@@ -1029,7 +833,7 @@ std::optional<Match_Score_Breakdown_2014_Alliance> maybe_decode(
 
 std::ostream& operator<<(std::ostream& o,Match_Score_Breakdown_2014_Alliance const& a){
 	o<<"Match_score_breakdown_2014_alliance(";
-	#define X(A,B,C) PRINT_ITEM(A,B)
+	#define X(A,B,C) TBA_PRINT_ITEM(A,B)
 	TBA_MATCH_SCORE_BREAKDOWN_2014_ALLIANCE(X)
 	#undef X
 	return o<<")";

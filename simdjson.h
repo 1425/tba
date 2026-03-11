@@ -77,6 +77,7 @@ std::optional<std::nullptr_t> maybe_decode(std::nullptr_t,std::nullptr_t const*)
 std::optional<int> maybe_decode(std::nullptr_t,int const*);
 std::optional<bool> maybe_decode(std::nullptr_t,bool const*);
 std::optional<short> maybe_decode(std::nullptr_t,short const*);
+std::optional<double> maybe_decode(std::nullptr_t,double const*);
 
 template<typename T>
 std::optional<std::optional<T>> maybe_decode(JSON_value in,std::optional<T> const*);
@@ -651,6 +652,15 @@ std::optional<std::variant<A,B,C,D,E,F,G,H,I,J>> maybe_decode(JSON_value in,std:
 	X(I)
 	#undef X
 	return maybe_decode(in,(J*)nullptr);
+}
+
+template<typename T>
+T decode(std::nullptr_t,T const* x){
+	throw Decode_error(
+		typeid(*x).name(),
+		"null",
+		"wrong type"
+	);
 }
 
 }
