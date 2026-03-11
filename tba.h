@@ -5,6 +5,7 @@
 #include "data.h"
 #include "simdjson.h"
 #include "event_insights.h"
+#include "match.h"
 
 namespace tba{
 

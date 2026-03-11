@@ -17,6 +17,7 @@ OBJS=\
      simdjson.o\
      year.o\
      event_insights.o\
+     match.o\
 
 demo: $(OBJS)
 	$(CXX) $(CXXFLAGS) $^ $(LIBS) -o $@

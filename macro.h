@@ -152,5 +152,10 @@
 	}\
 	TBA_MAYBE_DECODE(NAME,ITEMS)
 
+#define TBA_NO_NULL(NAME) \
+	std::optional<NAME> maybe_decode(std::nullptr_t,NAME const*){\
+		return std::nullopt;\
+	}\
+
 
 #endif
