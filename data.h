@@ -11,6 +11,10 @@
 #include "vector_fixed.h"
 #include "int_limited.h"
 #include "year.h"
+#include "district_key.h"
+#include "team_key.h"
+#include "event_key.h"
+#include "match_key.h"
 
 #define TBA_SINGLE_ARG(A,B) A,B
 
@@ -80,27 +84,6 @@ TBA_MAKE_INST(API_Status_App_Version,TBA_API_STATUS_APP_VERSION)
 
 TBA_MAKE_INST(API_Status,TBA_API_STATUS)
 
-class Team_key{
-	alignas(8) std::array<char,8> buf;
-
-	public:
-	explicit Team_key(std::string const&);
-	explicit Team_key(std::string_view);
-	explicit Team_key(const char*);
-	explicit Team_key(int);
-
-	std::string str()const;
-
-	//auto operator<=>(Team_key const&)const=default;
-	std::strong_ordering operator<=>(Team_key const&)const;
-	bool operator==(Team_key const&)const;
-};
-
-std::ostream& operator<<(std::ostream&,Team_key const&);
-Team_key decode(JSON_value,Team_key const*);
-Team_key decode2(std::string_view,Team_key const*);
-std::optional<Team_key> maybe_decode(JSON_value,Team_key const*);
-
 #define TBA_TEAM(X)\
 	X(Team_key,key)\
 	X(std::optional<int>,team_number)\
@@ -144,26 +127,6 @@ using Team_number=int;
 
 TBA_MAKE_INST(Team_Simple,TBA_TEAM_SIMPLE)
 
-class District_key{
-	alignas(8) std::array<char,8> buf;
-
-	public:
-	explicit District_key(std::string const&);
-	explicit District_key(const char *);
-
-	std::string get()const;
-
-	std::strong_ordering operator<=>(District_key const&)const;
-	bool operator==(District_key const&)const;
-
-	static std::optional<District_key> parse(std::string const&);
-};
-
-std::ostream& operator<<(std::ostream&,District_key const&);
-bool operator==(District_key const&,std::string const&);
-District_key decode(JSON_value,const District_key*);
-std::optional<District_key> maybe_decode(JSON_value,District_key const*);
-
 using District_abbreviation=std::string;
 
 #define TBA_DISTRICT_LIST(X)\
@@ -173,39 +136,6 @@ using District_abbreviation=std::string;
 	X(Year,year)
 
 TBA_MAKE_INST(District_List,TBA_DISTRICT_LIST)
-
-class Event_key{
-	alignas(8) std::array<char,12> buf;
-
-	public:
-	explicit Event_key(std::string_view);
-	explicit Event_key(const char*);
-	std::string_view get()const;
-
-	std::strong_ordering operator<=>(Event_key const&)const;
-	bool operator==(Event_key const&)const;
-};
-
-bool operator==(Event_key const&,const char *);
-std::ostream& operator<<(std::ostream&,Event_key const&);
-Event_key decode(JSON_value,Event_key const*);
-std::optional<Event_key> maybe_decode(JSON_value,Event_key const*);
-
-class Match_key{
-	std::string s;
-
-	public:
-	explicit Match_key(std::string);
-	std::string const& get()const;
-	Year year()const;
-
-	auto operator<=>(Match_key const&)const=default;
-};
-
-std::ostream& operator<<(std::ostream&,Match_key const&);
-Match_key decode(JSON_value,Match_key const*);
-Match_key decode2(std::string_view,Match_key const*);
-std::optional<Match_key> maybe_decode(JSON_value,Match_key const*);
 
 #define TBA_EVENT_POINTS(X)\
 	X(Event_key,event_key)\
