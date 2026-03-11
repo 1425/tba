@@ -10,6 +10,7 @@
 #include "simdjson.h"
 #include "vector_fixed.h"
 #include "int_limited.h"
+#include "year.h"
 
 #define TBA_SINGLE_ARG(A,B) A,B
 
@@ -62,37 +63,6 @@ using URL=std::string;
 	std::ostream& operator<<(std::ostream&,NAME);
 
 using Page=unsigned;
-
-class Year{
-	//An integer that is between 1992 and 2092.
-	short i;
-
-	bool valid()const;
-
-	public:
-	explicit Year(int);
-	int get()const;
-
-	Year& operator--();
-
-	auto operator<=>(Year const&)const=default;
-	friend Year& operator++(Year&);
-
-	bool operator==(Year const&)const;
-	bool operator==(int)const;
-	bool operator>=(int)const;
-	bool operator<(int)const;
-};
-
-std::ostream& operator<<(std::ostream& o,Year);
-Year& operator++(Year&);
-Year operator++(Year&,int);
-Year operator-(Year,int);
-Year operator+(Year,int);
-Year decode(JSON_value,const Year*);
-Year decode(std::string_view,Year const*);
-std::optional<Year> maybe_decode(JSON_value,Year const*);
-Year rand(Year const*);
 
 #define TBA_API_STATUS_APP_VERSION(X)\
 	X(int,min_app_version)\

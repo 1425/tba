@@ -4,7 +4,16 @@ CXXFLAGS=-std=c++23 -Wall -Wextra -pedantic -Og -g -fdiagnostics-color=always
 
 LIBS=-lcurl -lsqlite3 -lpthread -lsimdjson
 
-demo: demo.o curl.o db.o data.o util.o simdjson.o
+OBJS=\
+     demo.o\
+     curl.o\
+     db.o\
+     data.o\
+     util.o\
+     simdjson.o\
+     year.o\
+
+demo: $(OBJS)
 	$(CXX) $(CXXFLAGS) $^ $(LIBS) -o $@
 
 .PHONY: clean
