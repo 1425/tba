@@ -10,6 +10,14 @@ Year::Year(int i1):i(i1){
 	}
 }
 
+Year& Year::operator=(int x){
+	i=x;
+	if(!valid()){
+		throw std::invalid_argument("year out of range");
+	}
+	return *this;
+}
+
 bool Year::valid()const{
 	return i>=1992 && i<2092;
 }

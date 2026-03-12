@@ -13,6 +13,9 @@ class Year{
 
 	public:
 	explicit Year(int);
+	Year& operator=(Year const&)=default;
+	Year& operator=(int);
+
 	int get()const;
 
 	Year& operator--();

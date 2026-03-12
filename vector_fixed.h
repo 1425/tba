@@ -267,7 +267,7 @@ template<size_t N,typename T>
 auto take(std::vector<T> const& a){
 	vector_fixed<T,N> r;
 	for(size_t i=0;i<N && i<a.size();i++){
-		r|=a;
+		r|=a[i];
 	}
 	return r;
 }

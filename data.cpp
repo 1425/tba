@@ -6,12 +6,12 @@
 
 namespace tba{
 
-template<size_t LEN>
+/*template<size_t LEN>
 std::array<char,LEN> take(std::string const& s){
 	std::array<char,LEN> r;
 	std::copy_n(s.begin(),LEN,std::begin(r));
 	return r;
-}
+}*/
 
 template<typename T>
 std::ostream& operator<<(std::ostream& o,std::set<T> const& a){
