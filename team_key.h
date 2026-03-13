@@ -15,6 +15,7 @@ class Team_key{
 	explicit Team_key(int);
 
 	std::string str()const;
+	uint64_t data()const;
 
 	//auto operator<=>(Team_key const&)const=default;
 	std::strong_ordering operator<=>(Team_key const&)const;
@@ -27,5 +28,10 @@ Team_key decode2(std::string_view,Team_key const*);
 std::optional<Team_key> maybe_decode(JSON_value,Team_key const*);
 
 }
+
+template<>
+struct std::hash<tba::Team_key>{
+	static uint64_t operator()(tba::Team_key);
+};
 
 #endif

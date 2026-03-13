@@ -16,7 +16,7 @@ class Year{
 	Year& operator=(Year const&)=default;
 	Year& operator=(int);
 
-	int get()const;
+	short get()const;
 
 	Year& operator--();
 
@@ -40,5 +40,10 @@ std::optional<Year> maybe_decode(JSON_value,Year const*);
 Year rand(Year const*);
 
 }
+
+template<>
+struct std::hash<tba::Year>{
+	static short operator()(tba::Year);
+};
 
 #endif

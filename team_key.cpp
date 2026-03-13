@@ -49,6 +49,10 @@ std::string Team_key::str()const{
 	//return s;
 }
 
+uint64_t Team_key::data()const{
+	return *(uint64_t*)(&buf[0]);
+}
+
 std::strong_ordering Team_key::operator<=>(Team_key const& a)const{
 	//Not allowed by some older compilers, so leave this out.
 	//static_assert(buf.size()==8);
@@ -79,4 +83,8 @@ Team_key decode2(std::string_view in,Team_key const*){
 	return Team_key{std::string(in)};
 }
 
+}
+
+size_t std::hash<tba::Team_key>::operator()(tba::Team_key a){
+	return a.data();
 }

@@ -26,7 +26,7 @@ Year rand(Year const*){
 	return Year(1992+::rand()%100);
 }
 
-int Year::get()const{
+short Year::get()const{
 	return i;
 }
 
@@ -90,4 +90,8 @@ Year decode(std::string_view a,Year const*){
 	return Year(stoi(std::string(a)));
 }
 
+}
+
+short std::hash<tba::Year>::operator()(tba::Year a){
+	return a.get();
 }
