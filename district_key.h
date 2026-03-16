@@ -13,6 +13,7 @@ class District_key{
 	explicit District_key(const char *);
 
 	std::string get()const;
+	std::string location_part()const;
 
 	std::strong_ordering operator<=>(District_key const&)const;
 	bool operator==(District_key const&)const;

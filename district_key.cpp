@@ -40,6 +40,11 @@ std::string District_key::get()const{
 	return std::string(&buf[0]);
 }
 
+std::string District_key::location_part()const{
+	auto s=get();
+	return s.substr(4,s.size());
+}
+
 std::strong_ordering District_key::operator<=>(District_key const& a)const{
 	//This is not understood by clang++ 20.1.8 or g++ 15
 	//so leave it out.
