@@ -20,6 +20,7 @@ struct High_score{
 std::ostream& operator<<(std::ostream&,High_score const&);
 High_score decode(JSON_value,const High_score*);
 std::optional<High_score> maybe_decode(JSON_value,High_score const*);
+High_score rand(High_score const*);
 
 using D3=std::array<double,3>;
 using I3=std::array<int,3>;

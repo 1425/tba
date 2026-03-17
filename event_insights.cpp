@@ -26,6 +26,10 @@ std::ostream& operator<<(std::ostream& o,High_score const& a){
 	return o<<")";
 }
 
+High_score rand(High_score const*){
+	TBA_NYI
+}
+
 High_score decode(JSON_value in,const High_score*){
 	auto check=[&](bool b){
 		if(b) return;

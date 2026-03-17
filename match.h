@@ -18,7 +18,8 @@ using u8=Int_limited<0,255>;
 	enum class NAME:char{ITEMS(TBA_LIST)};\
 	NAME decode(JSON_value,NAME const*);\
 	std::optional<NAME> maybe_decode(JSON_value,NAME const*);\
-	std::ostream& operator<<(std::ostream&,NAME);
+	std::ostream& operator<<(std::ostream&,NAME);\
+	NAME rand(NAME const*);\
 
 /*
 curiosly, this sometimes appears as just:
@@ -74,6 +75,7 @@ enum class Coopertition:char{
 std::ostream& operator<<(std::ostream&,Coopertition);
 Coopertition decode(JSON_value,const Coopertition*);
 std::optional<Coopertition> maybe_decode(JSON_value,Coopertition const*);
+Coopertition rand(Coopertition const*);
 
 #define TBA_MATCH_SCORE_BREAKDOWN_2015(X)\
 	X(Match_Score_Breakdown_2015_Alliance,blue)\
@@ -90,6 +92,7 @@ TBA_MAKE_INST(Match_Score_Breakdown_2015,TBA_MATCH_SCORE_BREAKDOWN_2015)
 	std::ostream& operator<<(std::ostream&,NAME);\
 	NAME decode(JSON_value,const NAME *);\
 	std::optional<NAME> maybe_decode(JSON_value,NAME const*);\
+	NAME rand(NAME const*);\
 
 #define TBA_AUTO_2016_TYPES(X) X(Crossed) X(Reached) X(None) X(Unknown)
 
@@ -292,6 +295,7 @@ struct Match_Score_Breakdown_2014_Alliance{
 std::ostream& operator<<(std::ostream&,Match_Score_Breakdown_2014_Alliance const&);
 Match_Score_Breakdown_2014_Alliance decode(JSON_value,const Match_Score_Breakdown_2014_Alliance*);
 std::optional<Match_Score_Breakdown_2014_Alliance> maybe_decode(JSON_value,Match_Score_Breakdown_2014_Alliance const*);
+Match_Score_Breakdown_2014_Alliance rand(Match_Score_Breakdown_2014_Alliance const*);
 
 #define TBA_MATCH_SCORE_BREAKDOWN_2014(X)\
 	X(Match_Score_Breakdown_2014_Alliance,blue)\
@@ -312,6 +316,7 @@ enum class Init_line:char{
 std::ostream& operator<<(std::ostream&,Init_line);
 Init_line decode(JSON_value,Init_line const*);
 std::optional<Init_line> maybe_decode(JSON_value,Init_line const*);
+Init_line rand(Init_line const*);
 
 #define TBA_ENDGAME_OPTIONS(X)\
 	X(Park)\
@@ -327,6 +332,7 @@ enum class Endgame:char{
 std::ostream& operator<<(std::ostream&,Endgame);
 Endgame decode(JSON_value,Endgame const*);
 std::optional<Endgame> maybe_decode(JSON_value,Endgame const*);
+Endgame rand(Endgame const*);
 
 #define TBA_TARGET_COLOR_OPTIONS(X)\
 	X(Unknown)\
@@ -344,6 +350,7 @@ enum class Target_color:char{
 std::ostream& operator<<(std::ostream&,Target_color);
 Target_color decode(JSON_value,Target_color const*);
 std::optional<Target_color> maybe_decode(JSON_value,Target_color const*);
+Target_color rand(Target_color const*);
 
 #define TBA_RUNG_LEVEL_OPTIONS(X)\
 	X(NotLevel)\
@@ -358,6 +365,7 @@ enum class Rung_level:char{
 std::ostream& operator<<(std::ostream&,Rung_level);
 Rung_level decode(JSON_value,Rung_level const*);
 std::optional<Rung_level> maybe_decode(JSON_value,Rung_level const*);
+Rung_level rand(Rung_level const*);
 
 #define TBA_MATCH_SCORE_BREAKDOWN_2020_ALLIANCE(X)\
 	X(Init_line,initLineRobot1)\
@@ -420,6 +428,7 @@ enum class Yes_no:char{
 std::ostream& operator<<(std::ostream&,Yes_no);
 Yes_no decode(JSON_value,Yes_no const*);
 std::optional<Yes_no> maybe_decode(JSON_value,Yes_no const*);
+Yes_no rand(Yes_no const*);
 
 #define TBA_ENDGAME_2022_OPTIONS(X)\
 	X(Traversal)\
@@ -437,6 +446,7 @@ enum class Endgame_2022:char{
 std::ostream& operator<<(std::ostream&,Endgame_2022);
 Endgame_2022 decode(JSON_value,Endgame_2022 const*);
 std::optional<Endgame_2022> maybe_decode(JSON_value,Endgame_2022 const*);
+Endgame_2022 rand(Endgame_2022 const*);
 
 #define TBA_MATCH_SCORE_BREAKDOWN_2022_ALLIANCE(X)\
 	X(std::optional<Yes_no>,taxiRobot1)\

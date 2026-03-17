@@ -147,6 +147,7 @@ enum class Webcast_type:char{
 std::ostream& operator<<(std::ostream&,Webcast_type);
 Webcast_type decode(JSON_value,const Webcast_type*);
 std::optional<Webcast_type> maybe_decode(JSON_value,Webcast_type const*);
+Webcast_type rand(Webcast_type const*);
 
 #define TBA_WEBCAST(X)\
 	X(Webcast_type,type)\
@@ -178,6 +179,7 @@ enum class Event_type:char{
 std::ostream& operator<<(std::ostream&,Event_type);
 Event_type decode(JSON_value,const Event_type *);
 std::optional<Event_type> maybe_decode(JSON_value,Event_type const*);
+Event_type rand(Event_type const*);
 
 #define TBA_PLAYOFF_TYPES(X)\
 	X(0,BRACKET_8_TEAM,"Elimination Bracket (8 Alliances)")\
@@ -207,6 +209,8 @@ std::optional<Playoff_type> maybe_decode(JSON_value,Playoff_type const*);
 using Date=std::chrono::year_month_day;
 Date decode(JSON_value,const Date*);
 Date decode(std::string const&,Date const*);
+Playoff_type rand(Playoff_type const*);
+Date rand(Date const*);
 
 #define TBA_EVENT(X)\
 	X(Event_key,key)\
@@ -287,6 +291,7 @@ enum class Media_type:char{
 std::ostream& operator<<(std::ostream&,Media_type);
 Media_type decode(JSON_value,const Media_type*);
 std::optional<Media_type> maybe_decode(JSON_value,Media_type const*);
+Media_type rand(Media_type const*);
 
 #define TBA_MEDIA_DETAILS(X)\
 	X(std::optional<int64_t>,author_id)\
@@ -333,6 +338,7 @@ class M_score{
 std::ostream& operator<<(std::ostream&,M_score const&);
 M_score decode(JSON_value,const M_score*);
 std::optional<M_score> maybe_decode(JSON_value,M_score const*);
+M_score rand(M_score const*);
 
 #define TBA_MATCH_ALLIANCE(X)\
 	X(M_score,score)\
@@ -353,6 +359,7 @@ std::ostream& operator<<(std::ostream&,Winning_alliance);
 
 Winning_alliance decode(JSON_value,const Winning_alliance *);
 std::optional<Winning_alliance> maybe_decode(JSON_value,Winning_alliance const*);
+Winning_alliance rand(Winning_alliance const*);
 
 #define TBA_PLAYOFF_LEVELS(X) X(qm) X(ef) X(qf) X(sf) X(f)
 
@@ -365,6 +372,7 @@ enum class Playoff_level:char{
 std::ostream& operator<<(std::ostream&,Playoff_level);
 Playoff_level decode(JSON_value,const Playoff_level*);
 std::optional<Playoff_level> maybe_decode(JSON_value,Playoff_level const*);
+Playoff_level rand(Playoff_level const*);
 
 using Competition_level=Playoff_level;//this is probably going to have to change.
 
@@ -484,6 +492,7 @@ enum class Award_type:char{
 std::ostream& operator<<(std::ostream&,Award_type);
 Award_type decode(JSON_value,const Award_type *);
 std::optional<Award_type> maybe_decode(JSON_value,Award_type const*);
+Award_type rand(Award_type const*);
 
 //You can have so many award recipients because of Dean's list.
 //up to 25 known
@@ -551,6 +560,7 @@ class Pick_order{
 std::ostream& operator<<(std::ostream&,Pick_order);
 Pick_order decode(JSON_value,const Pick_order *);
 std::optional<Pick_order> maybe_decode(JSON_value,Pick_order const*);
+Pick_order rand(Pick_order const*);
 
 #define TBA_TEAM_EVENT_STATUS_ALLIANCE(X)\
 	X(std::string,name)\
@@ -572,6 +582,7 @@ std::ostream& operator<<(std::ostream&,Playoff_status);
 
 Playoff_status decode(JSON_value,const Playoff_status*);
 std::optional<Playoff_status> maybe_decode(JSON_value,Playoff_status const*);
+Playoff_status rand(Playoff_status const*);
 
 #define TBA_TEAM_EVENT_STATUS_PLAYOFF(X)\
 	X(Playoff_level,level)\
@@ -696,6 +707,7 @@ std::ostream& operator<<(std::ostream&,Alliance_color);
 
 Alliance_color decode(JSON_value,const Alliance_color *);
 std::optional<Alliance_color> maybe_decode(JSON_value,Alliance_color const*);
+Alliance_color rand(Alliance_color const*);
 
 #define TBA_ALLIANCE_PREDICTION(X)\
 	X(std::optional<double>,gears)\

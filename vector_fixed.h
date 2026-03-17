@@ -217,12 +217,13 @@ class set_limited;
 template<typename T,size_t N>
 set_limited<T,N> to_set(vector_fixed<T,N>);*/
 
-#if 0
+#if 1
 template<typename T,size_t N>
 auto rand(vector_fixed<T,N> const*){
 	vector_fixed<T,N> r;
-	for(auto _:range(std::rand()%(N+1))){
-		(void)_;
+	auto size=std::rand()%(N+1);
+	for(size_t i=0;i<size;i++){
+		(void)i;
 		r|=rand((T*)0);
 	}
 	return r;

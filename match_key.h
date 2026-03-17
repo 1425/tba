@@ -20,6 +20,7 @@ std::ostream& operator<<(std::ostream&,Match_key const&);
 Match_key decode(JSON_value,Match_key const*);
 Match_key decode2(std::string_view,Match_key const*);
 std::optional<Match_key> maybe_decode(JSON_value,Match_key const*);
+Match_key rand(Match_key const*);
 
 }
 

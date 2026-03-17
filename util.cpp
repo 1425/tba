@@ -19,4 +19,36 @@ std::ostream& operator<<(std::ostream& o,std::nullptr_t){
 	return o<<"NULL";
 }
 
+double rand(double const*){
+	TBA_NYI
+}
+
+short rand(short const*){
+	return std::rand();
+}
+
+int rand(int const*){
+	return std::rand();
+}
+
+long rand(long const*){
+	return std::rand();
+}
+
+unsigned rand(unsigned const*){
+	TBA_NYI
+}
+
+bool rand(bool const*){
+	return std::rand()%2;
+}
+
+nullptr_t rand(nullptr_t const*){
+	TBA_NYI
+}
+
+std::string rand(std::string const*){
+	TBA_NYI
+}
+
 }

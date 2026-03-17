@@ -22,6 +22,12 @@ std::ostream& operator<<(std::ostream& o,std::set<T> const& a){
 	return o<<"}";
 }
 
+#define ENUM_RAND(NAME,OPTIONS)\
+	NAME rand(NAME const*){\
+		TBA_NYI\
+	}
+
+
 #define DECODE_FAIL TBA_DECODE_FAIL
 //obviously, this is the slow way to do this, but should be sufficient to see that the other pieces are working.
 DECODE_FAIL(Webcast_type)
@@ -128,6 +134,8 @@ std::ostream& operator<<(std::ostream& o,Webcast_type a){
 	assert(0);
 }
 
+ENUM_RAND(Webcast_type,TBA_WEBCAST_TYPES)
+
 Webcast_type decode(JSON_value in,const Webcast_type*){
 	auto s=decode(in,(std::string*)nullptr);
 	#define X(A) if(s==""#A) return Webcast_type::A;
@@ -147,6 +155,8 @@ std::ostream& operator<<(std::ostream& o,Event_type a){
 			assert(0);
 	}
 }
+
+ENUM_RAND(Event_type,TBA_EVENT_TYPES)
 
 Event_type decode(JSON_value in,const Event_type *){
 	auto i=decode(in,(int*)nullptr);
@@ -232,6 +242,8 @@ std::ostream& operator<<(std::ostream& o,Media_type a){
 	assert(0);
 }
 
+ENUM_RAND(Media_type,TBA_MEDIA_TYPES)
+
 Media_type decode(JSON_value in,const Media_type*){
 	if(in.type()!=simdjson::dom::element_type::STRING){
 		throw Decode_error{"Media_type",as_string(in),"expected string"};
@@ -265,6 +277,10 @@ int M_score::value()const{
 std::ostream& operator<<(std::ostream& o,M_score const& a){
 	if(!a.valid()) return o<<"NULL";
 	return o<<a.value();
+}
+
+M_score rand(M_score const*){
+	TBA_NYI
 }
 
 M_score decode(JSON_value in,const M_score*){
@@ -308,6 +324,8 @@ std::ostream& operator<<(std::ostream& o,Playoff_level a){
 	assert(0);
 }
 
+TBA_ENUM_RAND(Playoff_level,PLAYOFF_LEVELS)
+
 Playoff_level decode(JSON_value in,const Playoff_level*){
 	if(in.type()!=simdjson::dom::element_type::STRING){
 		throw Decode_error{"Playoff_level",as_string(in.type()),"expected string"};
@@ -329,6 +347,8 @@ std::ostream& operator<<(std::ostream& o,Award_type a){
 	#undef X
 	assert(0);
 }
+
+ENUM_RAND(Award_type,TBA_AWARD_TYPES)
 
 Award_type decode(JSON_value in,const Award_type *){
 	auto i=decode(in,(int*)nullptr);
@@ -363,6 +383,10 @@ Pick_order::Pick_order(int i1):i(i1){
 }
 
 int Pick_order::get()const{ return i; }
+
+Pick_order rand(Pick_order const*){
+	TBA_NYI
+}
 
 std::ostream& operator<<(std::ostream& o,Pick_order a){
 	return o<<a.get();
@@ -431,6 +455,11 @@ std::ostream& operator<<(std::ostream &o,Alliance_color a){
 	if(a==Alliance_color::BLUE) return o<<"blue";
 	assert(0);
 }
+
+#define TBA_ALLIANCE_COLOR(X)\
+	X(red) X(blue)
+
+ENUM_RAND(Alliance_color,TBA_ALLIANCE_COLOR)
 
 Alliance_color decode(JSON_value in,const Alliance_color*){
 	auto s=decode(in,(std::string*)nullptr);

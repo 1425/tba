@@ -1,4 +1,6 @@
 #include "match_key.h"
+#include "event_key.h"
+#include "util.h"
 
 namespace tba{
 
@@ -45,6 +47,12 @@ Match_key decode2(std::string_view a,Match_key const*){
 
 std::ostream& operator<<(std::ostream& o,Match_key const& a){
 	return o<<a.get();
+}
+
+Match_key rand(Match_key const*){
+	auto e=rand((Event_key*)0);
+	(void)e;
+	TBA_NYI
 }
 
 }

@@ -26,6 +26,7 @@ std::ostream& operator<<(std::ostream&,Team_key const&);
 Team_key decode(JSON_value,Team_key const*);
 Team_key decode2(std::string_view,Team_key const*);
 std::optional<Team_key> maybe_decode(JSON_value,Team_key const*);
+Team_key rand(Team_key const*);
 
 }
 

@@ -151,6 +151,10 @@ std::ostream& operator<<(std::ostream& o,Coopertition a){
 	assert(0);
 }
 
+Coopertition rand(Coopertition const*){
+	TBA_NYI
+}
+
 Coopertition decode(JSON_value in,const Coopertition*){
 	if(in.type()!=simdjson::dom::element_type::STRING){
 		throw Decode_error("Coopertiton",as_string(in),"expected string");
@@ -209,6 +213,10 @@ std::ostream& operator<<(std::ostream& o,Defense a){
 	TBA_DEFENSE(STR_OPT_F2)
 	assert(0);
 }
+
+NAME rand(NAME const*){
+	TBA_NYI
+}
 #undef NAME
 
 #define STR_OPTIONS(OPTIONS)\
@@ -232,7 +240,8 @@ std::ostream& operator<<(std::ostream& o,Defense a){
 		OPTIONS(STR_OPT_DEC)\
 		return std::nullopt;\
 	}\
-	TBA_NO_NULL(NAME)
+	TBA_NO_NULL(NAME)\
+	TBA_ENUM_RAND(NAME,OPTIONS)\
 
 #define AUTO_2017(X) X(Unknown) X(Mobility) X(None)
 #define NAME Auto_2017
@@ -297,6 +306,10 @@ Ignore decode(std::nullptr_t,Ignore const*){
 	return Ignore();
 }
 
+Ignore rand(Ignore const*){
+	return Ignore();
+}
+
 std::optional<Ignore> maybe_decode(std::nullptr_t,Ignore const*){
 	return Ignore();
 }
@@ -322,6 +335,10 @@ Match_Score_Breakdown_2014_Alliance decode(JSON_value in,const Match_Score_Break
 		TBA_MATCH_SCORE_BREAKDOWN_2014_ALLIANCE(X)
 		#undef X
 	};
+}
+
+Match_Score_Breakdown_2014_Alliance rand(Match_Score_Breakdown_2014_Alliance const*){
+	TBA_NYI
 }
 
 std::optional<Match_Score_Breakdown_2014_Alliance> maybe_decode(
@@ -400,6 +417,8 @@ std::ostream& operator<<(std::ostream& o,Init_line a){
 	#undef X
 	assert(0);
 }
+
+TBA_ENUM_RAND(Init_line,TBA_INIT_LINE_OPTIONS)
 
 Init_line decode(JSON_value in,Init_line const*){
 	auto s=decode(in,(std::string*)nullptr);

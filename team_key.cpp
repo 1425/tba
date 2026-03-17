@@ -72,6 +72,10 @@ std::ostream& operator<<(std::ostream& o,Team_key const& a){
 	return o<<a.str();
 }
 
+Team_key rand(Team_key const*){
+	return Team_key(std::rand()%10000);
+}
+
 Team_key decode(JSON_value in,const Team_key*){
 	if(in.type()==simdjson::dom::element_type::STRING){
 		return Team_key{in.get_string()};

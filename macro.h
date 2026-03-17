@@ -1,6 +1,27 @@
 #ifndef MACRO_H
 #define MACRO_H
 
+#include<optional>
+
+namespace tba{
+
+/*bool rand(bool const*);
+double rand(double const*);
+int rand(int const*);
+short rand(short const*);*/
+
+template<typename T>
+std::optional<T> rand(std::optional<T> const*);
+
+}
+/*template<typename K,typename V>
+std::map<K,V> rand(std::map<K,V> const*);
+
+std::string rand(std::string const*);
+
+template<typename T>
+std::vector<T> rand(std::vector<T> const*);*/
+
 #define TBA_INST(A,B) A B;
 
 #define TBA_MAKE_INST(NAME,ITEMS)\
@@ -17,6 +38,7 @@
 	std::optional<NAME> maybe_decode(tba::JSON_object,const NAME*);\
 	std::optional<NAME> maybe_decode(tba::JSON_array,const NAME*);\
 	std::optional<NAME> maybe_decode(std::nullptr_t,NAME const*);\
+	NAME rand(NAME const*);\
 
 #define TBA_SINGLE_ARG(A,B) A,B
 
@@ -133,6 +155,7 @@
 		}\
 	}
 
+#define TBA_RAND_INNER(A,B) tba::rand((A*)0),
 
 #define TBA_MAKE_IMPL(NAME,ITEMS)\
 	TBA_INST_PRINT(NAME,ITEMS)\
@@ -150,12 +173,19 @@
 	NAME decode(std::nullptr_t,NAME const*){\
 		throw Decode_error{""#NAME,"null","exprected object"};\
 	}\
-	TBA_MAYBE_DECODE(NAME,ITEMS)
+	TBA_MAYBE_DECODE(NAME,ITEMS)\
+	NAME rand(NAME const*){\
+		return NAME{ITEMS(TBA_RAND_INNER)};\
+	}
 
 #define TBA_NO_NULL(NAME) \
 	std::optional<NAME> maybe_decode(std::nullptr_t,NAME const*){\
 		return std::nullopt;\
 	}\
 
+#define TBA_ENUM_RAND(NAME,OPTIONS)\
+	NAME rand(NAME const*){\
+		TBA_NYI\
+	}
 
 #endif

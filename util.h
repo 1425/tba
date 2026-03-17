@@ -117,6 +117,48 @@ void print_lines(T t){
 	}
 }
 
+nullptr_t rand(nullptr_t const*);
+bool rand(bool const*);
+short rand(short const*);
+int rand(int const*);
+long rand(long const*);
+unsigned rand(unsigned const*);
+double rand(double const*);
+std::string rand(std::string const*);
+
+template<typename T>
+std::vector<T> rand(std::vector<T> const*){
+	TBA_NYI
+}
+
+template<typename K,typename V>
+std::map<K,V> rand(std::map<K,V> const*){
+	TBA_NYI
+}
+
+template<typename T,size_t N>
+std::array<T,N> rand(std::array<T,N> const*){
+	TBA_NYI
+}
+
+template<typename A,typename B,typename C>
+std::tuple<A,B,C> rand(std::tuple<A,B,C> const*){
+	TBA_NYI
+}
+
+template<typename T>
+std::optional<T> rand(std::optional<T> const*){
+	if(std::rand()%2){
+		return rand((T*)0);
+	}
+	return std::nullopt;
+}
+
+template<typename A,typename B>
+std::variant<A,B> rand(std::variant<A,B> const*){
+	TBA_NYI
+}
+
 }
 
 #endif

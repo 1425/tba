@@ -1,5 +1,6 @@
 #include "district_key.h"
 #include "year.h"
+#include "util.h"
 
 namespace tba{
 
@@ -43,6 +44,10 @@ std::string District_key::get()const{
 std::string District_key::location_part()const{
 	auto s=get();
 	return s.substr(4,s.size());
+}
+
+District_key rand(District_key const*){
+	return District_key(as_string(rand((Year*)0))+rand((std::string*)0));
 }
 
 std::strong_ordering District_key::operator<=>(District_key const& a)const{

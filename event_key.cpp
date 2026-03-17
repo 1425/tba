@@ -46,6 +46,10 @@ std::string_view Event_key::get()const{
 	return std::string_view(&buf[0]);
 }
 
+Event_key rand(Event_key const*){
+	return Event_key(as_string(rand((Year*)0))+rand((std::string*)0));
+}
+
 bool operator==(Event_key const& a,const char *s){
 	if(!s) return 0;
 	return a.get()==s;
