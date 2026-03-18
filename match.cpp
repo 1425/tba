@@ -137,6 +137,7 @@ Match decode(JSON_value in,Match const* x){
 
 Match decode(JSON_array,Match const*)TBA_NYI
 Match decode(std::nullptr_t,Match const*)TBA_NYI
+Match rand(Match const*)TBA_NYI
 
 TBA_INST_PRINT(Match,TBA_MATCH)
 
@@ -442,6 +443,8 @@ Endgame decode(JSON_value in,Endgame const*){
 	#undef X
 	throw Decode_error("Endgame",as_string(in),"unexpected string");
 }
+
+Endgame rand(Endgame const*)TBA_NYI
 
 std::ostream& operator<<(std::ostream& o,Target_color a){
 	#define X(A) if(a==Target_color::A) return o<<""#A;

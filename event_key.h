@@ -20,6 +20,7 @@ class Event_key{
 bool operator==(Event_key const&,const char *);
 std::ostream& operator<<(std::ostream&,Event_key const&);
 Event_key decode(JSON_value,Event_key const*);
+Event_key decode(std::string_view,Event_key const*);
 std::optional<Event_key> maybe_decode(JSON_value,Event_key const*);
 Event_key rand(Event_key const*);
 

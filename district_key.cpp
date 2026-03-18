@@ -47,7 +47,12 @@ std::string District_key::location_part()const{
 }
 
 District_key rand(District_key const*){
-	return District_key(as_string(rand((Year*)0))+rand((std::string*)0));
+	std::stringstream ss;
+	ss<<rand((Year*)0);
+	for(auto _:range(2)){
+		ss<<char('a'+std::rand()%26);
+	}
+	return District_key(ss.str());
 }
 
 std::strong_ordering District_key::operator<=>(District_key const& a)const{
@@ -75,6 +80,10 @@ bool operator==(District_key const& a,std::string const& b){
 
 District_key decode(JSON_value in,const District_key *){
 	return District_key{decode(in,(std::string*)nullptr)};
+}
+
+District_key decode(std::string const& in,District_key const*){
+	return District_key(in);
 }
 
 }

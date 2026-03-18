@@ -205,12 +205,13 @@ std::ostream& operator<<(std::ostream&,Playoff_type);
 
 Playoff_type decode(JSON_value,const Playoff_type*);
 std::optional<Playoff_type> maybe_decode(JSON_value,Playoff_type const*);
+Playoff_type rand(Playoff_type const*);
 
 using Date=std::chrono::year_month_day;
 Date decode(JSON_value,const Date*);
 Date decode(std::string const&,Date const*);
-Playoff_type rand(Playoff_type const*);
 Date rand(Date const*);
+
 
 #define TBA_EVENT(X)\
 	X(Event_key,key)\

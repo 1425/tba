@@ -45,6 +45,10 @@ Match_key decode2(std::string_view a,Match_key const*){
 	return Match_key{std::string(a)};
 }
 
+Match_key decode(std::string const& a,Match_key const*){
+	return Match_key(a);
+}
+
 std::ostream& operator<<(std::ostream& o,Match_key const& a){
 	return o<<a.get();
 }

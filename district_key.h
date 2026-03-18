@@ -24,6 +24,7 @@ class District_key{
 std::ostream& operator<<(std::ostream&,District_key const&);
 bool operator==(District_key const&,std::string const&);
 District_key decode(JSON_value,const District_key*);
+District_key decode(std::string const&,District_key const*);
 std::optional<District_key> maybe_decode(JSON_value,District_key const*);
 District_key rand(District_key const*);
 

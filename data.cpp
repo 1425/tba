@@ -22,12 +22,6 @@ std::ostream& operator<<(std::ostream& o,std::set<T> const& a){
 	return o<<"}";
 }
 
-#define ENUM_RAND(NAME,OPTIONS)\
-	NAME rand(NAME const*){\
-		TBA_NYI\
-	}
-
-
 #define DECODE_FAIL TBA_DECODE_FAIL
 //obviously, this is the slow way to do this, but should be sufficient to see that the other pieces are working.
 DECODE_FAIL(Webcast_type)
@@ -134,7 +128,7 @@ std::ostream& operator<<(std::ostream& o,Webcast_type a){
 	assert(0);
 }
 
-ENUM_RAND(Webcast_type,TBA_WEBCAST_TYPES)
+TBA_ENUM_RAND(Webcast_type,TBA_WEBCAST_TYPES)
 
 Webcast_type decode(JSON_value in,const Webcast_type*){
 	auto s=decode(in,(std::string*)nullptr);
@@ -156,7 +150,19 @@ std::ostream& operator<<(std::ostream& o,Event_type a){
 	}
 }
 
-ENUM_RAND(Event_type,TBA_EVENT_TYPES)
+//TBA_ENUM_RAND(Event_type,TBA_EVENT_TYPES)
+
+auto options(Event_type const*){
+	return std::array{
+		#define X(A,B) Event_type::A,
+		TBA_EVENT_TYPES(X)
+		#undef X
+	};
+}
+
+Event_type rand(Event_type const* x){
+	return choose(options(x));
+}
 
 Event_type decode(JSON_value in,const Event_type *){
 	auto i=decode(in,(int*)nullptr);
@@ -193,6 +199,18 @@ std::optional<Playoff_type> maybe_decode(JSON_value in,Playoff_type const*){
 	TBA_PLAYOFF_TYPES(X)
 	#undef X
 	return std::nullopt;
+}
+
+auto options(Playoff_type const*){
+	return std::array{
+		#define X(A,B,C) Playoff_type::B,
+		TBA_PLAYOFF_TYPES(X)
+		#undef X
+	};
+}
+
+Playoff_type rand(Playoff_type const* x){
+	return choose(options(x));
 }
 
 MAKE_INST(Event,TBA_EVENT)
@@ -232,6 +250,30 @@ std::optional<Date> maybe_decode(JSON_value in,Date const*){
 	return ymd;
 }
 
+/*Date rand(Date const*){
+	TBA_NYI
+}*/
+
+std::chrono::year rand(std::chrono::year const*){
+	return std::chrono::year(std::rand()%3000);
+}
+
+std::chrono::month rand(std::chrono::month const*){
+	return std::chrono::month(1+std::rand()%12);
+}
+
+std::chrono::day rand(std::chrono::day const*){
+	return std::chrono::day(std::rand()%29);
+}
+
+std::chrono::year_month_day rand(std::chrono::year_month_day const*){
+	std::chrono::year_month_day r{
+		rand((std::chrono::year*)0),
+		rand((std::chrono::month*)0),
+		rand((std::chrono::day*)0)
+	};
+	return r;
+}
 
 MAKE_INST(Event_Simple,TBA_EVENT_SIMPLE)
 
@@ -242,7 +284,10 @@ std::ostream& operator<<(std::ostream& o,Media_type a){
 	assert(0);
 }
 
-ENUM_RAND(Media_type,TBA_MEDIA_TYPES)
+//TBA_ENUM_RAND(Media_type,TBA_MEDIA_TYPES)
+Media_type rand(Media_type const*){
+	TBA_NYI
+}
 
 Media_type decode(JSON_value in,const Media_type*){
 	if(in.type()!=simdjson::dom::element_type::STRING){
@@ -348,7 +393,20 @@ std::ostream& operator<<(std::ostream& o,Award_type a){
 	assert(0);
 }
 
-ENUM_RAND(Award_type,TBA_AWARD_TYPES)
+//TBA_ENUM_RAND(Award_type,TBA_AWARD_TYPES)
+
+auto options(Award_type const*){
+	return std::array{
+		#define X(A,B) Award_type::A,
+		TBA_AWARD_TYPES(X)
+		#undef X
+	};
+}
+
+Award_type rand(Award_type const* x){
+	return choose(options(x));
+	TBA_NYI
+}
 
 Award_type decode(JSON_value in,const Award_type *){
 	auto i=decode(in,(int*)nullptr);
@@ -413,6 +471,10 @@ Playoff_status decode(JSON_value in,const Playoff_status*){
 	throw std::invalid_argument{"Playoff_status:"+s};
 }
 
+Playoff_status rand(Playoff_status const*){
+	TBA_NYI
+}
+
 MAKE_INST(Team_Event_Status_playoff,TBA_TEAM_EVENT_STATUS_PLAYOFF)
 
 MAKE_INST(Team_Event_Status,TBA_TEAM_STATUS)
@@ -459,7 +521,11 @@ std::ostream& operator<<(std::ostream &o,Alliance_color a){
 #define TBA_ALLIANCE_COLOR(X)\
 	X(red) X(blue)
 
-ENUM_RAND(Alliance_color,TBA_ALLIANCE_COLOR)
+#define TBA_ALLIANCE_COLOR_NAME(X)\
+	X(RED)\
+	X(BLUE)
+
+TBA_ENUM_RAND(Alliance_color,TBA_ALLIANCE_COLOR_NAME)
 
 Alliance_color decode(JSON_value in,const Alliance_color*){
 	auto s=decode(in,(std::string*)nullptr);
@@ -509,6 +575,5 @@ MAKE_INST(Team_data,TBA_TEAM_DATA)
 MAKE_INST(District_data,TBA_DISTRICT_DATA)
 MAKE_INST(Year_data,TBA_YEAR_DATA)
 MAKE_INST(Advancement_status,TBA_ADVANCEMENT_STATUS)
-
 
 }

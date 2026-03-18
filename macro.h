@@ -155,7 +155,7 @@ std::vector<T> rand(std::vector<T> const*);*/
 		}\
 	}
 
-#define TBA_RAND_INNER(A,B) tba::rand((A*)0),
+#define TBA_RAND_INNER(A,B) rand((A*)0),
 
 #define TBA_MAKE_IMPL(NAME,ITEMS)\
 	TBA_INST_PRINT(NAME,ITEMS)\
@@ -183,9 +183,18 @@ std::vector<T> rand(std::vector<T> const*);*/
 		return std::nullopt;\
 	}\
 
+#define TBA_OPTIONS_INNER(A) A,
+
+#define TBA_OPTIONS(NAME,OPTIONS)\
+	auto options(NAME const*){\
+		using enum NAME;\
+		return std::array{OPTIONS(TBA_OPTIONS_INNER)};\
+	}\
+
 #define TBA_ENUM_RAND(NAME,OPTIONS)\
-	NAME rand(NAME const*){\
-		TBA_NYI\
+	TBA_OPTIONS(NAME,OPTIONS)\
+	NAME rand(NAME const* x){\
+		return choose(options(x));\
 	}
 
 #endif

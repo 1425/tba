@@ -1,5 +1,6 @@
 #include "util.h"
 #include<numeric>
+#include "simdjson.h"
 
 namespace tba{
 
@@ -20,7 +21,7 @@ std::ostream& operator<<(std::ostream& o,std::nullptr_t){
 }
 
 double rand(double const*){
-	TBA_NYI
+	return std::rand();
 }
 
 short rand(short const*){
@@ -48,7 +49,7 @@ nullptr_t rand(nullptr_t const*){
 }
 
 std::string rand(std::string const*){
-	TBA_NYI
+	return "foo"+as_string(std::rand());
 }
 
 }

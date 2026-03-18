@@ -9,9 +9,9 @@
 
 namespace tba{
 
-template<typename Fetch,typename T>
-auto run(Fetch& fetcher,std::string const& url,const T*){
-	auto const& json=fetcher.fetch(url.c_str()).second;
+template<typename T>
+auto postprocess(std::pair<std::string,std::string> const& a,std::string const& url){
+	auto const& json=a.second;
 	simdjson::dom::parser parser;
 	simdjson::padded_string str(json);
 	auto doc=parser.parse(str);
@@ -31,6 +31,12 @@ auto run(Fetch& fetcher,std::string const& url,const T*){
 		std::cout<<json<<"\n";
 		throw;
 	}
+
+}
+
+template<typename Fetch,typename T>
+auto run(Fetch& fetcher,std::string const& url,const T*){
+	return postprocess<T>(fetcher.fetch(url.c_str()),url);
 }
 
 #define TBA_QUERY0(NAME,RETURN_TYPE,URL)\

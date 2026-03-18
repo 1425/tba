@@ -11,9 +11,10 @@ Event_key::Event_key(std::string_view s){
 		Year{atoi(s.data())};
 	}
 	if(s.size()>=buf.size()){
-		TBA_PRINT(s);
+		throw std::invalid_argument("Event_key");
+		/*TBA_PRINT(s);
 		TBA_PRINT(s.size())
-		TBA_PRINT(buf.size())
+		TBA_PRINT(buf.size())*/
 	}
 	assert(s.size()<buf.size());
 	bzero(&buf[0],buf.size());
@@ -47,7 +48,12 @@ std::string_view Event_key::get()const{
 }
 
 Event_key rand(Event_key const*){
-	return Event_key(as_string(rand((Year*)0))+rand((std::string*)0));
+	std::stringstream ss;
+	ss<<rand((Year*)0);
+	for(auto _:range(5)){
+		ss<<char('a'+std::rand()%26);
+	}
+	return Event_key(ss.str());
 }
 
 bool operator==(Event_key const& a,const char *s){
@@ -65,6 +71,10 @@ Event_key decode(JSON_value in,const Event_key*){
 		throw "expected str";
 	}
 	return Event_key{in.get_string()};
+}
+
+Event_key decode(std::string_view s,Event_key const*){
+	return Event_key(s);
 }
 
 }

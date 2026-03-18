@@ -126,9 +126,52 @@ unsigned rand(unsigned const*);
 double rand(double const*);
 std::string rand(std::string const*);
 
+template<
+	typename A,typename B,typename C,typename D,
+	typename E,typename F,typename G
+> auto rand(std::tuple<A,B,C,D,E,F,G> const*){
+	return std::make_tuple(
+		rand((A*)0),
+		rand((B*)0),
+		rand((C*)0),
+		rand((D*)0),
+		rand((E*)0),
+		rand((F*)0),
+		rand((G*)0)
+	);
+}
+
+template<
+	typename A,typename B,typename C,typename D,
+	typename E,typename F,typename G,typename H,
+	typename I
+> auto rand(std::tuple<A,B,C,D,E,F,G,H,I> const*){
+	return std::make_tuple(
+		rand((A*)0),
+		rand((B*)0),
+		rand((C*)0),
+		rand((D*)0),
+		rand((E*)0),
+		rand((F*)0),
+		rand((G*)0),
+		rand((H*)0),
+		rand((I*)0)
+	);
+}
+
+template<typename A,typename B>
+std::pair<A,B> rand(std::pair<A,B> const*){
+	return std::make_pair(rand((A*)0),rand((B*)0));
+}
+
 template<typename T>
 std::vector<T> rand(std::vector<T> const*){
-	TBA_NYI
+	std::vector<T> r;
+	size_t lim=std::rand()%10;
+	for(size_t i=0;i<lim;i++){
+		r|=rand((T*)0);
+	}
+	return r;
 }
 
 template<typename K,typename V>
@@ -157,6 +200,15 @@ std::optional<T> rand(std::optional<T> const*){
 template<typename A,typename B>
 std::variant<A,B> rand(std::variant<A,B> const*){
 	TBA_NYI
+}
+
+template<typename T>
+T choose(std::vector<T> const&);
+
+template<typename T,size_t N>
+T choose(std::array<T,N> const& a){
+	static_assert(N!=0);
+	return a[std::rand()%N];
 }
 
 }
