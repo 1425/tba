@@ -2,6 +2,7 @@
 #define TBA_EVENT_KEY_H
 
 #include "simdjson.h"
+#include "year.h"
 
 namespace tba{
 
@@ -11,7 +12,10 @@ class Event_key{
 	public:
 	explicit Event_key(std::string_view);
 	explicit Event_key(const char*);
+
 	std::string_view get()const;
+	Year year()const;
+	std::string code()const;
 
 	std::strong_ordering operator<=>(Event_key const&)const;
 	bool operator==(Event_key const&)const;

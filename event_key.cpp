@@ -47,6 +47,15 @@ std::string_view Event_key::get()const{
 	return std::string_view(&buf[0]);
 }
 
+Year Event_key::year()const{
+	auto s=std::string(get()).substr(0,4);
+	return Year(stoi(s));
+}
+
+std::string Event_key::code()const{
+	return std::string(get()).substr(4,100);
+}
+
 Event_key rand(Event_key const*){
 	std::stringstream ss;
 	ss<<rand((Year*)0);
