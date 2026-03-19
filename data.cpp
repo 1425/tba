@@ -263,7 +263,8 @@ std::chrono::month rand(std::chrono::month const*){
 }
 
 std::chrono::day rand(std::chrono::day const*){
-	return std::chrono::day(std::rand()%29);
+	//give a day that is always valid for all months
+	return std::chrono::day(1+std::rand()%28);
 }
 
 std::chrono::year_month_day rand(std::chrono::year_month_day const*){
@@ -357,6 +358,10 @@ Winning_alliance decode(JSON_value in,const Winning_alliance *){
 	if(s=="blue") return Winning_alliance::blue;
 	if(s=="") return Winning_alliance::NONE;
 	throw Decode_error{"Winning_alliance",s,"unrecognized option"};
+}
+
+Winning_alliance rand(Winning_alliance const*){
+	TBA_NYI
 }
 
 #define PLAYOFF_LEVELS(X)\
@@ -575,5 +580,49 @@ MAKE_INST(Team_data,TBA_TEAM_DATA)
 MAKE_INST(District_data,TBA_DISTRICT_DATA)
 MAKE_INST(Year_data,TBA_YEAR_DATA)
 MAKE_INST(Advancement_status,TBA_ADVANCEMENT_STATUS)
+
+District_abbreviation::District_abbreviation(std::string a):
+	s(std::move(a))
+{}
+
+std::string const& District_abbreviation::get()const{
+	return s;
+}
+
+District_abbreviation::operator std::string()const{
+	return s;
+}
+
+std::ostream& operator<<(std::ostream& o,District_abbreviation const& a){
+	return o<<a.get();
+}
+
+std::string operator+(std::string const& a,District_abbreviation const& b){
+	return a+b.get();
+}
+
+District_abbreviation decode(std::string const& s,District_abbreviation const*){
+	return s;
+}
+
+District_abbreviation decode(JSON_value in,District_abbreviation const*){
+	return decode(in,(std::string*)0);
+}
+
+std::optional<District_abbreviation> maybe_decode(JSON_value in,District_abbreviation const*){
+	return maybe_decode(in,(std::string*)0);
+}
+
+std::optional<District_abbreviation> maybe_decode(std::nullptr_t,District_abbreviation const*){
+	return std::nullopt;
+}
+
+District_abbreviation rand(District_abbreviation const*){
+	std::stringstream ss;
+	for(auto _:range(2+std::rand()%2)){
+		ss<<char('a'+std::rand()%26);
+	}
+	return ss.str();
+}
 
 }

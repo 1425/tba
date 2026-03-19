@@ -16,8 +16,8 @@ class Team_key{
 
 	std::string str()const;
 	uint64_t data()const;
+	std::string_view raw()const;
 
-	//auto operator<=>(Team_key const&)const=default;
 	std::strong_ordering operator<=>(Team_key const&)const;
 	bool operator==(Team_key const&)const;
 };

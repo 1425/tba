@@ -7,6 +7,10 @@ namespace tba{
 
 class Year{
 	//An integer that is between 1992 and 2092.
+	public:
+	static constexpr short MAX=2091;
+
+	private:
 	short i;
 
 	bool valid()const;

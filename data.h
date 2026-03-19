@@ -99,10 +99,27 @@ using Team_number=int;
 
 TBA_MAKE_INST(Team_Simple,TBA_TEAM_SIMPLE)
 
-using District_abbreviation=std::string;
+class District_abbreviation{
+	std::string s;
+
+	public:
+	District_abbreviation(std::string);
+	std::string const& get()const;
+	operator std::string()const;
+
+	auto operator<=>(District_abbreviation const&)const=default;
+};
+
+std::ostream& operator<<(std::ostream&,District_abbreviation const&);
+std::string operator+(std::string const&,District_abbreviation const&);
+District_abbreviation decode(std::string const&,District_abbreviation const*);
+District_abbreviation decode(JSON_value,District_abbreviation const*);
+std::optional<District_abbreviation> maybe_decode(JSON_value,District_abbreviation const*);
+std::optional<District_abbreviation> maybe_decode(std::nullptr_t,District_abbreviation const*);
+District_abbreviation rand(District_abbreviation const*);
 
 #define TBA_DISTRICT_LIST(X)\
-	X(std::string,abbreviation)\
+	X(District_abbreviation,abbreviation)\
 	X(std::string,display_name)\
 	X(District_key,key)\
 	X(Year,year)
@@ -672,7 +689,7 @@ using M_Elimination_Alliance_status=std::variant<Unknown,Elimination_Alliance_st
 TBA_MAKE_INST(Elimination_Alliance,TBA_ELIMINATION_ALLIANCE)
 
 #define TBA_YEAR_INFO(X)\
-	X(std::string,abbreviation)\
+	X(District_abbreviation,abbreviation)\
 	X(std::string,display_name)\
 	X(District_key,key)\
 	X(Year,year)

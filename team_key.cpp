@@ -53,6 +53,10 @@ uint64_t Team_key::data()const{
 	return *(uint64_t*)(&buf[0]);
 }
 
+std::string_view Team_key::raw()const{
+	return std::string_view{&buf[0]};
+}
+
 std::strong_ordering Team_key::operator<=>(Team_key const& a)const{
 	//Not allowed by some older compilers, so leave this out.
 	//static_assert(buf.size()==8);

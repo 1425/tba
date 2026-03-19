@@ -176,7 +176,12 @@ std::vector<T> rand(std::vector<T> const*){
 
 template<typename K,typename V>
 std::map<K,V> rand(std::map<K,V> const*){
-	TBA_NYI
+	auto keys=rand((std::vector<K>*)0);
+	std::map<K,V> r;
+	for(auto k:keys){
+		r[k]=rand((V*)0);
+	}
+	return r;
 }
 
 template<typename T,size_t N>

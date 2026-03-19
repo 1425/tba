@@ -462,6 +462,10 @@ Target_color decode(JSON_value in,Target_color const*){
 	TBA_NYI
 }
 
+Target_color rand(Target_color const*){
+	TBA_NYI
+}
+
 std::ostream& operator<<(std::ostream& o,Rung_level a){
 	#define X(A) if(a==Rung_level::A) return o<<""#A;
 	TBA_RUNG_LEVEL_OPTIONS(X)
@@ -475,6 +479,10 @@ Rung_level decode(JSON_value in,Rung_level const*){
 	TBA_RUNG_LEVEL_OPTIONS(X)
 	#undef X
 	TBA_PRINT(s);
+	TBA_NYI
+}
+
+Rung_level rand(Rung_level const*){
 	TBA_NYI
 }
 
