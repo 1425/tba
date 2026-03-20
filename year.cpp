@@ -90,6 +90,12 @@ Year decode(std::string_view a,Year const*){
 	return Year(stoi(std::string(a)));
 }
 
+std::string operator+(std::string const& a,Year b){
+	std::stringstream ss;
+	ss<<a<<b;
+	return ss.str();
+}
+
 }
 
 short std::hash<tba::Year>::operator()(tba::Year a){

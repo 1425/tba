@@ -91,6 +91,13 @@ Team_key decode2(std::string_view in,Team_key const*){
 	return Team_key{std::string(in)};
 }
 
+std::string operator+(Team_key const& a,const char *s){
+	assert(s);
+	std::stringstream ss;
+	ss<<a<<s;
+	return ss.str();
+}
+
 }
 
 size_t std::hash<tba::Team_key>::operator()(tba::Team_key a){

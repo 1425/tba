@@ -42,6 +42,7 @@ Year decode(JSON_value,const Year*);
 Year decode(std::string_view,Year const*);
 std::optional<Year> maybe_decode(JSON_value,Year const*);
 Year rand(Year const*);
+std::string operator+(std::string const&,Year);
 
 }
 
