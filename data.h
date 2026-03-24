@@ -117,6 +117,7 @@ District_abbreviation decode(JSON_value,District_abbreviation const*);
 std::optional<District_abbreviation> maybe_decode(JSON_value,District_abbreviation const*);
 std::optional<District_abbreviation> maybe_decode(std::nullptr_t,District_abbreviation const*);
 District_abbreviation rand(District_abbreviation const*);
+bool operator==(std::optional<District_abbreviation> const&,const char*);
 
 #define TBA_DISTRICT_LIST(X)\
 	X(District_abbreviation,abbreviation)\

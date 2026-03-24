@@ -625,4 +625,15 @@ District_abbreviation rand(District_abbreviation const*){
 	return ss.str();
 }
 
+bool operator==(std::optional<District_abbreviation> const& a,const char *b){
+	if(a){
+		if(b){
+			return a->get()==b;
+		}else{
+			return 0;
+		}
+	}
+	return !b;
+}
+
 }
