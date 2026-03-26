@@ -222,96 +222,43 @@ TBA_MAKE_INST(Match_Score_Breakdown_2017_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2017
 
 TBA_MAKE_INST(Match_Score_Breakdown_2017,TBA_MATCH_SCORE_BREAKDOWN_2017)
 
-#define TBA_MATCH_SCORE_BREAKDOWN_2019(X)\
-        X(int,adjustPoints)\
-        X(int,autoPoints)\
-        X(std::string,bay1)\
-        X(std::string,bay2)\
-        X(std::string,bay3)\
-        X(std::string,bay4)\
-        X(std::string,bay5)\
-        X(std::string,bay6)\
-        X(std::string,bay7)\
-        X(std::string,bay8)\
-        X(int,cargoPoints)\
-        X(bool,completeRocketRankingPoint)\
-        X(bool,completedRocketFar)\
-        X(bool,completedRocketNear)\
-        X(std::string,endgameRobot1)\
-        X(std::string,endgameRobot2)\
-        X(std::string,endgameRobot3)\
-        X(int,foulCount)\
-        X(int,foulPoints)\
-        X(int,habClimbPoints)\
-        X(bool,habDockingRankingPoint)\
-        X(std::string,habLineRobot1)\
-        X(std::string,habLineRobot2)\
-        X(std::string,habLineRobot3)\
-        X(int,hatchPanelPoints)\
-        X(std::string,lowLeftRocketFar)\
-        X(std::string,lowLeftRocketNear)\
-        X(std::string,lowRightRocketFar)\
-        X(std::string,lowRightRocketNear)\
-        X(std::string,midLeftRocketFar)\
-        X(std::string,midLeftRocketNear)\
-        X(std::string,midRightRocketFar)\
-        X(std::string,midRightRocketNear)\
-        X(std::string,preMatchBay1)\
-        X(std::string,preMatchBay2)\
-        X(std::string,preMatchBay3)\
-        X(std::string,preMatchBay6)\
-        X(std::string,preMatchBay7)\
-        X(std::string,preMatchBay8)\
-        X(std::string,preMatchLevelRobot1)\
-        X(std::string,preMatchLevelRobot2)\
-        X(std::string,preMatchLevelRobot3)\
-        X(int,rp)\
-        X(int,sandStormBonusPoints)\
-        X(int,techFoulCount)\
-        X(int,teleopPoints)\
-        X(std::string,topLeftRocketFar)\
-        X(std::string,topLeftRocketNear)\
-        X(std::string,topRightRocketFar)\
-        X(std::string,topRightRocketNear)\
-        X(int,totalPoints)
-
 #define TBA_MATCH_SCORE_BREAKDOWN_2018_ALLIANCE(X)\
-	X(int,adjustPoints)\
-	X(int,autoOwnershipPoints)\
-	X(int,autoPoints)\
-	X(bool,autoQuestRankingPoint)\
-	X(std::string,autoRobot1)\
-	X(std::string,autoRobot2)\
-	X(std::string,autoRobot3)\
-	X(int,autoRunPoints)\
-	X(int,autoScaleOwnershipSec)\
-	X(bool,autoSwitchAtZero)\
-	X(int,autoSwitchOwnershipSec)\
-	X(std::string,endgameRobot1)\
-	X(std::string,endgameRobot2)\
-	X(std::string,endgameRobot3)\
-	X(bool,faceTheBossRankingPoint)\
-	X(int,foulCount)\
-	X(int,foulPoints)\
-	X(int,rp)\
-	X(int,techFoulCount)\
-	X(int,teleopOwnershipPoints)\
-	X(int,teleopPoints)\
-	X(int,teleopScaleBoostSec)\
-	X(int,teleopScaleForceSec)\
-	X(int,teleopScaleOwnershipSec)\
-	X(int,teleopSwitchBoostSec)\
-	X(int,teleopSwitchForceSec)\
-	X(int,teleopSwitchOwnershipSec)\
-	X(int,totalPoints)\
-	X(int,vaultBoostPlayed)\
-	X(int,vaultBoostTotal)\
-	X(int,vaultForcePlayed)\
-	X(int,vaultForceTotal)\
-	X(int,vaultLevitatePlayed)\
-	X(int,vaultLevitateTotal)\
-	X(int,vaultPoints)\
-	X(std::string,tba_gameData)
+	X(std::optional<short>,adjustPoints)\
+	X(u8,autoOwnershipPoints)\
+	X(u8,autoPoints)\
+	X(std::optional<bool>,autoQuestRankingPoint)\
+	X(std::optional<std::string>,autoRobot1)\
+	X(std::optional<std::string>,autoRobot2)\
+	X(std::optional<std::string>,autoRobot3)\
+	X(u8,autoRunPoints)\
+	X(u8,autoScaleOwnershipSec)\
+	X(std::optional<bool>,autoSwitchAtZero)\
+	X(u8,autoSwitchOwnershipSec)\
+	X(std::optional<std::string>,endgameRobot1)\
+	X(std::optional<std::string>,endgameRobot2)\
+	X(std::optional<std::string>,endgameRobot3)\
+	X(std::optional<bool>,faceTheBossRankingPoint)\
+	X(std::optional<u8>,foulCount)\
+	X(short,foulPoints)\
+	X(u8,rp)\
+	X(std::optional<u8>,techFoulCount)\
+	X(short,teleopOwnershipPoints)\
+	X(short,teleopPoints)\
+	X(u8,teleopScaleBoostSec)\
+	X(std::optional<u8>,teleopScaleForceSec)\
+	X(short,teleopScaleOwnershipSec)\
+	X(u8,teleopSwitchBoostSec)\
+	X(std::optional<u8>,teleopSwitchForceSec)\
+	X(short,teleopSwitchOwnershipSec)\
+	X(short,totalPoints)\
+	X(u8,vaultBoostPlayed)\
+	X(u8,vaultBoostTotal)\
+	X(u8,vaultForcePlayed)\
+	X(u8,vaultForceTotal)\
+	X(u8,vaultLevitatePlayed)\
+	X(u8,vaultLevitateTotal)\
+	X(u8,vaultPoints)\
+	X(std::optional<std::string>,tba_gameData)
 
 TBA_MAKE_INST(Match_Score_Breakdown_2018_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2018_ALLIANCE)
 
@@ -320,6 +267,69 @@ TBA_MAKE_INST(Match_Score_Breakdown_2018_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2018
 	X(Match_Score_Breakdown_2018_Alliance,blue)
 
 TBA_MAKE_INST(Match_Score_Breakdown_2018,TBA_MATCH_SCORE_BREAKDOWN_2018)
+
+#define TBA_MATCH_SCORE_BREAKDOWN_2019_ALLIANCE(X)\
+	X(std::optional<int>,adjustPoints)\
+	X(std::optional<int>,autoPoints)\
+	X(std::string,bay1)\
+	X(std::string,bay2)\
+	X(std::string,bay3)\
+	X(std::string,bay4)\
+	X(std::string,bay5)\
+	X(std::string,bay6)\
+	X(std::string,bay7)\
+	X(std::string,bay8)\
+	X(int,cargoPoints)\
+	X(bool,completeRocketRankingPoint)\
+	X(std::optional<bool>,completeRocketFar)\
+	X(std::optional<bool>,completeRocketNear)\
+	X(std::string,endgameRobot1)\
+	X(std::string,endgameRobot2)\
+	X(std::string,endgameRobot3)\
+	X(std::optional<int>,foulCount)\
+	X(int,foulPoints)\
+	X(int,habClimbPoints)\
+	X(bool,habDockingRankingPoint)\
+	X(std::string,habLineRobot1)\
+	X(std::string,habLineRobot2)\
+	X(std::string,habLineRobot3)\
+	X(int,hatchPanelPoints)\
+	X(std::string,lowLeftRocketFar)\
+	X(std::string,lowLeftRocketNear)\
+	X(std::string,lowRightRocketFar)\
+	X(std::string,lowRightRocketNear)\
+	X(std::string,midLeftRocketFar)\
+	X(std::string,midLeftRocketNear)\
+	X(std::string,midRightRocketFar)\
+	X(std::string,midRightRocketNear)\
+	X(std::string,preMatchBay1)\
+	X(std::string,preMatchBay2)\
+	X(std::string,preMatchBay3)\
+	X(std::optional<std::string>,preMatchBay4)\
+	X(std::optional<std::string>,preMatchBay5)\
+	X(std::string,preMatchBay6)\
+	X(std::string,preMatchBay7)\
+	X(std::string,preMatchBay8)\
+	X(std::string,preMatchLevelRobot1)\
+	X(std::string,preMatchLevelRobot2)\
+	X(std::string,preMatchLevelRobot3)\
+	X(int,rp)\
+	X(int,sandStormBonusPoints)\
+	X(std::optional<int>,techFoulCount)\
+	X(int,teleopPoints)\
+	X(std::string,topLeftRocketFar)\
+	X(std::string,topLeftRocketNear)\
+	X(std::string,topRightRocketFar)\
+	X(std::string,topRightRocketNear)\
+	X(int,totalPoints)
+
+TBA_MAKE_INST(Match_Score_Breakdown_2019_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2019_ALLIANCE)
+
+#define TBA_MATCH_SCORE_BREAKDOWN_2019(X)\
+	X(Match_Score_Breakdown_2019_Alliance,red)\
+	X(Match_Score_Breakdown_2019_Alliance,blue)
+
+TBA_MAKE_INST(Match_Score_Breakdown_2019,TBA_MATCH_SCORE_BREAKDOWN_2019)
 
 #define TBA_MATCH_SCORE_BREAKDOWN_2014_ALLIANCE(X)\
 	X(short,assist,assist)\
@@ -437,13 +447,13 @@ Rung_level rand(Rung_level const*);
 	X(u8,teleopPoints)\
 	X(bool,shieldOperationalRankingPoint)\
 	X(bool,shieldEnergizedRankingPoint)\
-	X(bool,tba_shieldEnergizedRankingPointFromFoul)\
-	X(u8,tba_numRobotsHanging)\
+	X(std::optional<bool>,tba_shieldEnergizedRankingPointFromFoul)\
+	X(std::optional<u8>,tba_numRobotsHanging)\
 	X(u8,foulCount)\
 	X(u8,techFoulCount)\
-	X(short,adjustPoints)\
+	X(std::optional<short>,adjustPoints)\
 	X(u8,foulPoints)\
-	X(u8,rp)\
+	X(std::optional<u8>,rp)\
 	X(short,totalPoints)
 
 struct Match_Score_Breakdown_2020_Alliance{
@@ -736,27 +746,27 @@ TBA_MAKE_INST(Match_Score_Breakdown_2025,TBA_MATCH_SCORE_BREAKDOWN_2025)
 TBA_MAKE_ENUM(TowerRobot_2026,TBA_TOWERROBOT_2026)
 
 #define TBA_MATCH_SCORE_BREAKDOWN_2026_ALLIANCE(X)\
-	X(int,adjustPoints)\
-	X(int,autoTowerPoints)\
+	X(short,adjustPoints)\
+	X(u8,autoTowerPoints)\
 	X(TowerRobot_2026,autoTowerRobot1)\
 	X(TowerRobot_2026,autoTowerRobot2)\
 	X(TowerRobot_2026,autoTowerRobot3)\
-	X(int,endGameTowerPoints)\
+	X(u8,endGameTowerPoints)\
 	X(TowerRobot_2026,endGameTowerRobot1)\
 	X(TowerRobot_2026,endGameTowerRobot2)\
 	X(TowerRobot_2026,endGameTowerRobot3)\
 	X(bool,energizedAchieved)\
-	X(int,foulPoints)\
+	X(short,foulPoints)\
 	X(bool,g206Penalty)\
 	X(Ignore,hubScore)\
-	X(int,majorFoulCount)\
-	X(int,minorFoulCount)\
-	X(int,rp)\
+	X(u8,majorFoulCount)\
+	X(u8,minorFoulCount)\
+	X(u8,rp)\
 	X(bool,superchargedAchieved)\
-	X(int,totalAutoPoints)\
-	X(int,totalPoints)\
-	X(int,totalTeleopPoints)\
-	X(int,totalTowerPoints)\
+	X(short,totalAutoPoints)\
+	X(short,totalPoints)\
+	X(short,totalTeleopPoints)\
+	X(u8,totalTowerPoints)\
 	X(bool,traversalAchieved)
 
 TBA_MAKE_INST(Match_Score_Breakdown_2026_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2026_ALLIANCE)
@@ -774,6 +784,8 @@ using Match_Score_Breakdown=std::variant<
 	Match_Score_Breakdown_2023,
 	Match_Score_Breakdown_2022,
 	Match_Score_Breakdown_2020,
+	Match_Score_Breakdown_2019,
+	Match_Score_Breakdown_2018,
 	Match_Score_Breakdown_2017,
 	Match_Score_Breakdown_2014,
 	Match_Score_Breakdown_2016,

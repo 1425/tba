@@ -52,8 +52,8 @@ Match_Score_Breakdown decode(JSON_value in,std::optional<Year>& year,Match_Score
 	   	X(2015)
 		X(2016)
 		X(2017)
-		//X(2018)
-		//X(2019)
+		X(2018)
+		X(2019)
 		X(2020)
 		//X(2021)
 		X(2022)
@@ -62,10 +62,10 @@ Match_Score_Breakdown decode(JSON_value in,std::optional<Year>& year,Match_Score
 		X(2025)
 		X(2026)
 		#undef X
-		case 2018:
-		case 2019:
 		case 2021:
-			return Ignore();
+			return decode(in,(Match_Score_Breakdown_2020*)0);
+			//return Ignore();
+			//TBA_PRINT(in);
 		default:
 			TBA_PRINT(year);
 			TBA_NYI
@@ -493,6 +493,14 @@ MAKE_INST(Match_Score_Breakdown_2016,TBA_MATCH_SCORE_BREAKDOWN_2016)
 MAKE_INST(Match_Score_Breakdown_2017_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2017_ALLIANCE)
 
 MAKE_INST(Match_Score_Breakdown_2017,TBA_MATCH_SCORE_BREAKDOWN_2017)
+
+MAKE_INST(Match_Score_Breakdown_2018_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2018_ALLIANCE)
+
+MAKE_INST(Match_Score_Breakdown_2018,TBA_MATCH_SCORE_BREAKDOWN_2018)
+
+MAKE_INST(Match_Score_Breakdown_2019_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2019_ALLIANCE)
+
+MAKE_INST(Match_Score_Breakdown_2019,TBA_MATCH_SCORE_BREAKDOWN_2019)
 
 MAKE_INST(Match_Score_Breakdown_2020_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2020_ALLIANCE)
 

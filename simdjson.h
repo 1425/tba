@@ -78,6 +78,7 @@ std::optional<int> maybe_decode(std::nullptr_t,int const*);
 std::optional<bool> maybe_decode(std::nullptr_t,bool const*);
 std::optional<short> maybe_decode(std::nullptr_t,short const*);
 std::optional<double> maybe_decode(std::nullptr_t,double const*);
+std::optional<std::string> maybe_decode(std::nullptr_t,std::string const*);
 
 template<typename T>
 std::optional<std::optional<T>> maybe_decode(JSON_value in,std::optional<T> const*);
@@ -316,16 +317,27 @@ template<
 	typename I,typename J,typename K
 >
 std::variant<A,B,C,D,E,F,G,H,I,J,K> decode(JSON_object in,std::variant<A,B,C,D,E,F,G,H,I,J,K> const*){
-	/*#define X(NAME) try{\
-		return decode(in,(NAME*)nullptr);\
-	}catch(...){\
-	}*/
 	#define X TBA_DECODE_VARIANT
 	X(A) X(B) X(C) X(D)
 	X(E) X(F) X(G) X(H)
 	X(I) X(J)
 	#undef X
 	return decode(in,(K*)nullptr);
+}
+
+template<
+	typename A,typename B,typename C,typename D,
+	typename E,typename F,typename G,typename H,
+	typename I,typename J,typename K,typename L,
+	typename M
+>
+std::variant<A,B,C,D,E,F,G,H,I,J,K,L,M> decode(JSON_object in,std::variant<A,B,C,D,E,F,G,H,I,J,K,L,M> const*){
+	#define X TBA_DECODE_VARIANT
+	X(A) X(B) X(C) X(D)
+	X(E) X(F) X(G) X(H)
+	X(I) X(J) X(K) X(L)
+	#undef X
+	return decode(in,(M*)nullptr);
 }
 
 /*template<typename ...Ts>
