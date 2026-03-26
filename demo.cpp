@@ -513,9 +513,10 @@ int main1(int argc,char **argv){
 	//TBA_PRINT(s);
 
 	for(auto name:{"ca","pnw","fma","mar"}){
-		auto d=dcmp_history(f,name);
-		auto d1=history(f,name);
-		auto d2=insights(f,name);
+		District_abbreviation da(name);
+		auto d=dcmp_history(f,da);
+		auto d1=history(f,da);
+		auto d2=insights(f,da);
 		//print_r(d2);
 	}
 	for(District_key k:vector{District_key("2025pnw")}){

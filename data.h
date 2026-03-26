@@ -100,6 +100,7 @@ using Team_number=int;
 TBA_MAKE_INST(Team_Simple,TBA_TEAM_SIMPLE)
 
 class District_abbreviation{
+	//could make this more efficient because its always 2-3 chars.
 	std::string s;
 
 	public:

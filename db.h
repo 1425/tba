@@ -42,10 +42,28 @@ class Nonempty_string{
 
 std::string operator+(const char*,Nonempty_string const&);
 
+using ETag=std::string;
+
+#define FETCH_RESULT(X)\
+	X(std::optional<HTTP_Date>,date)\
+	X(std::optional<ETag>,etag)\
+	X(std::optional<std::string>,cache_control)\
+	X(std::string,data)
+
+struct Fetch_result{
+	#define X(A,B) A B;
+	FETCH_RESULT(X)
+	#undef X
+
+	auto operator<=>(Fetch_result const&)const=default;
+};
+
+std::ostream& operator<<(std::ostream&,Fetch_result const&);
+
 struct Fetcher{
 	Nonempty_string auth_key;
 
-	std::pair<HTTP_Date,Data> fetch(URL);
+	Fetch_result fetch(URL,std::optional<ETag>)const;
 };
 
 class Cache_policy{
@@ -80,7 +98,9 @@ class Cache{
 	explicit Cache(const char *filename);
 
 	void add(URL,std::pair<HTTP_Date,Data>);
+	void add(URL,Fetch_result);
 	void update(URL,std::pair<HTTP_Date,Data>);
+	void update(URL,Fetch_result);
 	std::optional<std::pair<HTTP_Date,Data>> fetch(URL url);
 };
 

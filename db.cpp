@@ -7,6 +7,14 @@
 
 namespace tba{
 
+std::ostream& operator<<(std::ostream& o,Fetch_result const& a){
+	o<<"Fetche_results( ";
+	#define X(A,B) o<<""#B<<":"<<a.B<<" ";
+	FETCH_RESULT(X)
+	#undef X
+	return o<<")";
+}
+
 static int callback2(void *data,int arg,char **argv,char **azColname);
 
 Sqlite::Sqlite(const char *filename){
@@ -51,27 +59,53 @@ static int callback2(void *data,int argc,char **argv,char **azColname){
 
 using Date=std::string;
 
-std::pair<Date,Data> Fetcher::fetch(URL url){
+Fetch_result Fetcher::fetch(URL url,std::optional<ETag> etag_in)const{
 	auto g=tba::get_url(
 		url,
-		{"X-TBA-Auth-Key: "+auth_key}
+		[&](){
+			std::vector<std::string> r;
+			r|={"X-TBA-Auth-Key: "+auth_key};
+			if(etag_in){
+				r|="ETag: "+*etag_in;
+			}
+			return r;
+		}()
 	);
 
-	{
-		auto f=std::find_if(g.headers.begin(),g.headers.end(),[](auto const& p){ return p.first=="Last-Modified"; });
+	auto get_header=[&](std::string name)->std::optional<std::string>{
+		auto f=std::find_if(g.headers.begin(),g.headers.end(),[=](auto const& p){ return p.first==name; });
 		if(f!=g.headers.end()){
-			return make_pair(f->second,g.data);
+			return f->second;
 		}
-	}
+		return std::nullopt;
+	};
 
-	{
+	auto date=[&]()->std::optional<std::string>{
 		auto f2=std::find_if(g.headers.begin(),g.headers.end(),[](auto const& p){ return p.first=="Date" || p.first=="date"; });
 		if(f2!=g.headers.end()){
-			return make_pair(f2->second,g.data);
+			return f2->second;
 		}
-	}
+		return std::nullopt;
+	}();
 
-	{
+	auto etag_out=[&]()->std::optional<std::string>{
+		auto f=std::find_if(g.headers.begin(),g.headers.end(),[](auto const& p){ return p.first=="ETag"; });
+		if(f!=g.headers.end()){
+			return f->second;
+		}
+		return std::nullopt;
+	}();
+
+	assert(date);
+
+	return Fetch_result(
+		date,
+		etag_out,
+		get_header("Cache-Control"),
+		g.data
+	);
+
+	/*{
 		std::ostringstream ss;
 		ss<<"fetching:"<<url<<"\n";
 		//ss<<"got:"<<g.headers<<"\n";
@@ -79,9 +113,7 @@ std::pair<Date,Data> Fetcher::fetch(URL url){
 		for(auto elem:g.headers) ss<<elem<<"\n";
 		ss<<"Error: Did not find Last-Modified header";
 		throw std::runtime_error{ss.str()};
-	}
-
-
+	}*/
 }
 
 Cache_policy::Cache_policy(Type type1):type_(type1){}
@@ -105,9 +137,41 @@ Cache_policy Cache_policy::none(){ return Cache_policy{Type::NONE}; }
 
 Cache::Cache(const char *filename):db(filename),policy(Cache_policy::any()){
 	db.query("CREATE TABLE IF NOT EXISTS cache (url STRING UNIQUE NOT NULL,date INT NOT NULL,body VARCHAR NOT NULL);");
+
+	db.query(
+		"CREATE TABLE IF NOT EXISTS cache2 ("
+		       	//could make this enforce uniqueness, but want to be able to keep track of how data changes
+			//so queries will have to ask for the most recent.
+			"url TEXT NOT NULL,"
+
+			//because sqlite does not include a real date/time type
+			//this will be UNIX time, in relative to GMT.
+			"date INTEGER NOT NULL,"
+
+			//supposedly included in all the queries, so hopefully the non-null is ok.
+			"etag TEXT NOT NULL,"
+
+			"cache_control TEXT NOT NULL,"
+
+			"body TEXT NOT NULL"
+		") STRICT;" //strict not used originally because it didn't exist yet.
+	);
 }
 
 Cache::Cache():Cache("cache.db"){
+}
+
+void Cache::update(URL url,Fetch_result a){
+	assert(a.date);
+	
+	//const char* sql = "INSERT INTO cache (url, date, etag, body) VALUES (?, ?, ?)";
+	
+	//const char *sql="UPDATE cache2 SET date=?, body=?, WHERE url=?";
+	//nyi
+
+
+
+	update(url,std::pair<Date,Data>(*a.date,a.data));
 }
 
 void Cache::update(URL url,std::pair<Date,Data> p){
@@ -195,6 +259,17 @@ void Cache::add(URL url,std::pair<Date,Data> p){
 	}
 }
 
+void Cache::add(URL url,Fetch_result fr){
+	if(!fr.date){
+		TBA_PRINT(fr);
+	}
+	assert(fr.date);
+	return add(
+		url,
+		make_pair(*fr.date,fr.data)
+	);
+}
+
 struct Mutex_lock{
 	std::mutex &mutex;
 
@@ -240,10 +315,11 @@ std::optional<std::pair<Date,Data>> Cache::fetch(URL url){
 std::pair<Date,Data> Cached_fetcher::fetch(URL url){
 	auto c=cache.fetch(url);
 	if(c) return std::move(*c);
-	auto f=fetcher.fetch(url);
+	auto f=fetcher.fetch(url,std::nullopt);
 	cache.add(url,f);
 	TBA_PRINT(url);
-	return f;
+	assert(f.date);
+	return make_pair(*f.date,f.data);
 }
 
 Nonempty_string::Nonempty_string(std::string s1):s(std::move(s1)){}
