@@ -275,8 +275,51 @@ TBA_MAKE_INST(Match_Score_Breakdown_2017,TBA_MATCH_SCORE_BREAKDOWN_2017)
         X(std::string,topRightRocketNear)\
         X(int,totalPoints)
 
+#define TBA_MATCH_SCORE_BREAKDOWN_2018_ALLIANCE(X)\
+	X(int,adjustPoints)\
+	X(int,autoOwnershipPoints)\
+	X(int,autoPoints)\
+	X(bool,autoQuestRankingPoint)\
+	X(std::string,autoRobot1)\
+	X(std::string,autoRobot2)\
+	X(std::string,autoRobot3)\
+	X(int,autoRunPoints)\
+	X(int,autoScaleOwnershipSec)\
+	X(bool,autoSwitchAtZero)\
+	X(int,autoSwitchOwnershipSec)\
+	X(std::string,endgameRobot1)\
+	X(std::string,endgameRobot2)\
+	X(std::string,endgameRobot3)\
+	X(bool,faceTheBossRankingPoint)\
+	X(int,foulCount)\
+	X(int,foulPoints)\
+	X(int,rp)\
+	X(int,techFoulCount)\
+	X(int,teleopOwnershipPoints)\
+	X(int,teleopPoints)\
+	X(int,teleopScaleBoostSec)\
+	X(int,teleopScaleForceSec)\
+	X(int,teleopScaleOwnershipSec)\
+	X(int,teleopSwitchBoostSec)\
+	X(int,teleopSwitchForceSec)\
+	X(int,teleopSwitchOwnershipSec)\
+	X(int,totalPoints)\
+	X(int,vaultBoostPlayed)\
+	X(int,vaultBoostTotal)\
+	X(int,vaultForcePlayed)\
+	X(int,vaultForceTotal)\
+	X(int,vaultLevitatePlayed)\
+	X(int,vaultLevitateTotal)\
+	X(int,vaultPoints)\
+	X(std::string,tba_gameData)
 
-//TBA_MAKE_INST(Match_Score_Breakdown_2018,TBA_MATCH_SCORE_BREAKDOWN_2018)
+TBA_MAKE_INST(Match_Score_Breakdown_2018_Alliance,TBA_MATCH_SCORE_BREAKDOWN_2018_ALLIANCE)
+
+#define TBA_MATCH_SCORE_BREAKDOWN_2018(X)\
+	X(Match_Score_Breakdown_2018_Alliance,red)\
+	X(Match_Score_Breakdown_2018_Alliance,blue)
+
+TBA_MAKE_INST(Match_Score_Breakdown_2018,TBA_MATCH_SCORE_BREAKDOWN_2018)
 
 #define TBA_MATCH_SCORE_BREAKDOWN_2014_ALLIANCE(X)\
 	X(short,assist,assist)\
