@@ -5,7 +5,6 @@
 #include<optional>
 #include<map>
 #include<variant>
-#include<array>
 #include<chrono>
 #include "simdjson.h"
 #include "vector_fixed.h"
@@ -18,23 +17,6 @@
 #include "macro.h"
 
 namespace tba{
-
-template<long long MIN,long long MAX>
-auto decode(JSON_value in,Int_limited<MIN,MAX> const*){
-	return Int_limited<MIN,MAX>(decode(in,(int*)0));
-}
-
-template<long long MIN,long long MAX>
-auto maybe_decode(JSON_value in,Int_limited<MIN,MAX> const*){
-	return Int_limited<MIN,MAX>(decode(in,(int*)0));
-}
-
-template<long long MIN,long long MAX>
-std::optional<Int_limited<MIN,MAX>> maybe_decode(std::nullptr_t,Int_limited<MIN,MAX> const*){
-	return std::nullopt;
-}
-
-std::strong_ordering operator<=>(std::optional<std::nullptr_t> const&,std::optional<std::nullptr_t> const&);
 
 using URL=std::string;
 
@@ -312,6 +294,8 @@ std::ostream& operator<<(std::ostream&,Media_type);
 Media_type decode(JSON_value,const Media_type*);
 std::optional<Media_type> maybe_decode(JSON_value,Media_type const*);
 Media_type rand(Media_type const*);
+
+std::strong_ordering operator<=>(std::optional<std::nullptr_t> const& a,std::optional<std::nullptr_t> const& b);
 
 #define TBA_MEDIA_DETAILS(X)\
 	X(std::optional<int64_t>,author_id)\

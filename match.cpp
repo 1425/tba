@@ -3,6 +3,21 @@
 
 namespace tba{
 
+template<long long MIN,long long MAX>
+auto decode(JSON_value in,Int_limited<MIN,MAX> const*){
+	return Int_limited<MIN,MAX>(decode(in,(int*)0));
+}
+
+template<long long MIN,long long MAX>
+auto maybe_decode(JSON_value in,Int_limited<MIN,MAX> const*){
+	return Int_limited<MIN,MAX>(decode(in,(int*)0));
+}
+
+template<long long MIN,long long MAX>
+std::optional<Int_limited<MIN,MAX>> maybe_decode(std::nullptr_t,Int_limited<MIN,MAX> const*){
+	return std::nullopt;
+}
+
 template<typename T>
 std::string type_name(T* x){
 	return typeid(x).name();
