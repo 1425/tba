@@ -20,6 +20,7 @@ class Team_key{
 
 	std::strong_ordering operator<=>(Team_key const&)const;
 	bool operator==(Team_key const&)const;
+	bool operator==(const char*)const;
 };
 
 std::ostream& operator<<(std::ostream&,Team_key const&);

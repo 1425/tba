@@ -71,6 +71,13 @@ bool Team_key::operator==(Team_key const& a)const{
 	return (*this<=>a)==std::strong_ordering::equal;
 }
 
+bool Team_key::operator==(const char *s)const{
+	if(!s){
+		return 0;
+	}
+	return s==str();
+}
+
 std::ostream& operator<<(std::ostream& o,Team_key const& a){
 	//return o<<"Team_key("<<a.str()<<")";
 	return o<<a.str();
