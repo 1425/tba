@@ -118,7 +118,7 @@ void print_lines(T t){
 	}
 }
 
-nullptr_t rand(nullptr_t const*);
+std::nullptr_t rand(std::nullptr_t const*);
 bool rand(bool const*);
 short rand(short const*);
 int rand(int const*);
