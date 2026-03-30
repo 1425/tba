@@ -44,7 +44,7 @@ bool rand(bool const*){
 	return std::rand()%2;
 }
 
-nullptr_t rand(nullptr_t const*){
+std::nullptr_t rand(std::nullptr_t const*){
 	TBA_NYI
 }
 
